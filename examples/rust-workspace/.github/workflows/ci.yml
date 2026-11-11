@@ -1,0 +1,37 @@
+# Every push and pull request: the whole Rust gate (lint, tests with the
+# coverage floors, cache pruning on main) as one Linux job, from the
+# practices repository. The same scripts run in the git hooks and the
+# Claude Code hook, so CI confirms what passed locally.
+name: CI
+
+on:
+  push:
+    # Dependabot's branches are tested as pull requests: not twice.
+    branches-ignore: ["dependabot/**"]
+    # Docs alone don't need a build (a private repository pays per minute).
+    paths-ignore: ["**.md", "docs/**"]
+  pull_request:
+    paths-ignore: ["**.md", "docs/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One run per branch: a new push cancels the one still going.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust:
+    permissions:
+      contents: read
+      # Deleting the caches a newer one replaced (main only).
+      actions: write
+    uses: dorhawk-software/practices/.github/workflows/rust-ci.yml@v1
+    with:
+      # Your own runner, once there is one: '["self-hosted", "linux"]'.
+      runs-on: '"ubuntu-24.04"'
+    secrets:
+      # The patterns of dev/private-terms; without it, CI says it skipped.
+      private-terms: ${{ secrets.PRIVATE_TERMS }}

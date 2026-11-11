@@ -11,3 +11,8 @@ show exactly what changed to make them work for any project.
 | rust/templates/Cargo-lints.toml | Cargo.toml's [workspace.lints] |
 | rust/templates/dependabot.yml | .github/dependabot.yml |
 | rust/templates/claude-settings.json | .claude/settings.json |
+
+Then renamed to the kit's names (scripts/lint.sh → scripts/lint, and so
+on; claude-lint-hook.sh → claude-hook; pre-commit.sh → hooks/pre-commit),
+made to read each project's .practices/config, and fixed where they could
+pass silently. CHANGELOG.md says what, the commit messages say why.

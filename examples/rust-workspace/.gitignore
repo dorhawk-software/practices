@@ -1,0 +1,5 @@
+target/
+# What was learned on real systems, never committed (common/privacy-public-repos.md).
+CLAUDE.local.md
+# Names that must never be committed; the hooks search for them.
+dev/private-terms

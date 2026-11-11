@@ -1,0 +1,7 @@
+# .practices/config: this project's settings for the scripts in
+# .practices/bin (defaults in .practices/bin/lib.sh).
+
+# This example has no clients, hosts or people to keep out of git, and says
+# so: the privacy check never assumes "nothing to check" on its own. A real
+# project keeps the names in dev/private-terms (git-ignored) instead.
+PRIVATE_TERMS=none

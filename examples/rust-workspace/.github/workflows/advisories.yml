@@ -1,0 +1,16 @@
+# Daily: known vulnerabilities in the dependencies (cargo deny check
+# advisories). A new advisory then fails this one scheduled run first,
+# instead of turning every branch red at once.
+name: Advisories
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  advisories:
+    uses: dorhawk-software/practices/.github/workflows/rust-advisories.yml@v1

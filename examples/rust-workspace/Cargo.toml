@@ -1,0 +1,25 @@
+# The smallest workspace that takes every practice: lints as errors, one
+# crate inheriting the workspace's package settings, nothing published.
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+publish = false
+
+# Lints are errors, not warnings: a build with any of them fails
+# (rust/templates/Cargo-lints.toml).
+[workspace.lints.rust]
+warnings = "deny"
+unused_imports = "deny"
+unused_must_use = "deny"
+unsafe_op_in_unsafe_fn = "deny"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }
+# Long functions too (the limit is in clippy.toml); long files are checked by
+# .practices/bin/check-size.
+too_many_lines = "deny"
