@@ -8,10 +8,13 @@ newest first, in the kinds common/changelog.md describes.
 ### New
 
 - **An identity pass, through the whole app** (`ui/identity-pass.md`).
-  One physical idea and objects with one job each; how far to push
-  depends on the identity already there, but every screen is reviewed; a
-  first pass on the showcase screens, then an audit of the entire app
-  against the chosen spec. From the Obálka, Crake and tern passes.
+  Ideally the identity is researched before the first screen: audience,
+  the product's job and process, inspiration, the market, and the facts
+  behind its metaphor. Then three iterations, each agreed with the owner:
+  establish the identity, redesign a few parts, then redesign the whole
+  app, re-audit and polish. How far to push depends on the identity
+  already there, but every screen is reviewed. From the Obálka, Crake and
+  tern passes.
 - **Visual craft** (`ui/visual-craft.md`). Tone instead of outlines, every
   stroke end matching, one drawing per object, a line weight per family,
   compact screens, an 11 px floor, one anatomy per job, real context in

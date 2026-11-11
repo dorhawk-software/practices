@@ -1,6 +1,6 @@
-# An identity pass, through the whole app
+# An identity, in iterations, through the whole app
 
-How to give a product a stronger identity, and how to carry it into every
+How to give a product its identity, and how to carry it into every
 screen. It is written to be followed step by step, by a person or a coding
 agent. The rules for the drawing itself (outlines, stroke ends, type
 sizes) are in [visual-craft.md](visual-craft.md).
@@ -10,7 +10,85 @@ bland app, pushed far), Crake (a strong identity, polished) and tern (a
 strong identity, first wrongly limited to its logo). Product details here
 are labelled examples. The rules hold for any product.
 
-## The bar: serious, with one physical idea
+The work runs in three iterations, each agreed with the product's owner
+before the next starts:
+
+1. **Establish the identity**: research, facts, one physical idea, its
+   objects ([below](#iteration-1-establish-the-identity)).
+2. **Redesign a few parts** toward it, show them, iterate until agreed
+   ([below](#iteration-2-a-few-parts-shown-iterated-agreed)).
+3. **Redesign the whole app** against the agreed spec, re-audit, iterate,
+   polish ([below](#iteration-3-the-whole-app-re-audited-and-polished)).
+
+## Identity first, before the first screen
+
+**What.** Ideally the identity is researched before anything is built,
+and the app is polished from its first screen. A redesign after the app
+exists should not be needed. The research covers who the app is for, what
+it does and for which process, what inspires it, and what the market
+already looks like.
+
+**Why.** All three passes of 2026-11-11 polished apps that already
+shipped screens. Each one meant redrawing work that was already built and
+tested. The owner: "in an ideal world, the polish after an app is already
+done should NOT be necessary at all". Products differ too much for one
+look: Shrike and Crake are different kinds of product, aimed at
+different processes.
+
+**Apply.** Before the first screen of a new product, write a one-page
+identity brief:
+1. **Audience.** Who uses it, how often, in what setting and light, with
+   what at stake (their money, their mail, their network).
+2. **The job and the process.** What the app does, step by step, from
+   the user's side. The identity should fit this process, not a
+   category.
+3. **Inspiration.** The references the owner holds up, and why each one.
+   Look at them before drawing.
+4. **The market.** Five to ten products in the same space. Note the
+   category's defaults, so you can avoid looking like all of them.
+5. **The idea and its facts.** The physical idea (see the bar below), and
+   the facts about it, gathered from real sources.
+6. **Tone.** How serious the product must be, with one sentence on what
+   would go too far.
+
+Show the brief to the owner and agree on it. Then design the first
+screens with it. For an existing product, write the brief first anyway:
+it is iteration 1.
+
+**Check.** The project has the brief, and the owner agreed to it before
+the first designed screen.
+
+## Get the facts right
+
+**What.** When the identity borrows from the real world, draw the real
+thing. Research what makes it recognisable, and keep those features as
+the drawing gets simpler.
+
+**Why.** Tern's logo was a stock bird icon. The pass redrew it from what
+a tern really looks like: a black cap that runs into a long, sharp bill,
+long narrow wings, and the forked tail, kept for the flying bird. The
+owner "really loved" that it went for the facts. Obálka's printed-matter
+objects (an envelope's window, a postmark, a stamp) worked for the same
+reason: real postal objects people recognise.
+
+**Apply.**
+1. Look up the real thing in reliable sources: field guides, museum
+   collections, real objects, photographs.
+2. List its two or three identifying features: the ones someone would
+   name first.
+3. Keep those features at every size the mark ships at. Simplify
+   everything else.
+4. Check the drawing against a photograph, then at 16 px.
+
+**Check.** The design doc names the identifying features and shows the
+drawing at its smallest size with them still visible.
+
+## Iteration 1: establish the identity
+
+The identity brief above, then the two rules below: the bar, and how far
+to push.
+
+### The bar: serious, with one physical idea
 
 **What.** An identity pass gives a product its own look and feel: drawn
 icons, a material or a physical metaphor, considered buttons and sections,
@@ -42,7 +120,7 @@ looks like a toy loses trust.
 **Check.** You can name the idea in one sentence and list its objects,
 each with its one job. No object appears without a job.
 
-## Scale of change follows the identity; scope is always the whole app
+### Scale of change follows the identity; scope is always the whole app
 
 **What.** Judge how much identity the product already has before you
 propose anything. A bland product gets pushed far. A product with a
@@ -73,16 +151,16 @@ canvas had drifted from the code.
 **Check.** The proposal states the rating and lists every screen that
 was reviewed, with a verdict for each.
 
-## The first pass: idea, showcase screens, pick
+## Iteration 2: a few parts, shown, iterated, agreed
 
-**What.** The first pass settles the direction. It applies the idea to
-the screens that define the product and to the logo. Variants go
-side by side on the design canvas, the owner picks, and the pick is
-polished into the spec.
+**What.** Apply the identity to a few parts first: the logo and the
+screens that define the product. Show them to the owner, iterate, and
+agree. The agreed parts become the spec for the rest of the app.
 
-**Why.** On Obálka and Crake, the first pass redesigned only some screens.
-That is enough to agree on the idea and the polished spec. It is not
-enough to call the product done; that is the second pass.
+**Why.** This is how the three passes actually went: the identity, then
+a few screens, shown and iterated until the owner agreed. A few parts
+are enough to agree on the idea and the polished spec. They are not
+enough to call the product done; that is iteration 3.
 
 **Apply.**
 1. Survey every screen and board first. Read each one's source, not only
@@ -104,22 +182,25 @@ enough to call the product done; that is the second pass.
    canvas ([design-before-build.md](design-before-build.md)).
 8. Polish the picked design: a second critique, then fixes, then look at
    it again.
+9. Repeat steps 4 to 8 until the owner agrees the parts are right.
+   Expect several rounds.
 
 **Check.** Every choice on the canvas has exactly one design left. The
 critique report and its verdicts are saved where the next pass can read
 them.
 
-## The second pass: audit the entire app against the spec
+## Iteration 3: the whole app, re-audited and polished
 
-**What.** After the first pass is chosen and polished, audit the whole
+**What.** Only once iteration 2 is agreed, redesign the whole
 application against that spec. Redraw everything that falls short. Show
 it to the owner and take their tweaks. The pass is done when the whole
 app matches the spec, not when the showcase screens do.
 
-**Why.** The owner, after the three first passes: the first pass shows
+**Why.** The owner, after the three passes: the redesigned parts show
 "the idea of how we want to take the product further". What must follow
 is an audit of "the entire application, its all sections, clickity-
-clacketies, modals, animations, processes".
+clacketies, modals, animations, processes", then iterating and
+re-auditing until it is polished.
 
 **Apply.**
 1. Build an inventory from the code, not from the canvas. List every
@@ -144,9 +225,12 @@ clacketies, modals, animations, processes".
     features the canvas still calls "soon".
 11. Build the agreed designs one to one, then capture the app and compare
     it with the canvas ([design-before-build.md](design-before-build.md)).
+12. Re-audit the built app with a fresh critique. Iterate with the owner
+    until the critique and the owner find nothing left to fix.
 
 **Check.** The inventory exists as a checklist, and every line is marked
-matches or fixed. The owner has seen every redrawn item.
+matches or fixed. The owner has seen every redrawn item. The last
+critique of the built app found nothing new.
 
 ## Where the product's mark appears
 
