@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Every relative link in the docs points at a file that exists: a guide
+# that sends the reader to a missing page is worse than no link.
+#
+#   tests/links
+set -uo pipefail
+cd "$(dirname "$0")/.." || exit 2
+failed=0
+while IFS= read -r doc; do
+    dir=$(dirname "$doc")
+    # [text](target): targets that aren't web links, mail or in-page anchors.
+    while IFS= read -r target; do
+        path=${target%%#*}
+        [ -z "$path" ] && continue
+        if [ ! -e "$dir/$path" ]; then
+            echo "$doc: broken link to $target"
+            failed=1
+        fi
+    done < <(grep -oE '\]\([^)[:space:]]+\)' "$doc" | sed -E 's/^\]\(//; s/\)$//' |
+        grep -vE '^(https?:|mailto:|#)')
+done < <(git ls-files --cached --others --exclude-standard -- '*.md')
+[ $failed = 0 ] && echo "links: all relative links resolve"
+exit $failed

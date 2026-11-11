@@ -1,0 +1,77 @@
+# When the practices change (a release tag, or by hand), each project in
+# projects.json gets a pull request bringing its kit (.practices/bin and
+# hooks) up to date: bin/install's result, nothing else. The project's CI
+# runs on it, and the project decides when to merge.
+#
+# Needs the secret PRACTICES_SYNC_TOKEN: a fine-grained token with
+# contents and pull requests write on the listed repositories (GITHUB_TOKEN
+# reaches only this one). Without it, the run says so and does nothing.
+name: Sync projects
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  projects:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      list: ${{ steps.list.outputs.list }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: list
+        run: echo "list=$(jq -c '[.projects[].repo]' projects.json)" >>"$GITHUB_OUTPUT"
+
+  sync:
+    needs: projects
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        repo: ${{ fromJSON(needs.projects.outputs.list) }}
+    env:
+      HAVE_TOKEN: ${{ secrets.PRACTICES_SYNC_TOKEN != '' }}
+    steps:
+      - if: env.HAVE_TOKEN != 'true'
+        run: echo "::warning::No PRACTICES_SYNC_TOKEN secret: ${{ matrix.repo }} not synced."
+      - if: env.HAVE_TOKEN == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: practices
+          fetch-depth: 0
+      - if: env.HAVE_TOKEN == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ matrix.repo }}
+          token: ${{ secrets.PRACTICES_SYNC_TOKEN }}
+          path: project
+      - if: env.HAVE_TOKEN == 'true'
+        id: install
+        run: |
+          practices/bin/install project
+          echo "version=$(cat project/.practices/VERSION)" >>"$GITHUB_OUTPUT"
+      - if: env.HAVE_TOKEN == 'true'
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          path: project
+          token: ${{ secrets.PRACTICES_SYNC_TOKEN }}
+          branch: practices-sync
+          add-paths: .practices/
+          title: Practices ${{ steps.install.outputs.version }}
+          commit-message: |
+            Practices ${{ steps.install.outputs.version }}
+
+            The kit in .practices/bin and .practices/hooks, synced from
+            dorhawk-software/practices. What changed: its CHANGELOG.md.
+          body: >-
+            Synced from dorhawk-software/practices
+            ${{ steps.install.outputs.version }}. Only the synced kit
+            changes (.practices/bin, .practices/hooks, VERSION); what the
+            project owns stays. What changed and why:
+            https://github.com/dorhawk-software/practices/blob/main/CHANGELOG.md

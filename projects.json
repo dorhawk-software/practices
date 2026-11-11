@@ -1,0 +1,6 @@
+{
+  "projects": [
+    { "repo": "dorhawk-software/crake", "language": "rust", "since": "2026-11-11" },
+    { "repo": "dorhawk-software/tern", "language": "rust", "since": "2026-11-11" }
+  ]
+}

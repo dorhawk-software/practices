@@ -1,0 +1,32 @@
+# Reusable: RustSec advisories, checked on a schedule. The lint gate checks
+# them on every push too, but a new advisory then turns every branch red at
+# once; a daily run says so first, on a day nobody pushed.
+#
+#   on: { schedule: [{ cron: "17 6 * * *" }], workflow_dispatch: {} }
+#   jobs:
+#     advisories:
+#       uses: dorhawk-software/practices/.github/workflows/rust-advisories.yml@v1
+name: Rust advisories
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        type: string
+        default: '"ubuntu-24.04"'
+
+permissions:
+  contents: read
+
+jobs:
+  advisories:
+    runs-on: ${{ fromJSON(inputs.runs-on) }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: taiki-e/install-action@5488ac5a951645ce95062214902ac4b6bc1a1037 # v2.87.32
+        with:
+          tool: cargo-deny
+      # cargo deny reads the dependency graph through cargo: the pinned one.
+      - run: if [ -f rust-toolchain.toml ]; then rustup toolchain install --profile minimal; fi
+      - run: cargo deny --log-level error check advisories

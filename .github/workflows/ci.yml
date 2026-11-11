@@ -1,0 +1,87 @@
+# The practices' own checks: the kit's scripts are tested on Linux and on
+# macOS (bash 3.2, BSD tools), shellchecked, run end to end on the example
+# workspace, and the workflows and actions are linted. The docs' links
+# resolve, and no commit carries a session ID. A checker with a hole lets
+# through exactly what it exists to stop, so the checkers are tested too.
+name: CI
+
+on:
+  push:
+    branches-ignore: ["dependabot/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scripts:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: The kit's checks, on throwaway projects
+        run: tests/run
+
+  static:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: shellcheck
+        run: |
+          shellcheck -x -P SCRIPTDIR scripts/lib.sh scripts/lint scripts/check-* scripts/claude-hook \
+            scripts/disk-guard scripts/install-hooks hooks/* bin/install tests/run tests/example tests/links
+          shellcheck -s sh scripts/prune-caches scripts/sweep-target
+      - name: actionlint (workflows, and the actions' scripts)
+        run: |
+          bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash) 1.7.12
+          ./actionlint -color
+      - name: JSON files parse, the plugin has what Claude Code reads
+        run: |
+          for f in projects.json .claude-plugin/marketplace.json plugin/.claude-plugin/plugin.json; do
+            jq empty "$f" || exit 1
+          done
+          jq -e '.name and .owner.name and (.plugins | length > 0)' .claude-plugin/marketplace.json >/dev/null
+          jq -e '.name and .description' plugin/.claude-plugin/plugin.json >/dev/null
+          for s in plugin/skills/*/SKILL.md; do
+            head -n 5 "$s" | grep -q '^name: ' && head -n 5 "$s" | grep -q '^description: ' ||
+              { echo "$s: needs name and description"; exit 1; }
+          done
+      - name: Docs' relative links
+        run: tests/links
+      - name: No session IDs in the pushed commits
+        if: github.event_name == 'push'
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          range=HEAD
+          if [ -n "$BEFORE" ] && [ "$BEFORE" != 0000000000000000000000000000000000000000 ]; then
+            range="$BEFORE..HEAD"
+          fi
+          for c in $(git rev-list "$range"); do
+            git log -1 --format=%B "$c" >"$RUNNER_TEMP/msg"
+            scripts/check-commit-msg "$RUNNER_TEMP/msg" || { echo "in $c"; exit 1; }
+          done
+
+  example:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./actions/rust-setup
+        with:
+          tools: cargo-deny,cargo-machete,cargo-llvm-cov
+          save-cache: never
+      - name: The kit on a real workspace, and each check failing on its fault
+        run: tests/example

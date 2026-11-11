@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# The kit end to end on a real Cargo workspace: examples/rust-workspace,
+# copied to a throwaway git repository with the kit installed, must pass
+# the lint gate and its coverage floors; then each check must fail on the
+# fault it exists for. Needs Rust (the example's pinned toolchain),
+# cargo-deny, cargo-machete, cargo-llvm-cov and jq.
+#
+#   tests/example
+set -uo pipefail
+here=$(cd "$(dirname "$0")/.." && pwd)
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+unset PRACTICES_BASE_REF
+p=$work/example
+cp -R "$here/examples/rust-workspace" "$p"
+cd "$p" || exit 2
+git init -q
+git config user.email t@example.com
+git config user.name t
+"$here/bin/install" "$p" >/dev/null
+rustup toolchain install >/dev/null 2>&1 || true
+git add -A
+git commit -q -m "Start"
+# The hooks are installed in a real clone; CI=1 skips that one check here.
+export CI=1
+
+failed=0
+step() { # want NAME COMMAND...
+    local want=$1 name=$2 out status
+    shift 2
+    out=$("$@" 2>&1)
+    status=$?
+    if { [ "$want" = pass ] && [ $status = 0 ]; } || { [ "$want" = fail ] && [ $status != 0 ]; }; then
+        echo "ok: $name"
+    else
+        echo "FAIL: $name (exit $status)"
+        printf '%s\n' "$out" | tail -n 40
+        failed=1
+    fi
+}
+
+step pass "the example passes the lint gate" .practices/bin/lint
+step pass "the example meets its coverage floors" .practices/bin/check-coverage
+
+for ((i = 0; i < 701; i++)); do echo "// $i"; done >crates/hello/src/long.rs
+step fail "the gate refuses a 701-line file" .practices/bin/lint
+rm crates/hello/src/long.rs
+
+printf 'pub fn f() {\n    unsafe { std::hint::unreachable_unchecked() }\n}\n' >crates/hello/src/sneaky.rs
+step fail "the gate refuses unsafe code" .practices/bin/check-unsafe
+rm crates/hello/src/sneaky.rs
+
+cp .practices/coverage-floors "$work/floors"
+awk '$1 !~ /^#/ { $2 = 100; $3 = 100 } { print }' "$work/floors" >.practices/coverage-floors
+step fail "coverage under a floor fails" .practices/bin/check-coverage
+cp "$work/floors" .practices/coverage-floors
+
+awk '$1 !~ /^#/ { $2 = $2 - 10 } { print }' "$work/floors" >.practices/coverage-floors
+step fail "a floor lowered against the base fails" env PRACTICES_BASE_REF=HEAD .practices/bin/check-coverage
+cp "$work/floors" .practices/coverage-floors
+
+exit $failed

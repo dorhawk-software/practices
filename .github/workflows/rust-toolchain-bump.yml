@@ -1,0 +1,75 @@
+# Reusable: moves rust-toolchain.toml to the newest stable Rust once that
+# release is old enough (14 days by default: a broken release usually has
+# its point release by then), as a pull request, then starts CI on it (a
+# pull request opened with GITHUB_TOKEN starts no workflow by itself).
+# A pinned toolchain keeps a new release's new clippy lints from breaking
+# CI on a day nobody changed anything (Crake ba10f9e).
+#
+#   on: { schedule: [{ cron: "23 5 * * 1" }], workflow_dispatch: {} }
+#   jobs:
+#     toolchain:
+#       uses: dorhawk-software/practices/.github/workflows/rust-toolchain-bump.yml@v1
+#       permissions: { contents: write, pull-requests: write, actions: write }
+name: Rust toolchain bump
+
+on:
+  workflow_call:
+    inputs:
+      cooldown-days:
+        type: number
+        default: 14
+      ci-workflow:
+        description: The workflow file to start on the pull request's branch.
+        type: string
+        default: ci.yml
+
+permissions:
+  contents: read
+
+jobs:
+  bump:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: newest
+        name: The newest stable release, if old enough
+        env:
+          COOLDOWN: ${{ inputs.cooldown-days }}
+        run: |
+          manifest=$(curl -fsSL --retry 3 https://static.rust-lang.org/dist/channel-rust-stable.toml)
+          version=$(printf '%s\n' "$manifest" | awk '/^\[pkg\.rust\]/ { p = 1 } p && /^version = / { print $3; exit }' | tr -d '"')
+          date=$(printf '%s\n' "$manifest" | awk -F'"' '/^date = / { print $2; exit }')
+          pinned=$(awk -F'"' '/^channel *=/ { print $2 }' rust-toolchain.toml)
+          age=$(( ( $(date -u +%s) - $(date -u -d "$date" +%s) ) / 86400 ))
+          echo "stable $version from $date ($age days); pinned $pinned"
+          if [ "$version" = "$pinned" ] || [ "$age" -lt "$COOLDOWN" ]; then
+            echo "Nothing to do."
+            exit 0
+          fi
+          sed -i "s/^channel *= *\".*\"/channel = \"$version\"/" rust-toolchain.toml
+          echo "version=$version" >>"$GITHUB_OUTPUT"
+          echo "date=$date" >>"$GITHUB_OUTPUT"
+      - if: steps.newest.outputs.version != ''
+        id: pr
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          branch: rust-toolchain-bump
+          title: Rust ${{ steps.newest.outputs.version }}
+          commit-message: |
+            Rust ${{ steps.newest.outputs.version }}
+
+            The stable release from ${{ steps.newest.outputs.date }}, now ${{ inputs.cooldown-days }}+ days old.
+          body: >-
+            Stable Rust ${{ steps.newest.outputs.version }}
+            (released ${{ steps.newest.outputs.date }}). New clippy lints
+            may need fixes on this branch before it merges.
+      - if: steps.pr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_WORKFLOW: ${{ inputs.ci-workflow }}
+        run: gh workflow run "$CI_WORKFLOW" --ref rust-toolchain-bump

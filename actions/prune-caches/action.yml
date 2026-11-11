@@ -1,0 +1,26 @@
+name: Prune replaced caches
+description: >-
+  Deletes the default branch's caches that a newer one of the same kind
+  replaced, so old keys don't push out the ones jobs need under GitHub's
+  10 GB per repository. Run it after the jobs that save caches; the job
+  needs permissions actions: write.
+inputs:
+  dry-run:
+    description: Only list what would go.
+    default: "false"
+  token:
+    description: A token with actions write.
+    default: ${{ github.token }}
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        DRY: ${{ inputs.dry-run }}
+      run: |
+        if [ "$DRY" = true ]; then
+          "$GITHUB_ACTION_PATH/../../scripts/prune-caches" --dry-run
+        else
+          "$GITHUB_ACTION_PATH/../../scripts/prune-caches"
+        fi

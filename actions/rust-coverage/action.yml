@@ -1,0 +1,42 @@
+name: Rust tests and coverage floors
+description: >-
+  Every test, instrumented, and each crate's share of lines held at its
+  floor (.practices/bin/check-coverage), a floor lowered against the base
+  refused, then extra test scripts in the same build. Needs rust-setup
+  with tools cargo-llvm-cov.
+inputs:
+  extra:
+    description: Test scripts to run after, against the same build (space separated).
+    default: ""
+runs:
+  using: composite
+  steps:
+    - name: The base to compare floors with
+      id: base
+      shell: bash
+      env:
+        EVENT: ${{ github.event_name }}
+        PR_BASE: ${{ github.base_ref }}
+        BEFORE: ${{ github.event.before }}
+      # A pull request: its base branch. A push: the commit before it. A
+      # new branch's first push (no before) has nothing to compare with.
+      run: |
+        ref=
+        if [ "$EVENT" = pull_request ]; then
+          ref=$PR_BASE
+        elif [ -n "$BEFORE" ] && [ "$BEFORE" != 0000000000000000000000000000000000000000 ]; then
+          ref=$BEFORE
+        fi
+        if [ -n "$ref" ] && git fetch --quiet --depth=1 origin "$ref"; then
+          echo "ref=FETCH_HEAD" >>"$GITHUB_OUTPUT"
+        else
+          echo "::notice::Coverage floors not compared with a base (none for this run)."
+        fi
+    - name: Tests and coverage floors
+      shell: bash
+      env:
+        PRACTICES_BASE_REF: ${{ steps.base.outputs.ref }}
+        EXTRA: ${{ inputs.extra }}
+      run: |
+        # shellcheck disable=SC2086 # a list of scripts
+        .practices/bin/check-coverage $EXTRA

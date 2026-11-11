@@ -1,0 +1,29 @@
+name: Rust lint gate
+description: >-
+  The project's lint gate (.practices/bin/lint): rustfmt, clippy with
+  every lint an error, cargo deny, cargo machete, private names, file
+  sizes, unsafe code, and the project's own checks in .practices/lint.d.
+  Needs rust-setup with tools cargo-deny,cargo-machete.
+inputs:
+  private-terms:
+    description: >-
+      The private terms (one pattern per line), from a secret. Without
+      them, and without the project saying it has none, the privacy check
+      says it skipped, and this step warns.
+    default: ""
+runs:
+  using: composite
+  steps:
+    - name: Lint gate
+      shell: bash
+      env:
+        PRACTICES_PRIVATE_TERMS: ${{ inputs.private-terms }}
+      run: |
+        if [ ! -x .practices/bin/lint ]; then
+          echo "::error::No .practices/bin/lint: install the kit (practices' bin/install)."
+          exit 1
+        fi
+        if [ -z "$PRACTICES_PRIVATE_TERMS" ] && ! grep -qs '^PRIVATE_TERMS=none' .practices/config; then
+          echo "::warning::No private terms in this run (a fork, Dependabot, or the secret isn't set): names were not checked."
+        fi
+        .practices/bin/lint

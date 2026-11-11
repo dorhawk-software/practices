@@ -1,0 +1,93 @@
+name: Rust setup
+description: >-
+  System packages (with a timeout), the project's pinned Rust toolchain,
+  a dependency cache saved by the default branch only, and cargo tools.
+inputs:
+  apt-packages:
+    description: Extra Ubuntu packages to install (space separated).
+    default: ""
+  gpui:
+    description: Install what GPUI links (X11, Wayland, keyboard, fonts, Vulkan) and builds with.
+    default: "false"
+  toolchain:
+    description: >-
+      The toolchain when the project has no rust-toolchain.toml (with one,
+      that file decides and this is ignored).
+    default: stable
+  targets:
+    description: Extra compile targets, e.g. x86_64-pc-windows-gnu (space separated).
+    default: ""
+  tools:
+    description: Cargo tools to install, e.g. cargo-deny,cargo-machete,cargo-llvm-cov.
+    default: ""
+  cache-shared-key:
+    description: >-
+      Share one dependency cache between jobs that build the same thing
+      (a restore-only job then reuses what the main job compiled).
+    default: ""
+  save-cache:
+    description: >-
+      "main": only runs on the default branch save the cache (every branch
+      restores it); "never": restore only. GitHub keeps 10 GB per
+      repository, and caches saved per branch pushed out the ones jobs
+      needed (Crake a31caa9).
+    default: main
+outputs:
+  rust-version:
+    description: The rustc version in use, e.g. 1.99.1.
+    value: ${{ steps.toolchain.outputs.version }}
+runs:
+  using: composite
+  steps:
+    - name: System packages
+      if: runner.os == 'Linux' && (inputs.gpui == 'true' || inputs.apt-packages != '')
+      shell: bash
+      env:
+        GPUI: >-
+          build-essential pkg-config cmake clang
+          libxcb1-dev libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev
+          libfontconfig-dev libfreetype-dev libvulkan-dev
+        EXTRA: ${{ inputs.apt-packages }}
+        WITH_GPUI: ${{ inputs.gpui }}
+      # A mirror can hang (52 min once, against a 6-hour job limit: Crake
+      # 63fb60e); composite steps take no timeout-minutes, so `timeout`.
+      run: |
+        packages=$EXTRA
+        [ "$WITH_GPUI" = true ] && packages="$GPUI $packages"
+        # shellcheck disable=SC2086 # a list of packages
+        timeout 300 sudo apt-get update &&
+          timeout 900 sudo apt-get install -y --no-install-recommends $packages
+
+    - name: Rust toolchain
+      id: toolchain
+      shell: bash
+      env:
+        TOOLCHAIN: ${{ inputs.toolchain }}
+        TARGETS: ${{ inputs.targets }}
+      run: |
+        if [ -f rust-toolchain.toml ] || [ -f rust-toolchain ]; then
+          rustup toolchain install
+        else
+          rustup toolchain install "$TOOLCHAIN" --profile minimal -c clippy,rustfmt,llvm-tools-preview
+          rustup default "$TOOLCHAIN"
+        fi
+        for t in $TARGETS; do rustup target add "$t"; done
+        echo "version=$(rustc --version | cut -d' ' -f2)" >>"$GITHUB_OUTPUT"
+        {
+          echo CARGO_TERM_COLOR=always
+          # Line numbers are all CI needs from debug info; full debug info
+          # is most of a target folder, so most of every cache.
+          echo CARGO_PROFILE_DEV_DEBUG=line-tables-only
+        } >>"$GITHUB_ENV"
+
+    # rust-cache keys include the rustc version, so a new toolchain starts
+    # a new cache rather than one Cargo can't reuse.
+    - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+      with:
+        shared-key: ${{ inputs.cache-shared-key }}
+        save-if: ${{ inputs.save-cache == 'main' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+
+    - if: inputs.tools != ''
+      uses: taiki-e/install-action@5488ac5a951645ce95062214902ac4b6bc1a1037 # v2.87.32
+      with:
+        tool: ${{ inputs.tools }}
