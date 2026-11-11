@@ -5,6 +5,8 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+## 1.0.0 (2026-11-11)
+
 ### New
 
 - **The practices, from Crake.** Ten common practices and four Rust ones,
