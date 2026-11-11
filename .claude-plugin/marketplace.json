@@ -1,0 +1,15 @@
+{
+  "name": "dorhawk-practices",
+  "owner": { "name": "dorhawk.software" },
+  "metadata": {
+    "description": "Development practices learned shipping real apps: lints as hard errors, tests that never touch your machine, CI caching, gated releases."
+  },
+  "plugins": [
+    {
+      "name": "practices",
+      "source": "./plugin",
+      "description": "Skills to adopt the practices kit in a project, run and fix its lint gate, and fold another project's practices in.",
+      "version": "1.0.0"
+    }
+  ]
+}

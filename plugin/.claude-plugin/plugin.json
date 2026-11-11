@@ -1,0 +1,8 @@
+{
+  "name": "practices",
+  "description": "Skills to adopt the practices kit in a project, run and fix its lint gate, and fold another project's practices in.",
+  "version": "1.0.0",
+  "author": { "name": "dorhawk.software" },
+  "homepage": "https://github.com/dorhawk-software/practices",
+  "license": "MIT"
+}
