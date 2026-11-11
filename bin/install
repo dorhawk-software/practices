@@ -28,7 +28,7 @@ if [ "${1:-}" = --templates ]; then
 fi
 project=${1:?usage: bin/install [--templates] PROJECT_DIR}
 project=$(cd "$project" && git rev-parse --show-toplevel)
-version=$(git -C "$here" describe --tags --always --dirty)
+version=$(git -C "$here" describe --tags --match 'v[0-9]*.[0-9]*.[0-9]*' --always --dirty)
 
 kit=$project/.practices
 rm -rf "${kit:?}/bin" "${kit:?}/hooks"

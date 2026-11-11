@@ -5,6 +5,14 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+## 1.1.1 (2026-11-11)
+
+### Fixed
+
+- **The version a project records.** `bin/install` wrote `v1` into
+  `.practices/VERSION` when the moving `v1` tag was newer than the release
+  tag on the same commit; it names the release (`v1.1.1`) now.
+
 ## 1.1.0 (2026-11-11)
 
 ### Better
