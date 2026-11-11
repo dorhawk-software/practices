@@ -5,6 +5,13 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+### New
+
+- **UI design practices, in `ui/`.** Window buttons where each system puts
+  them: macOS draws its own on the left and the header makes room, from
+  Crake's Mac fixes, with the GPUI how-to in `rust/gpui.md`. Design before
+  build moved here from `common/` (its old link is gone).
+
 ### Better
 
 - **Dependabot in a private repository.** The template shows how to group

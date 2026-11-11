@@ -130,5 +130,8 @@ web/                        (from the dorhawk.software website)
   `Cargo.toml` → the Rust checks, `package.json` → the TypeScript ones).
 - Shared actions get a language prefix: `actions/ts-setup`, `actions/ts-lint`.
 - A practice that turns out to hold in every language moves to `common/`.
+- A lesson about the interface (layout, platform conventions, the design
+  process) goes to `ui/`, whatever the toolkit; its toolkit how-to stays in
+  the language folder and links to it.
 - Each new folder gets a line in the README's map and in
   [ROADMAP.md](../ROADMAP.md).

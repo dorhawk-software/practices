@@ -12,8 +12,9 @@ is the source of everything Rust here; its commit links are in each doc.
   [CLAUDE.md](common/claude-md.md), [not-now](common/not-now.md),
   [changelog](common/changelog.md), [releases](common/releases.md),
   [testing](common/testing.md), [CI and caching](common/ci-caching.md),
-  [agent working rules](common/agent-working-rules.md),
-  [design before build](common/design-before-build.md)
+  [agent working rules](common/agent-working-rules.md)
+- [x] UI docs: [design before build](ui/design-before-build.md),
+  [window buttons](ui/window-buttons.md)
 - [x] Rust docs: [conventions](rust/conventions.md), [lints](rust/lints.md),
   [coverage](rust/coverage.md), [GPUI](rust/gpui.md)
 - [x] Templates: lints, clippy, deny (GPL and closed-source lists), toolchain,
@@ -107,6 +108,9 @@ is the source of everything Rust here; its commit links are in each doc.
   Folded in with [the same method](guides/fold-in-a-project.md).
 - **`web/`, from the dorhawk.software website:** conventions, deploy,
   templates.
+- **`ui/`, more pages:** tern's design canvas rules (an agreed design only,
+  captures of the built app, every screen checked in each language), and
+  what Obálka and the website teach about UI.
 - **Starts when:** Rust has settled (phase 1 proven in Crake and tern).
 
 ## Known gaps

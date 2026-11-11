@@ -51,8 +51,14 @@ cd path/to/your-project && .practices/bin/install-hooks && .practices/bin/lint
 | [CI and caching](common/ci-caching.md) | GitHub's 10 GB cache and private repos' minutes are budgets, spent on purpose. |
 | [CLAUDE.md and docs](common/claude-md.md) | Rules and pointers in CLAUDE.md, detail in docs/engineering, every rule dated. |
 | [Privacy in public repos](common/privacy-public-repos.md) | Made-up names, documentation addresses, and a denylist the hooks refuse. |
-| [Design before build](common/design-before-build.md) | Proposals with options first; build what was chosen, one to one. |
 | [Working rules for coding agents](common/agent-working-rules.md) | Low CPU priority, a disk floor, rebuild before "restart", keep going on a plan. |
+
+### UI design ([ui/](ui))
+
+| Practice | In one line |
+| --- | --- |
+| [Design before build](ui/design-before-build.md) | Proposals with options first; build what was chosen, one to one. |
+| [Window buttons](ui/window-buttons.md) | macOS draws its own on the left and the header makes room; the app's own on the right elsewhere. |
 
 ### Rust ([rust/](rust))
 
@@ -61,7 +67,7 @@ cd path/to/your-project && .practices/bin/install-hooks && .practices/bin/lint
 | [Lints are errors](rust/lints.md) | Every rustc and clippy lint denied; deny, machete, size and unsafe checks; a pinned toolchain. | `.practices/bin/lint` |
 | [Coverage floors](rust/coverage.md) | A floor per crate and OS that only rises; under it, the lines no test ran. | `.practices/bin/check-coverage` |
 | [Code conventions](rust/conventions.md) | One workspace; unsafe in one crate; OS code behind small modules; errors as sentences. | review, `check-unsafe`, `check-size` |
-| [GPUI desktop apps](rust/gpui.md) | Headless window tests, a journey kit, demo switches, frame timing, a patched GPUI kept current. | tests, CI |
+| [GPUI desktop apps](rust/gpui.md) | Headless window tests, a journey kit, demo switches, frame timing, macOS window buttons, a patched GPUI kept current. | tests, CI |
 
 Coming: `typescript/` (from Obálka, a React Native app) and `web/` (from
 the dorhawk.software website). The roadmap lists them.
@@ -70,6 +76,7 @@ the dorhawk.software website). The roadmap lists them.
 
 ```text
 common/            practices for any project
+ui/                UI design practices, for any toolkit
 rust/              Rust practices, and templates/ to copy into a project
 guides/            how to use all of it, step by step
 examples/          a project that uses everything (CI runs the kit on it)

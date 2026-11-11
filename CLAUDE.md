@@ -1,7 +1,7 @@
 # Practices
 
 The public source of truth for how dorhawk.software builds software:
-practices (common/ and one folder per language), and the kit that
+practices (common/, ui/ and one folder per language), and the kit that
 enforces them (scripts/, hooks/, actions/, .github/workflows/, plugin/).
 README.md is the map; read it first.
 

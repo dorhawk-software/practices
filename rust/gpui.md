@@ -1,6 +1,6 @@
 # Rust: GPUI desktop apps
 
-What applies to apps built on GPUI (directly or through `gpui-kit`): build profiles that keep frames smooth in development, headless window tests, a journey suite that drives the real app shell, a demo mode, CI packages, and how to keep a patched GPUI current.
+What applies to apps built on GPUI (directly or through `gpui-kit`): build profiles that keep frames smooth in development, headless window tests, a journey suite that drives the real app shell, a demo mode, window buttons on macOS, CI packages, and how to keep a patched GPUI current.
 
 Links point at commits in [Crake](https://github.com/dorhawk-software/crake).
 
@@ -88,6 +88,82 @@ Keep a table of the variables in the project's docs.
 **Apply.** Add `<APP>_BENCH=1`, which logs build, layout and paint time per frame and a summary on exit. Document how to profile.
 
 **Check.** A "faster" commit quotes before and after medians.
+
+## Window buttons on macOS
+
+**What.** The practice is [ui/window-buttons.md](../ui/window-buttons.md):
+on a Mac the system draws its buttons and the app's header makes room. In
+GPUI that's one module (Crake's `chrome.rs`): the buttons' position, the
+width they take, a header helper, and a switch tests can set.
+
+**Why.** With `appears_transparent: true` and no position, macOS draws its
+buttons wherever its default puts them, over the app's header (Crake's
+Cancel, [407cf71](https://github.com/dorhawk-software/crake/commit/407cf71)).
+Titles that only started after them still stood 4 px above them
+([c75a781](https://github.com/dorhawk-software/crake/commit/c75a781)).
+
+**Apply.**
+```rust
+pub struct Chrome { pub system_buttons: bool } // tests set it either way
+impl Global for Chrome {}
+
+pub fn system_buttons(cx: &App) -> bool {
+    cx.try_global::<Chrome>()
+        .map_or(cfg!(target_os = "macos"), |c| c.system_buttons)
+}
+
+pub const HEADER_HEIGHT: f32 = 56.;
+const BUTTON: f32 = 14.;        // macOS's buttons are this tall
+const BUTTONS_LEFT: f32 = 18.;  // window edge to the first button
+const BUTTONS_SPAN: f32 = 54.;  // across the three (macOS 26)
+const BUTTONS_CLEAR: f32 = 16.; // kept clear after them
+/// The room every header leaves at its left on a Mac (76 px left none).
+pub const BUTTONS_WIDTH: f32 = BUTTONS_LEFT + BUTTONS_SPAN + BUTTONS_CLEAR;
+
+/// Centred on a header HEADER_HEIGHT tall.
+pub fn traffic_lights() -> Option<Point<Pixels>> {
+    Some(point(px(BUTTONS_LEFT), px((HEADER_HEIGHT - BUTTON) / 2.)))
+}
+
+/// A header on the buttons' line: nothing in it starts above them.
+pub fn on_buttons_line<E: Styled>(header: E) -> E {
+    header.h(px(HEADER_HEIGHT)).py(px(0.))
+}
+```
+Every window's options use it:
+```rust
+titlebar: Some(TitlebarOptions {
+    title: Some("Traffic".into()),
+    appears_transparent: true,
+    traffic_light_position: chrome::traffic_lights(),
+}),
+```
+In the header: when `system_buttons(cx)`, a left padding of
+`BUTTONS_WIDTH`, no close button of the app's own, and a top-left action
+(Cancel) moved to the right; the header goes through `on_buttons_line`.
+
+**Check.** A test per window with the system's buttons on (Crake's
+`traffic_view/tests.rs`):
+```rust
+#[gpui_kit::test]
+fn the_title_is_level_with_the_systems_buttons(cx: &mut TestAppContext) {
+    let w = open(cx);
+    cx.update(|cx| cx.set_global(chrome::Chrome { system_buttons: true }));
+    let title = cx
+        .update_window(w.window, |_, window, cx| {
+            window.refresh();
+            window.render_frame(cx);
+            window.find("traffic-title").bounds()
+        })
+        .unwrap();
+    assert!(f32::from(title.origin.x) >= chrome::BUTTONS_WIDTH);
+    let middle = f32::from(title.origin.y + title.size.height / 2.);
+    let line = chrome::HEADER_HEIGHT / 2. + 1.;
+    assert!((middle - line).abs() <= 1., "title at {middle:.1}, buttons at {line:.1}");
+}
+```
+and one that `window.try_find("close")` is `None` there. The other tests
+set `system_buttons: false`, so they run the same on every system.
 
 ## CI packages for GPUI on Linux
 

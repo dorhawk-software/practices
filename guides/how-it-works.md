@@ -10,7 +10,8 @@ each, who owns which file, and how a change here reaches every project.
 ```text
  dorhawk-software/practices                         a project (e.g. tern)
  ─────────────────────────                          ─────────────────────
- common/*.md, rust/*.md ── read, linked from ──────▶ CLAUDE.md (one line each)
+ common/*.md, ui/*.md,
+ rust/*.md ────────────── read, linked from ──────▶ CLAUDE.md (one line each)
 
  scripts/*, hooks/*  ──── bin/install ────────────▶ .practices/bin/*     synced
                           (or a sync PR)            .practices/hooks/*   synced

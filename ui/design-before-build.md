@@ -72,7 +72,7 @@ before anyone is shown the result.
 
 **Why.** "Looks about right" drifts. A demo mode that shows the design's
 sample data makes exact comparison possible (Crake's `CRAKE_DEMO`, tern's
-`TERN_FAKE` and `TERN_SHOW`). See [testing.md](testing.md).
+`TERN_FAKE` and `TERN_SHOW`). See [testing.md](../common/testing.md).
 
 **Apply.** Open the app in demo mode and capture the window. Compare it
 side by side with the design, and fix the differences before showing it.
