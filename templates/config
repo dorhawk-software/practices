@@ -1,0 +1,23 @@
+# .practices/config: this project's settings for the scripts in
+# .practices/bin (shell KEY=value lines). Every line is optional; the
+# defaults are in .practices/bin/lib.sh. This file is the project's own:
+# the practices sync never changes it.
+
+# Git pathspecs left out of every check (vendored code).
+#EXCLUDE=':!vendor'
+
+# Lines of code per Rust file, and per integration test file.
+#SIZE_CODE=700
+#SIZE_TESTS=1000
+
+# Folders where unsafe code may appear (space separated); empty: nowhere.
+#UNSAFE_ALLOWED='crates/app-os'
+
+# The git-ignored list of names never to commit, or "none".
+#PRIVATE_TERMS=dev/private-terms
+
+# Free space to keep on the disk the build folder is on.
+#DISK_FLOOR_GB=300
+
+# Files left out of the coverage share (regex on paths from the root).
+#COVERAGE_EXCLUDE='^crates/app/src/(scenarios/|journey_)'

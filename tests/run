@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+# Tests of the kit's checks, each against a throwaway project: a checker
+# with a hole lets through exactly what it exists to stop (Crake's size
+# check missed a 736-line file; its privacy check passed everything on
+# macOS). Where macOS' bash 3.2 is at /bin/bash, the scripts run under it.
+#
+#   tests/run
+# shellcheck disable=SC2015 # ok() never fails
+set -uo pipefail
+here=$(cd "$(dirname "$0")/.." && pwd)
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+
+shim=$work/shim
+mkdir -p "$shim"
+if /bin/bash -c '[ "${BASH_VERSINFO[0]}" -lt 4 ]' 2>/dev/null; then
+    ln -s /bin/bash "$shim/bash"
+    echo "(scripts run under $(/bin/bash -c 'echo $BASH_VERSION'))"
+fi
+export PATH="$shim:$PATH"
+unset CI PRACTICES_PRIVATE_TERMS PRACTICES_BASE_REF
+
+passed=0 failed=0
+ok() { passed=$((passed + 1)); }
+bad() { failed=$((failed + 1)); printf 'FAIL: %s\n%s\n' "$1" "${2:-}"; }
+# expect 0|1 NAME COMMAND...: the exit status is 0, or anything else.
+expect() {
+    local want=$1 name=$2 out status
+    shift 2
+    out=$("$@" 2>&1)
+    status=$?
+    if { [ "$want" = 0 ] && [ $status = 0 ]; } || { [ "$want" = 1 ] && [ $status != 0 ]; }; then
+        ok
+    else
+        bad "$name (exit $status, wanted $( [ "$want" = 0 ] && echo 0 || echo non-zero))" "$out"
+    fi
+}
+
+project() { # a fresh git project with the kit in it
+    p=$work/p$RANDOM$RANDOM
+    mkdir -p "$p/crates/app/src"
+    git -C "$p" init -q
+    git -C "$p" config user.email t@example.com
+    git -C "$p" config user.name t
+    "$here/bin/install" "$p" >/dev/null
+    printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
+    echo "$p"
+}
+lines() { local i; for ((i = 0; i < $1; i++)); do echo "// $i"; done; }
+
+# --- check-size
+p=$(project)
+lines 700 >"$p/crates/app/src/ok.rs"
+expect 0 "700 lines pass" "$p/.practices/bin/check-size"
+lines 701 >"$p/crates/app/src/big.rs"
+expect 1 "701 lines fail" "$p/.practices/bin/check-size"
+{ lines 600; printf '#[cfg(test)]\nmod tests {\n'; lines 300; echo '}'; } >"$p/crates/app/src/big.rs"
+expect 0 "an inline test module isn't counted" "$p/.practices/bin/check-size"
+{ printf '#[cfg(test)]\nmod tests;\n'; lines 720; } >"$p/crates/app/src/big.rs"
+expect 1 "cfg(test) over \`mod tests;\` exempts nothing (Crake 6de1e6a)" "$p/.practices/bin/check-size"
+{ lines 600; printf '#[cfg(all(test, target_os = "linux"))]\nmod linux_tests {\n'; lines 300; echo '}'; } >"$p/crates/app/src/big.rs"
+expect 0 "cfg(all(test, ...)) starts the test module" "$p/.practices/bin/check-size"
+lines 1000 >"$p/crates/app/src/big.rs"
+printf 'crates/app/src/big.rs 1000\n' >"$p/.practices/size-allowlist"
+expect 0 "an allowlisted file at its number passes" "$p/.practices/bin/check-size"
+lines 1001 >"$p/crates/app/src/big.rs"
+expect 1 "an allowlisted file may not grow" "$p/.practices/bin/check-size"
+lines 990 >"$p/crates/app/src/big.rs"
+expect 1 "a file that shrank must lower its number" "$p/.practices/bin/check-size"
+lines 100 >"$p/crates/app/src/big.rs"
+expect 1 "a file under the limit leaves the allowlist" "$p/.practices/bin/check-size"
+rm "$p/crates/app/src/big.rs"
+expect 1 "a gone file leaves the allowlist" "$p/.practices/bin/check-size"
+rm "$p/.practices/size-allowlist"
+mkdir -p "$p/crates/app/tests" "$p/vendor/x"
+lines 900 >"$p/crates/app/tests/flow.rs"
+lines 900 >"$p/vendor/x/lib.rs"
+expect 0 "integration tests get 1000, vendor is excluded" "$p/.practices/bin/check-size"
+
+# --- check-unsafe
+p=$(project)
+echo 'fn a() {} // unsafe in a comment' >"$p/crates/app/src/lib.rs"
+expect 0 "unsafe in a comment passes" "$p/.practices/bin/check-unsafe"
+echo 'fn b() { unsafe { std::env::set_var("A", "1") } }' >"$p/crates/app/src/sys.rs"
+expect 1 "unsafe code fails" "$p/.practices/bin/check-unsafe"
+mkdir -p "$p/crates/app-os/src"
+mv "$p/crates/app/src/sys.rs" "$p/crates/app-os/src/sys.rs"
+echo "UNSAFE_ALLOWED='crates/app-os'" >>"$p/.practices/config"
+expect 0 "unsafe in the allowed crate passes" "$p/.practices/bin/check-unsafe"
+echo "#![forbid(unsafe_code)]" >"$p/crates/app/src/main.rs"
+expect 0 "forbid(unsafe_code) isn't unsafe code" "$p/.practices/bin/check-unsafe"
+
+# --- check-private
+p=$(project)
+: >"$p/.practices/config"
+expect 1 "no terms file fails (fails closed)" "$p/.practices/bin/check-private"
+expect 0 "in CI without a secret it skips, saying so" env CI=true "$p/.practices/bin/check-private"
+mkdir -p "$p/dev"
+printf '# clients\nGlobexCorp\n' >"$p/dev/private-terms"
+expect 1 "a terms file git doesn't ignore fails" "$p/.practices/bin/check-private"
+echo dev/private-terms >"$p/.gitignore"
+expect 0 "clean files pass" "$p/.practices/bin/check-private"
+echo 'let host = "vpn.globexcorp.example";' >"$p/crates/app/src/lib.rs"
+expect 1 "a new file naming a client fails" "$p/.practices/bin/check-private"
+git -C "$p" add crates/app/src/lib.rs
+expect 1 "a staged file naming a client fails" "$p/.practices/bin/check-private"
+git -C "$p" rm -q --cached crates/app/src/lib.rs
+rm "$p/crates/app/src/lib.rs" "$p/dev/private-terms"
+expect 0 "the env secret stands in for the file" env CI=true PRACTICES_PRIVATE_TERMS=Initrode "$p/.practices/bin/check-private"
+echo "Initrode" >"$p/README"
+expect 1 "and is searched with" env CI=true PRACTICES_PRIVATE_TERMS=Initrode "$p/.practices/bin/check-private"
+rm "$p/README"
+printf 'GlobexCorp\n' >"$p/dev/private-terms"
+
+# --- check-commit-msg
+printf 'Fix the thing\n\nCo-Authored-By: Claude <noreply@anthropic.com>\n' >"$work/m1"
+expect 0 "a plain message with Co-Authored-By passes" "$p/.practices/bin/check-commit-msg" "$work/m1"
+printf 'Fix\n\nClaude-Session: https://claude.ai/code/session_01AbCdEfGhIjKlMnOpQrStUv\n' >"$work/m2"
+expect 1 "a session trailer fails" "$p/.practices/bin/check-commit-msg" "$work/m2"
+printf 'Fix\n\nSee https://claude.ai/code/session_01AbCdEfGhIjKlMnOpQrStUv\n' >"$work/m3"
+expect 1 "a session link fails" "$p/.practices/bin/check-commit-msg" "$work/m3"
+printf 'Keep sessions alive\n\nSession handling: retried once.\n' >"$work/m4"
+expect 0 "the word session alone passes" "$p/.practices/bin/check-commit-msg" "$work/m4"
+printf 'Talk to GlobexCorp\n' >"$work/m5"
+expect 1 "a message naming a client fails" "$p/.practices/bin/check-commit-msg" "$work/m5"
+printf 'Fix\n# GlobexCorp in a comment line\n' >"$work/m6"
+expect 0 "comment lines aren't the message" "$p/.practices/bin/check-commit-msg" "$work/m6"
+
+# --- install-hooks
+p=$(project)
+expect 1 "hooks not installed fails the check" "$p/.practices/bin/install-hooks" --check
+expect 0 "installing" "$p/.practices/bin/install-hooks"
+expect 0 "installed passes the check" "$p/.practices/bin/install-hooks" --check
+printf 'Fix\n\nClaude-Session: abc\n' >"$work/m7"
+expect 1 "the commit-msg hook refuses a session trailer" git -C "$p" commit -q --allow-empty -F "$work/m7"
+expect 0 "the hooks let a clean commit through" git -C "$p" commit -q --allow-empty -m "Start"
+
+# --- claude-hook: which commands run the lint gate (lint and the disk
+# guard replaced by stand-ins that record their runs)
+p=$(project)
+printf '#!/bin/sh\necho run >>"%s/lint-runs"\n' "$p" >"$p/.practices/bin/lint"
+printf '#!/bin/sh\nexit 0\n' >"$p/.practices/bin/disk-guard"
+hook() { printf '{"tool_input":{"command":"%s"}}' "$1" | "$p/.practices/bin/claude-hook"; }
+runs() { [ -f "$p/lint-runs" ] && wc -l <"$p/lint-runs" | tr -d ' ' || echo 0; }
+for c in "cargo build" "cargo test -p app" "nice -n 19 cargo clippy --workspace" "cd x && cargo run" "cargo +nightly check" "cargo nextest run"; do
+    before=$(runs)
+    hook "$c" >/dev/null 2>&1
+    [ "$(runs)" -gt "$before" ] && ok || bad "claude-hook runs lint after: $c"
+done
+for c in "ls" "cargo fmt" "git commit -m 'cargo build'" "cargo tree"; do
+    before=$(runs)
+    hook "$c" >/dev/null 2>&1
+    [ "$(runs)" = "$before" ] && ok || bad "claude-hook leaves lint alone after: $c"
+done
+printf '#!/bin/sh\necho "disk: 12 GB free"; exit 1\n' >"$p/.practices/bin/disk-guard"
+expect 1 "a disk under its floor stops the agent" hook "ls"
+
+# --- bin/install keeps what the project owns
+p=$(project)
+echo "SIZE_CODE=900" >"$p/.practices/config"
+"$here/bin/install" --templates "$p" >/dev/null
+grep -q SIZE_CODE=900 "$p/.practices/config" && ok || bad "install keeps .practices/config"
+[ -f "$p/deny.toml" ] && [ -f "$p/rust-toolchain.toml" ] && [ -f "$p/.github/dependabot.yml" ] && ok || bad "install --templates copies the templates"
+echo "# mine" >"$p/deny.toml"
+"$here/bin/install" --templates "$p" >/dev/null
+[ "$(cat "$p/deny.toml")" = "# mine" ] && ok || bad "install never overwrites a project's template copy"
+
+echo "$passed passed, $failed failed"
+[ $failed = 0 ]

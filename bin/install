@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# Puts the practices kit into a project, or brings it up to date.
+#
+#   bin/install PROJECT_DIR              # sync .practices/bin and hooks
+#   bin/install --templates PROJECT_DIR  # also copy the starting templates
+#
+# What it owns in the project (replaced on every run, never edit there):
+#   .practices/bin/      the scripts (lint, check-*, claude-hook, ...)
+#   .practices/hooks/    git hooks (install-hooks points git at them)
+#   .practices/VERSION   which practices commit they came from
+# What the project owns (created when missing, never changed after):
+#   .practices/config, .practices/coverage-floors, and with --templates
+#   clippy.toml, deny.toml, rust-toolchain.toml, .github/dependabot.yml,
+#   .claude/settings.json.
+# Cargo.toml's lints it can't merge safely: it prints what to paste.
+set -euo pipefail
+here=$(cd "$(dirname "$0")/.." && pwd)
+
+templates=
+if [ "${1:-}" = --templates ]; then
+    templates=1
+    shift
+fi
+project=${1:?usage: bin/install [--templates] PROJECT_DIR}
+project=$(cd "$project" && git rev-parse --show-toplevel)
+version=$(git -C "$here" describe --tags --always --dirty)
+
+kit=$project/.practices
+rm -rf "${kit:?}/bin" "${kit:?}/hooks"
+mkdir -p "$kit/bin" "$kit/hooks"
+cp "$here"/scripts/* "$kit/bin/"
+cp "$here"/hooks/* "$kit/hooks/"
+chmod +x "$kit"/bin/* "$kit"/hooks/*
+chmod -x "$kit/bin/lib.sh"
+printf '%s\n' "$version" >"$kit/VERSION"
+cat >"$kit/README.md" <<EOF
+# .practices
+
+The shared practices kit from github.com/dorhawk-software/practices
+($version). bin/ and hooks/ are synced from there: change them there, not
+here. config, coverage-floors, size-allowlist and lint.d/ are this
+project's own. Once per clone: \`.practices/bin/install-hooks\`.
+EOF
+
+own() { # copy a template to a project-owned path unless it exists
+    if [ -e "$project/$2" ]; then
+        echo "kept:    $2 (the project's own)"
+    else
+        mkdir -p "$(dirname "$project/$2")"
+        cp "$here/$1" "$project/$2"
+        echo "created: $2"
+    fi
+}
+own templates/config .practices/config
+if [ ! -e "$kit/coverage-floors" ]; then
+    printf '# crate folder   linux  macos   (a share of lines, in percent; "-": none)\n' >"$kit/coverage-floors"
+    echo "created: .practices/coverage-floors (add each crate's measured share)"
+fi
+
+if [ -n "$templates" ]; then
+    own rust/templates/clippy.toml clippy.toml
+    own rust/templates/deny.toml deny.toml
+    own rust/templates/rust-toolchain.toml rust-toolchain.toml
+    own rust/templates/dependabot.yml .github/dependabot.yml
+    own rust/templates/claude-settings.json .claude/settings.json
+    if ! grep -q '^\[workspace.lints' "$project/Cargo.toml" 2>/dev/null; then
+        echo
+        echo "Paste into Cargo.toml (and give each crate \`[lints] workspace = true\`):"
+        cat "$here/rust/templates/Cargo-lints.toml"
+    fi
+fi
+echo "practices $version in $project/.practices"
