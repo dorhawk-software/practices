@@ -20,6 +20,10 @@ newest first, in the kinds common/changelog.md describes.
 
 ### Better
 
+- **Window buttons on macOS take 96 px, not 88.** macOS 26 draws its
+  three buttons 60 px across, not 54, so 88 px left 10 px before the
+  header's content against 18 px before the first button. The room now
+  keeps as much after them as before.
 - **Dependabot in a private repository.** The template shows how to group
   major updates into one pull request with at most two open, so the first
   run doesn't open one build per crate (tern's opened six).

@@ -115,9 +115,9 @@ pub fn system_buttons(cx: &App) -> bool {
 pub const HEADER_HEIGHT: f32 = 56.;
 const BUTTON: f32 = 14.;        // macOS's buttons are this tall
 const BUTTONS_LEFT: f32 = 18.;  // window edge to the first button
-const BUTTONS_SPAN: f32 = 54.;  // across the three (macOS 26)
-const BUTTONS_CLEAR: f32 = 16.; // kept clear after them
-/// The room every header leaves at its left on a Mac (76 px left none).
+const BUTTONS_SPAN: f32 = 60.;  // three 14 px buttons 9 px apart (macOS 26)
+const BUTTONS_CLEAR: f32 = 18.; // as much after them as before them
+/// The room every header leaves at its left on a Mac: 96 px.
 pub const BUTTONS_WIDTH: f32 = BUTTONS_LEFT + BUTTONS_SPAN + BUTTONS_CLEAR;
 
 /// Centred on a header HEADER_HEIGHT tall.

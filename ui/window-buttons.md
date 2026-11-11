@@ -24,9 +24,13 @@ option A was chosen: the system draws the buttons, top left and centred on
 the header, the header leaves them room and drops its own close, and New
 tunnel's Cancel moves to the right there. Two more lessons followed:
 
-- The room has to be measured. 76 px left none: Traffic's title touched
-  the green button. 88 px (18 px to the first button, 54 px across the
-  three, 16 px clear after them, measured on macOS 26) does.
+- The room has to be measured, and then looked at. 76 px left none:
+  Traffic's title touched the green button. 88 px fitted, but tern's
+  owner saw the bird sit closer to the buttons than the buttons sit to
+  the window's edge: macOS 26 draws three 14 px buttons 9 px apart, 60 px
+  across, which left only 10 px after them. 96 px (18 px to the first
+  button, 60 across, 18 clear after them, as much as before them) looks
+  right.
 - Being after the buttons isn't enough; the header has to be on their
   line. Traffic's and the profile editor's titles stood 4 px above the
   buttons ([c75a781](https://github.com/dorhawk-software/crake/commit/c75a781)).
@@ -63,5 +67,9 @@ tunnel's Cancel moves to the right there. Two more lessons followed:
   the tunnel detail, Traffic, Settings, New tunnel).
 - Look at each window on each system you ship for, at the top left
   especially, before calling header work done.
+- On a Mac, capture a window and measure the gap after the green button
+  against the gap before the red one; they should match. Look at an
+  inactive window too: macOS draws its buttons grey there (on a light
+  header they read as faint rings), which is the system, not a fault.
 
 For GPUI: [rust/gpui.md](../rust/gpui.md#window-buttons-on-macos).
