@@ -39,7 +39,10 @@ jobs:
       HAVE_TOKEN: ${{ secrets.PRACTICES_SYNC_TOKEN != '' }}
     steps:
       - if: env.HAVE_TOKEN != 'true'
-        run: echo "::warning::No PRACTICES_SYNC_TOKEN secret: ${{ matrix.repo }} not synced."
+        env:
+          REPO: ${{ matrix.repo }}
+        run: |
+          echo "::warning::No PRACTICES_SYNC_TOKEN secret, so $REPO was not synced."
       - if: env.HAVE_TOKEN == 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

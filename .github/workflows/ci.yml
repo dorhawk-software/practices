@@ -46,7 +46,7 @@ jobs:
       - name: actionlint (workflows, and the actions' scripts)
         run: |
           bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash) 1.7.12
-          ./actionlint -color
+          ./actionlint -color .github/workflows/*.yml examples/rust-workspace/.github/workflows/*.yml
       - name: JSON files parse, the plugin has what Claude Code reads
         run: |
           for f in projects.json .claude-plugin/marketplace.json plugin/.claude-plugin/plugin.json; do
@@ -55,8 +55,10 @@ jobs:
           jq -e '.name and .owner.name and (.plugins | length > 0)' .claude-plugin/marketplace.json >/dev/null
           jq -e '.name and .description' plugin/.claude-plugin/plugin.json >/dev/null
           for s in plugin/skills/*/SKILL.md; do
-            head -n 5 "$s" | grep -q '^name: ' && head -n 5 "$s" | grep -q '^description: ' ||
-              { echo "$s: needs name and description"; exit 1; }
+            if ! head -n 5 "$s" | grep -q '^name: ' || ! head -n 5 "$s" | grep -q '^description: '; then
+              echo "$s: needs name and description"
+              exit 1
+            fi
           done
       - name: Docs' relative links
         run: tests/links
