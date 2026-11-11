@@ -59,6 +59,8 @@ cd path/to/your-project && .practices/bin/install-hooks && .practices/bin/lint
 | --- | --- |
 | [Design before build](ui/design-before-build.md) | Proposals with options first; build what was chosen, one to one. |
 | [Window buttons](ui/window-buttons.md) | macOS draws its own on the left and the header makes room; the app's own on the right elsewhere. |
+| [An identity pass](ui/identity-pass.md) | One physical idea, objects with one job; a first pass on the showcase screens, then an audit of the whole app. |
+| [Visual craft](ui/visual-craft.md) | Tone, not outlines; matching stroke ends; one drawing per object; compact; an 11 px floor. |
 
 ### Rust ([rust/](rust))
 

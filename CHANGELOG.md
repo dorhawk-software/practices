@@ -7,6 +7,15 @@ newest first, in the kinds common/changelog.md describes.
 
 ### New
 
+- **An identity pass, through the whole app** (`ui/identity-pass.md`).
+  One physical idea and objects with one job each; how far to push
+  depends on the identity already there, but every screen is reviewed; a
+  first pass on the showcase screens, then an audit of the entire app
+  against the chosen spec. From the Obálka, Crake and tern passes.
+- **Visual craft** (`ui/visual-craft.md`). Tone instead of outlines, every
+  stroke end matching, one drawing per object, a line weight per family,
+  compact screens, an 11 px floor, one anatomy per job, real context in
+  proposals, the product's voice, motion with a reason.
 - **UI design practices, in `ui/`.** Window buttons where each system puts
   them: macOS draws its own on the left and the header makes room, from
   Crake's Mac fixes, with the GPUI how-to in `rust/gpui.md`. Design before

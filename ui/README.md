@@ -8,6 +8,8 @@ the web) lives with its language, linked from these pages.
 | --- | --- |
 | [Design before build](design-before-build.md) | Proposals with options first; build what was chosen, one to one; the design kept in sync. |
 | [Window buttons](window-buttons.md) | macOS draws its own on the left and the header makes room; the app's own on the right elsewhere. |
+| [An identity pass](identity-pass.md) | One physical idea, objects with one job; a first pass on the showcase screens, then an audit of the whole app. |
+| [Visual craft](visual-craft.md) | Tone, not outlines; matching stroke ends; one drawing per object; compact; an 11 px floor; one anatomy per job. |
 | [Keyboard shortcuts](keyboard-shortcuts.md) | Bind the system's main modifier (⌘ on a Mac); show shortcuts as each system writes them: ⇧⌘K, Ctrl+Shift+K. |
 
 ## What belongs here
@@ -17,7 +19,5 @@ layout, platform conventions, design process, accessibility, motion,
 wording on screen. Each page says what, why (the incident, linked), how
 to apply it, and how to check it, like the rest of the practices.
 
-Coming ([ROADMAP.md](../ROADMAP.md)): tern's design canvas rules (an agreed
-design only, captures of the built app, every screen checked in each
-language), and what Obálka (React Native) and the dorhawk.software website
-teach.
+Coming ([ROADMAP.md](../ROADMAP.md)): what Obálka (React Native) and the
+dorhawk.software website teach, starting with Obálka's second pass.
