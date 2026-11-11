@@ -17,6 +17,13 @@ updates:
       crates:
         patterns: ["*"]
         update-types: ["minor", "patch"]
+      # A private repository pays for each pull request's build: put the
+      # majors in one pull request too, and keep at most two open (tern,
+      # 2026-11-11: the first run opened six). With it, add
+      # `open-pull-requests-limit: 2` above `groups:`.
+      # majors:
+      #   patterns: ["*"]
+      #   update-types: ["major"]
     # Crates updated another way, e.g. GPUI when the project patches it
     # (a bump here would quietly drop the patch):
     # ignore:

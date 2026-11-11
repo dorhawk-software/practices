@@ -5,6 +5,12 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+### Better
+
+- **Dependabot in a private repository.** The template shows how to group
+  major updates into one pull request with at most two open, so the first
+  run doesn't open one build per crate (tern's opened six).
+
 ## 1.1.1 (2026-11-11)
 
 ### Fixed
