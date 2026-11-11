@@ -11,6 +11,12 @@ newest first, in the kinds common/changelog.md describes.
   them: macOS draws its own on the left and the header makes room, from
   Crake's Mac fixes, with the GPUI how-to in `rust/gpui.md`. Design before
   build moved here from `common/` (its old link is gone).
+- **Keyboard shortcuts the way each system writes them** (`ui/`). Bind
+  the system's main modifier (⌘ on a Mac, Ctrl elsewhere) and show
+  shortcuts as each system does: ⇧⌘K on a Mac, Ctrl+Shift+K elsewhere.
+  Translations hold no key names. From tern's first Mac run, where the
+  search field said "Ctrl K" and ⌘K did nothing. The GPUI how-to is in
+  `rust/gpui.md`.
 
 ### Better
 

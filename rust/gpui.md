@@ -165,6 +165,80 @@ fn the_title_is_level_with_the_systems_buttons(cx: &mut TestAppContext) {
 and one that `window.try_find("close")` is `None` there. The other tests
 set `system_buttons: false`, so they run the same on every system.
 
+## Keyboard shortcuts per system
+
+**What.** The practice is [ui/keyboard-shortcuts.md](../ui/keyboard-shortcuts.md):
+bind the system's main modifier, and show shortcuts the way each system
+writes them. In GPUI, the binding is `secondary-`, and the label comes
+from a small function of the app's own.
+
+**Why.** `ctrl-k` in a `KeyBinding` means Control on every system, so on
+a Mac ⌘K did nothing (tern, 2026-11-11). GPUI's own `Display` for a
+keystroke is meant for developers. Off a Mac it prints `ctrl-K`, and on a
+Mac it shows Control as `^`, not ⌃.
+
+**Apply.**
+```rust
+cx.bind_keys([
+    KeyBinding::new("secondary-k", OpenSearch, None), // ⌘K on a Mac, Ctrl+K elsewhere
+    KeyBinding::new("e", MarkDone, Some("List")),    // the same everywhere
+]);
+
+#[derive(Clone, Copy)]
+pub enum System { Mac, Other }
+
+impl System {
+    pub const fn current() -> Self {
+        if cfg!(target_os = "macos") { Self::Mac } else { Self::Other }
+    }
+}
+
+/// "⇧⌘K" on a Mac, "Ctrl+Shift+K" elsewhere.
+pub fn label(keys: &Keystroke, system: System) -> String {
+    let m = &keys.modifiers;
+    let key = match (keys.key.as_str(), system) {
+        ("enter", System::Mac) => "↩".into(),
+        ("backspace", System::Mac) => "⌫".into(),
+        ("escape", System::Mac) => "⎋".into(),
+        ("tab", System::Mac) => "⇥".into(),
+        ("enter", System::Other) => "Enter".into(),
+        ("escape", System::Other) => "Esc".into(),
+        (k, _) => k.to_uppercase(),
+    };
+    match system {
+        System::Mac => [(m.control, "⌃"), (m.alt, "⌥"), (m.shift, "⇧"), (m.platform, "⌘")]
+            .iter().filter(|(on, _)| *on).map(|(_, s)| *s).chain([key.as_str()]).collect(),
+        System::Other => [(m.control, "Ctrl"), (m.alt, "Alt"), (m.shift, "Shift")]
+            .iter().filter(|(on, _)| *on).map(|(_, s)| *s).chain([key.as_str()])
+            .collect::<Vec<_>>().join("+"),
+    }
+}
+```
+A tooltip gets its keys from the binding. Use `window.bindings_for_action`,
+or keep the bindings in one table the app reads. The translated text has
+only a `{ $keys }` placeable.
+
+**Check.**
+```rust
+#[test]
+fn a_shortcut_reads_as_each_system_writes_it() {
+    let k = Keystroke::parse("ctrl-shift-k").unwrap();
+    assert_eq!(label(&k, System::Other), "Ctrl+Shift+K");
+    let k = Keystroke { modifiers: Modifiers { platform: true, shift: true, ..Default::default() },
+                        key: "k".into(), key_char: None };
+    assert_eq!(label(&k, System::Mac), "⇧⌘K");
+}
+
+#[test]
+fn no_translation_names_a_modifier() {
+    for (file, text) in locales() {
+        for word in ["Ctrl", "Alt", "Cmd", "Option", "⌘", "⌥", "⌃", "⇧"] {
+            assert!(!text.contains(word), "{file} names {word}; use {{ $keys }}");
+        }
+    }
+}
+```
+
 ## CI packages for GPUI on Linux
 
 **What.** GPUI links X11, Wayland, keyboard, font and Vulkan libraries.

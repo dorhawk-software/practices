@@ -8,6 +8,7 @@ the web) lives with its language, linked from these pages.
 | --- | --- |
 | [Design before build](design-before-build.md) | Proposals with options first; build what was chosen, one to one; the design kept in sync. |
 | [Window buttons](window-buttons.md) | macOS draws its own on the left and the header makes room; the app's own on the right elsewhere. |
+| [Keyboard shortcuts](keyboard-shortcuts.md) | Bind the system's main modifier (⌘ on a Mac); show shortcuts as each system writes them: ⇧⌘K, Ctrl+Shift+K. |
 
 ## What belongs here
 

@@ -14,7 +14,8 @@ is the source of everything Rust here; its commit links are in each doc.
   [testing](common/testing.md), [CI and caching](common/ci-caching.md),
   [agent working rules](common/agent-working-rules.md)
 - [x] UI docs: [design before build](ui/design-before-build.md),
-  [window buttons](ui/window-buttons.md)
+  [window buttons](ui/window-buttons.md),
+  [keyboard shortcuts](ui/keyboard-shortcuts.md)
 - [x] Rust docs: [conventions](rust/conventions.md), [lints](rust/lints.md),
   [coverage](rust/coverage.md), [GPUI](rust/gpui.md)
 - [x] Templates: lints, clippy, deny (GPL and closed-source lists), toolchain,
