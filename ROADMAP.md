@@ -29,10 +29,10 @@ is the source of everything Rust here; its commit links are in each doc.
   [start a Rust project](guides/start-a-rust-project.md),
   [fold in a project](guides/fold-in-a-project.md)
 - [x] [Example workspace](examples/rust-workspace/)
-- [ ] Composite actions `rust-setup`, `rust-lint`, `rust-coverage`,
+- [x] Composite actions `rust-setup`, `rust-lint`, `rust-coverage`,
   `prune-caches`; reusable workflows `rust-ci.yml`, `rust-advisories.yml`,
   `rust-toolchain-bump.yml`; the sync workflow and `projects.json`
-- [ ] The Claude Code plugin's skills
+- [x] The Claude Code plugin's skills
 - [ ] Crake switched to the kit, with no loss in what its CI catches; then
   the `v1` tag
 - [ ] tern adopts it ([the adopt guide](guides/adopt-in-a-rust-project.md))

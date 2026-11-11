@@ -21,6 +21,9 @@ newest first, in the kinds common/changelog.md describes.
   licence list in the deny.toml template now comes with
   `[licenses.private] ignore = true`; without it, cargo deny called each
   of the app's own unpublished crates unlicensed.
+- **A quiet pre-commit hook.** check-coverage listed every test binary
+  and its result even when all passed, filling an agent's context on each
+  commit (found adopting tern). It lists them only in CI now.
 
 ## 1.0.0 (2026-11-11)
 
