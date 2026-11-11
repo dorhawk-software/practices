@@ -18,6 +18,9 @@ runs:
       env:
         GH_TOKEN: ${{ inputs.token }}
         DRY: ${{ inputs.dry-run }}
+        # Known to the workflow already; asking the API for it needs more
+        # than this job's token has in a private repository.
+        PRACTICES_CACHE_BRANCH: ${{ github.event.repository.default_branch }}
       run: |
         if [ "$DRY" = true ]; then
           "$GITHUB_ACTION_PATH/../../scripts/prune-caches" --dry-run

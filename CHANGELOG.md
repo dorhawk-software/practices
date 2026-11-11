@@ -5,6 +5,8 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+## 1.1.0 (2026-11-11)
+
 ### Better
 
 - **Starting a project in any language.** The start guide is now for every
@@ -21,6 +23,11 @@ newest first, in the kinds common/changelog.md describes.
   licence list in the deny.toml template now comes with
   `[licenses.private] ignore = true`; without it, cargo deny called each
   of the app's own unpublished crates unlicensed.
+- **Cache pruning in private repositories.** The `prune-caches` action
+  asked GitHub's API for the default branch, which the job's token may not
+  read in a private repository ("Resource not accessible by
+  integration"); the workflow now passes the branch in. Found by tern's
+  first CI run.
 - **A quiet pre-commit hook.** check-coverage listed every test binary
   and its result even when all passed, filling an agent's context on each
   commit (found adopting tern). It lists them only in CI now.
