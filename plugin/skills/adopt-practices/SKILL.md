@@ -7,8 +7,11 @@ description: Bring the dorhawk-software/practices kit into a Rust project, or up
 
 The full guide, with what you'll see at each step:
 https://github.com/dorhawk-software/practices/blob/main/guides/adopt-in-a-rust-project.md
-(a new project: guides/start-a-new-project.md). Follow it; this is the
-order and the rules that matter most.
+(a new project: guides/start-a-new-project.md for any language, then
+guides/start-a-rust-project.md). Follow it; this is the order and the
+rules that matter most. A project in another language gets only the
+language-neutral part, the git hooks (privacy and commit messages):
+start-a-new-project.md step 4.
 
 ## 1. Get the kit
 

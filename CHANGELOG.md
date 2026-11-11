@@ -5,6 +5,23 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+### Better
+
+- **Starting a project in any language.** The start guide is now for every
+  project (identity, CLAUDE.md, privacy, the git hooks, CI's cost,
+  changelog, not-now), with the Rust steps on a page of their own,
+  `guides/start-a-rust-project.md`. `bin/install` puts the Rust parts
+  (coverage floors, templates) only into a project with a `Cargo.toml`;
+  the hooks work in any repository and never call cargo, which a test now
+  checks.
+
+### Fixed
+
+- **Closed-source apps' own crates in cargo deny.** The closed-source
+  licence list in the deny.toml template now comes with
+  `[licenses.private] ignore = true`; without it, cargo deny called each
+  of the app's own unpublished crates unlicensed.
+
 ## 1.0.0 (2026-11-11)
 
 ### New

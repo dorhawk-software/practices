@@ -58,6 +58,11 @@ allow = [
 #     "Unlicense",
 #     "Zlib",
 # ]
+#
+# [licenses.private]
+# # The app's own crates aren't published and have no open licence; without
+# # this, cargo deny calls each of them unlicensed (found adopting tern).
+# ignore = true
 
 # A crate whose licence is its own text (e.g. libbzip2's "bzip2-1.0.6")
 # goes in the list with a comment saying which crate brings it.

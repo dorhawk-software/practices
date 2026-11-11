@@ -9,10 +9,15 @@
 #   .practices/hooks/    git hooks (install-hooks points git at them)
 #   .practices/VERSION   which practices commit they came from
 # What the project owns (created when missing, never changed after):
-#   .practices/config, .practices/coverage-floors, and with --templates
-#   clippy.toml, deny.toml, rust-toolchain.toml, .github/dependabot.yml,
+#   .practices/config; and in a Rust project (a Cargo.toml at the root)
+#   .practices/coverage-floors, and with --templates clippy.toml,
+#   deny.toml, rust-toolchain.toml, .github/dependabot.yml,
 #   .claude/settings.json.
 # Cargo.toml's lints it can't merge safely: it prints what to paste.
+#
+# Any project gets the language-neutral part: the privacy check, the
+# commit-message check and the git hooks, none of which run cargo. The
+# Rust checks (lint, coverage, size, unsafe) run only on Rust files.
 set -euo pipefail
 here=$(cd "$(dirname "$0")/.." && pwd)
 
@@ -52,12 +57,17 @@ own() { # copy a template to a project-owned path unless it exists
     fi
 }
 own templates/config .practices/config
-if [ ! -e "$kit/coverage-floors" ]; then
+rust=
+[ -f "$project/Cargo.toml" ] && rust=1
+if [ -n "$rust" ] && [ ! -e "$kit/coverage-floors" ]; then
     printf '# crate folder   linux  macos   (a share of lines, in percent; "-": none)\n' >"$kit/coverage-floors"
     echo "created: .practices/coverage-floors (add each crate's measured share)"
 fi
 
-if [ -n "$templates" ]; then
+if [ -n "$templates" ] && [ -z "$rust" ]; then
+    echo "no Cargo.toml: no Rust templates copied (the only language with templates yet)"
+fi
+if [ -n "$templates" ] && [ -n "$rust" ]; then
     own rust/templates/clippy.toml clippy.toml
     own rust/templates/deny.toml deny.toml
     own rust/templates/rust-toolchain.toml rust-toolchain.toml

@@ -155,8 +155,38 @@ done
 printf '#!/bin/sh\necho "disk: 12 GB free"; exit 1\n' >"$p/.practices/bin/disk-guard"
 expect 1 "a disk under its floor stops the agent" hook "ls"
 
+# --- a project in another language: the hooks guard it, and cargo never
+# runs (a stand-in cargo records it if anything calls it)
+p=$work/web$RANDOM
+mkdir -p "$p" "$work/nocargo"
+git -C "$p" init -q
+git -C "$p" config user.email t@example.com
+git -C "$p" config user.name t
+printf '#!/bin/sh\necho "$*" >>"%s/cargo-runs"\nexit 1\n' "$work" >"$work/nocargo/cargo"
+chmod +x "$work/nocargo/cargo"
+nocargo() { PATH="$work/nocargo:$PATH" "$@"; }
+nocargo "$here/bin/install" --templates "$p" >/dev/null
+[ ! -e "$p/.practices/coverage-floors" ] && [ ! -e "$p/deny.toml" ] && [ ! -e "$p/rust-toolchain.toml" ] && ok ||
+    bad "install puts nothing of Rust's into a project without Cargo.toml"
+mkdir -p "$p/dev"
+printf 'dev/private-terms\n' >"$p/.gitignore"
+printf 'GlobexCorp\n' >"$p/dev/private-terms"
+expect 0 "installing the hooks there" nocargo "$p/.practices/bin/install-hooks"
+echo '<h1>Hello</h1>' >"$p/index.html"
+git -C "$p" add -A
+expect 0 "a clean commit goes through both hooks" nocargo git -C "$p" commit -q -m "Start the site"
+echo '<p>Built for GlobexCorp</p>' >"$p/about.html"
+git -C "$p" add about.html
+expect 1 "the pre-commit hook refuses a client's name in a file" nocargo git -C "$p" commit -q -m "Add about"
+git -C "$p" rm -q --cached about.html
+rm "$p/about.html"
+printf 'Fix\n\nClaude-Session: https://claude.ai/code/session_01AbCdEfGhIjKlMnOpQrStUv\n' >"$work/m8"
+expect 1 "the commit-msg hook refuses a session link" nocargo git -C "$p" commit -q --allow-empty -F "$work/m8"
+[ ! -e "$work/cargo-runs" ] && ok || bad "cargo ran in a project without Rust" "$(cat "$work/cargo-runs")"
+
 # --- bin/install keeps what the project owns
 p=$(project)
+touch "$p/Cargo.toml"
 echo "SIZE_CODE=900" >"$p/.practices/config"
 "$here/bin/install" --templates "$p" >/dev/null
 grep -q SIZE_CODE=900 "$p/.practices/config" && ok || bad "install keeps .practices/config"

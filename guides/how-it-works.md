@@ -32,6 +32,13 @@ each, who owns which file, and how a change here reaches every project.
  projects.json ── sync-projects.yml ── opens a PR ──▶ each listed project
 ```
 
+Every project gets the language-neutral part: `check-private`,
+`check-commit-msg` and the git hooks that run them, with nothing to build
+and no compiler called. A project with a `Cargo.toml` also gets the Rust
+part: the coverage floors file, the templates, and the Rust checks the
+pre-commit hook runs when Rust files are committed. Other languages have
+no checks in the kit yet ([ROADMAP.md](../ROADMAP.md), phase 7).
+
 The same scripts run in four places: by hand, in the git hooks, in the
 Claude Code hook, and in CI. A check that passes on your machine passes in
 CI for the same reason, and the other way round.
@@ -47,7 +54,7 @@ CI for the same reason, and the other way round.
 | `.practices/VERSION` | the kit | the practices commit or tag it came from |
 | `.practices/README.md` | the kit | says what's synced and what isn't |
 | `.practices/config` | the project | created once from [templates/config](../templates/config), then never touched |
-| `.practices/coverage-floors` | the project | created once with a header; you add the crates |
+| `.practices/coverage-floors` | the project | created once with a header in a Rust project; you add the crates |
 | `.practices/size-allowlist` | the project | you, when adopting the size limit ([adopt guide](adopt-in-a-rust-project.md)) |
 | `.practices/lint.d/*` | the project | your own extra lint steps |
 

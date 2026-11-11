@@ -20,13 +20,16 @@ wrote it, the next time they start one.
 | You want to | Read |
 | --- | --- |
 | Know what's here and why it's built this way | [guides/how-it-works.md](guides/how-it-works.md) |
-| Start a new project with all of it | [guides/start-a-new-project.md](guides/start-a-new-project.md) |
+| Start a new project, in any language | [guides/start-a-new-project.md](guides/start-a-new-project.md) |
+| Then set up a new Rust project | [guides/start-a-rust-project.md](guides/start-a-rust-project.md) |
 | Bring it into an existing Rust project | [guides/adopt-in-a-rust-project.md](guides/adopt-in-a-rust-project.md) |
 | See a project that uses everything | [examples/rust-workspace](examples/rust-workspace) |
 | Add another project's practices (or a language) | [guides/fold-in-a-project.md](guides/fold-in-a-project.md) |
 | See what's planned and what's missing | [ROADMAP.md](ROADMAP.md) |
 
-The short version for a Rust workspace:
+Any project gets the git hooks that keep private names and session links
+out of its commits; a Rust workspace also gets the lint gate and coverage
+floors. The short version for a Rust workspace:
 
 ```sh
 git clone https://github.com/dorhawk-software/practices

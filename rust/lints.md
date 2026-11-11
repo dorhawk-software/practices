@@ -62,6 +62,7 @@ jobs:
 - The template has two licence lists; keep the one that matches your project and delete the other.
   - **GPL projects** (Crake's): permissive licences plus GPL-3.0-or-later, MPL-2.0 and the other GPL-compatible ones.
   - **Proprietary or closed-source apps:** permissive licences only, with no GPL, AGPL or LGPL crates. A statically linked LGPL crate would oblige you to let users relink the app. MPL-2.0 is allowed, because its copyleft covers only the MPL files themselves.
+    Keep its `[licenses.private] ignore = true` too: the app's own crates are unpublished and have no open licence, and cargo deny would otherwise report each one as unlicensed (found adopting tern, 2026-11-11).
 - A dependency's security fix is a changelog line under Fixed and at least a hotfix release (see [common/changelog.md](../common/changelog.md)).
 - Call `rust-advisories.yml` daily, so a new advisory shows up before it turns every branch red at once.
 

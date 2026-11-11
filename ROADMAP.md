@@ -25,7 +25,8 @@ is the source of everything Rust here; its commit links are in each doc.
 - [x] Tests of the kit (`tests/run`), under bash 3.2 on macOS
 - [x] Guides: [how it works](guides/how-it-works.md),
   [adopt in a Rust project](guides/adopt-in-a-rust-project.md),
-  [start a new project](guides/start-a-new-project.md),
+  [start a new project](guides/start-a-new-project.md) (any language),
+  [start a Rust project](guides/start-a-rust-project.md),
   [fold in a project](guides/fold-in-a-project.md)
 - [x] [Example workspace](examples/rust-workspace/)
 - [ ] Composite actions `rust-setup`, `rust-lint`, `rust-coverage`,
