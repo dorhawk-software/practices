@@ -132,6 +132,36 @@ the icons are the part of the identity the user sees on every screen.
 design doc says why. Each icon of the family, side by side at 24 and at
 48, reads as one hand. The weight is in the families list above.
 
+## The system's own sign for the system's own act
+
+**What.** A control that stands for something the operating system does
+shows the sign that system uses for it. Unlocking shows Face ID's face on
+an iPhone and a fingerprint on Android. Sharing shows each system's share
+sign. The sign is drawn in the product's own icon family, not taken from
+a stock set.
+
+**Why.** Obálka's lock screen board drew the Face ID face, on an iPhone
+mock-up. Built as it was, Android phones that unlock with a fingerprint
+showed a face (2026-11-12). The owner's rule: the platform's own sign
+reads as native. The first fix took a stock fingerprint, which no longer
+matched the board's face; both are now drawn in one frame at one weight
+(1068694).
+
+**Apply.**
+1. List the controls that stand for a system act: unlock, share, open in
+   another app, add to the calendar, the system's settings.
+2. For each, draw one glyph per system, in the product's family: the same
+   frame, line weight and stroke ends. The system changes what is drawn,
+   never how.
+3. Choose the glyph in one place, by the platform, with the platform as
+   an argument so a test can ask for each.
+4. A board drawn for one system shows that system's sign; note the other
+   system's on the canvas, so the design holds both.
+
+**Check.** A test renders each such glyph for every platform and expects
+different drawings in the same frame. Walk the screen on each platform
+and look at the sign.
+
 ## Compact, not breathy
 
 **What.** Content or the main control starts right under the window's

@@ -7,6 +7,10 @@ newest first, in the kinds common/changelog.md describes.
 
 ### Changed
 
+- **A control for a system act shows that system's sign.** Unlock shows
+  Face ID on an iPhone and a fingerprint on Android; both drawn in the
+  product's own icon family, chosen by the platform in one place, tested
+  for each (`ui/visual-craft.md`).
 - **The rendered check runs before the owner sees anything, whatever the
   tool says.** A canvas type's "never verify unless asked" made the pass
   look optional; the owner's standing request wins, and the handoff says
