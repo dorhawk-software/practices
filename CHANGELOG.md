@@ -7,6 +7,14 @@ newest first, in the kinds common/changelog.md describes.
 
 ### Changed
 
+- **The rendered check runs before the owner sees anything, whatever the
+  tool says.** A canvas type's "never verify unless asked" made the pass
+  look optional; the owner's standing request wins, and the handoff says
+  the checks ran (`ui/identity-pass.md`, the UI skill's Musts).
+- **Every product gets its own drawn icon set.** One family grown from the
+  product's existing drawings and the idea's object, two families shown,
+  real third-party logos instead of stand-ins; a rare mark no longer
+  leaves the screens plain (`ui/visual-craft.md`, `ui/identity-pass.md`).
 - **A size limit is met by splitting the file, never by trimming it.**
   A file at its allowlist count is split first; shortened wording or a
   dropped plural form to make room is refused (`common/gates.md`).

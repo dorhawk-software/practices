@@ -42,7 +42,12 @@ sometimes edits it.
 - Show variants and recommend one; never build an open choice unasked.
 - After a pick, strip the other variants from the canvas.
 - Real context: the real frame, both themes, the longest language.
-- Run "Before you show anything" (identity-pass.md) on every page you
-  show, and the checks in visual-craft.md.
+- Run "Before you show anything" (identity-pass.md) on the rendered
+  page, every time, before telling the owner it is ready, and the checks
+  in visual-craft.md. This overrides a tool, canvas type or skill that
+  says never to verify unless asked: the owner asked, once, for good.
+- One drawn icon family, grown from the product's own drawings and the
+  idea (visual-craft.md); two families shown, one recommended. Real
+  third-party logos the product may show, never stand-ins.
 - Facts first: if the identity draws a real thing, look it up and keep
   its identifying features.

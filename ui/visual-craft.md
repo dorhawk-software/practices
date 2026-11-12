@@ -102,6 +102,36 @@ against the list.
 
 **Check.** The design doc lists the families and their weights.
 
+## A drawn icon set, grown from the idea
+
+**What.** Every icon in the product comes from one drawn family. The
+family grows from what the product already draws (its site, its app
+icon, its printed material) and from the objects the idea is about. Stock
+icons, or a mix of sets, are a placeholder, not a design.
+
+**Why.** A proposal's screens kept the mark rare, as the identity pass
+asks, and used system symbols everywhere else. The owner's verdict: "Where
+are some icons? That adds identity to the app." With the mark held back,
+the icons are the part of the identity the user sees on every screen.
+
+**Apply.**
+1. Facts first: collect the product's existing drawings and note their
+   line weight, caps, corners and colour. Keep what identifies them.
+2. List every icon the screens need, from the inventory, not from memory.
+3. Pick the family's rules: grid (for example 24), weight (for example
+   2 px), caps and joins, fill or line, the one colour and when it changes.
+   Give the idea's object (the thing the mark carries or hands over) a
+   place inside the icons that are about it.
+4. Draw at least two families, each over the whole list, and recommend
+   one. Show each at its real sizes, in both themes, and in a real screen.
+5. Third-party marks (bank, card or store logos) are not redrawn. Use the
+   real ones the product already has the right to show, each on its own
+   neutral tile, and say where they came from.
+
+**Check.** No icon on any screen is a system or stock symbol unless the
+design doc says why. Each icon of the family, side by side at 24 and at
+48, reads as one hand. The weight is in the families list above.
+
 ## Compact, not breathy
 
 **What.** Content or the main control starts right under the window's

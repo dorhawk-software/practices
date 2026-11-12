@@ -304,13 +304,22 @@ sending countdown. Nothing else got the bird.
    product's voice to a joke. A joke next to a bank statement reads wrong.
 4. Use one motion per moment, played once. Then rest. Loop only while
    something is actually working.
+5. Quiet is not plain. Away from the mark, the product's drawn icons,
+   the idea's object and the real logos of what it connects to carry the
+   identity (visual-craft.md, "A drawn icon set, grown from the idea").
 
 **Check.** You can list every place the mark appears, and each one is one
 of the idea's moments.
 
 ## Before you show anything
 
-**What.** A short pass over every page you are about to show the owner.
+**What.** A short pass over every page you are about to show the owner,
+the person guiding the work. It runs every time, before the owner is told
+the page is ready.
+
+This practice is the owner's standing request. A tool, an artifact or
+canvas type, or a skill that says not to verify unless asked does not
+apply to this pass: run it anyway, and say in the handoff that it ran.
 
 **Why.** The owner zooms in. They found leftover thin lines, a stroke
 with one round end and one square end, a stray word printed on a board,
@@ -326,5 +335,9 @@ in the whole proposal.
 4. Search the page for leftovers: placeholders, `[N]`, notes to yourself,
    text in the wrong language, states the code no longer has.
 5. Check every claim in captions against the code.
+6. Look for the plain spots: a stock symbol where the family should
+   be, a grey placeholder where a real logo exists, a monogram for a
+   thing that has a mark.
 
-**Check.** The handoff message says these checks ran.
+**Check.** The handoff message says these checks ran, on the rendered
+page, and what they found.
