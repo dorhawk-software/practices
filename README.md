@@ -94,7 +94,7 @@ as a pull request the project's own workflow opens.
 | [Releases and the stores](mobile/releases.md) | Version from the tag, build number from the run; a throwaway signing keychain; the artefact checked; promotion by hand. |
 | [CI for iOS and Android](mobile/ci.md) | Every platform built before every release; Xcode and toolchains pinned from the project's own files. |
 | [Devices and walks](mobile/devices.md) | Never test on a device with real data; done means walked on each platform; field crashes become tests. |
-| [Lifecycle and screens](mobile/lifecycle.md) | Modals close on background; single-flight actions; explain before a permission; no layout jumps. |
+| [Lifecycle and screens](mobile/lifecycle.md) | Modals close on background; single-flight actions; explain before a permission; no layout jumps; text takes its container's width. |
 
 Coming: `web/` (from the dorhawk.software website). The roadmap lists it.
 

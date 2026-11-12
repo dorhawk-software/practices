@@ -27,6 +27,9 @@ newest first, in the kinds common/changelog.md describes.
 - **Red before green, for a design port.** The code may come first; each
   assertion is then proven by a mutation, listed in the commit
   (`common/testing.md`).
+- **Text takes its container's width.** A line beside something else
+  gets `flex: 1`, a centred line stretches to its column: Android cut
+  the last word of text sized to its own words (`mobile/lifecycle.md`).
 
 ## 1.3.1 (2026-11-12)
 

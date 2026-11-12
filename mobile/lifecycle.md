@@ -117,3 +117,32 @@ font scale.
 
 **Check.** Turn on the largest text size and Reduce Motion, and walk every
 screen.
+
+## Text takes its container's width
+
+**What.** A line of text beside something else, or centred, is given the
+width it may use: `flex: 1` in a row, `alignSelf: 'stretch'` in a
+column. It is never left sized to its own words.
+
+**Why.** React Native on Android measures a Text sized to its own words
+a few pixels narrower than it draws it. The last word wraps onto a
+second line that the box has no room for, and disappears. Obálka lost
+it twice in one day: the empty inbox's centred title read "Ve schránce
+nic" for "Ve schránce nic není"
+([513c75c](https://github.com/dorhawk-software/obalka/commit/513c75c)),
+and a slip's header beside "ISDS" read "DORUČENKA ·" for "Doručenka ·
+fikcí" ([422f75c](https://github.com/dorhawk-software/obalka/commit/422f75c)).
+iOS and every test drew both whole. Upper-casing the string instead of
+`textTransform` did not help: the box stayed short.
+
+**Apply.**
+1. In a row, the text that may grow takes `flex: 1`; what sits beside
+   it keeps its own size.
+2. A centred line stretches to its column and centres its words with
+   `textAlign`, rather than the box being centred.
+3. A test holds the fix: the Text's style has `flex: 1` (or the
+   stretch), and fails without it.
+
+**Check.** Walk each new screen on an Android device or emulator and
+read every line to its end; a screenshot of the iOS simulator or a
+test proves nothing here.
