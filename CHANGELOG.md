@@ -5,6 +5,8 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+## 1.3.1 (2026-11-12)
+
 ### Fixed
 
 - **An identity pass's inventory proves it misses nothing.** Iteration 3
