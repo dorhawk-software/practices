@@ -33,12 +33,15 @@ README.md is the map; read it first.
 ## Checks
 
 ```sh
+tests/check     # the gate: shellcheck on every script, the links, tests/run
 tests/run       # the kit's checks on throwaway projects (seconds)
 tests/links     # every relative link in the docs resolves
 tests/example   # the kit end to end on examples/rust-workspace (needs Rust)
-shellcheck -x -P SCRIPTDIR scripts/lib.sh scripts/lint scripts/check-* scripts/claude-hook \
-  scripts/disk-guard scripts/install-hooks hooks/* bin/install tests/*
 ```
+
+The pre-commit hook runs `tests/check` (once per clone:
+`git config core.hooksPath .githooks`). Until 2026-11-12 the checks ran
+only in CI, and a commit that failed shellcheck reached main.
 
 CI (.github/workflows/ci.yml) runs all of them, tests/run on Linux and
 macOS, plus actionlint and the commit-message check.

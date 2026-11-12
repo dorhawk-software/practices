@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# This repository's pre-commit hook: its own gate (tests/check), at the
+# lowest CPU priority.
+exec nice -n 19 "$(git rev-parse --show-toplevel)/tests/check"

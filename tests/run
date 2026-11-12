@@ -193,8 +193,12 @@ mkdir -p "$p/src" "$p/__tests__" "$work/npmshim"
 log=$work/npm-calls
 # fake npm and npx: they log their arguments and fail when told to
 for tool in npm npx; do
-    printf '#!/bin/sh\necho "%s $*" >>"%s"\ncase " $* " in *" $FAIL_ON "*) echo "%s failed: $*"; exit 1 ;; esac\nexit 0\n' \
-        "$tool" "$log" "$tool" >"$work/npmshim/$tool"
+    {
+        echo '#!/bin/sh'
+        echo "echo \"$tool \$*\" >>\"$log\""
+        echo "case \" \$* \" in *\" \$FAIL_ON \"*) echo \"$tool failed: \$*\"; exit 1 ;; esac"
+        echo 'exit 0'
+    } >"$work/npmshim/$tool"
     chmod +x "$work/npmshim/$tool"
 done
 npmshim() { PATH="$work/npmshim:$PATH" FAIL_ON="${FAIL_ON:-none}" "$@"; }
@@ -229,7 +233,7 @@ grep -q 'npm run --silent test' "$log" && grep -q 'npm run --silent lint' "$log"
     bad "pre-commit runs the gate and the tests when JS files are committed" "$(cat "$log")"
 echo 'export const b = 2;' >"$p/src/b.ts"
 git -C "$p" add src/b.ts
-FAIL_ON=test expect 1 "pre-commit refuses a commit whose tests fail" npmshim git -C "$p" commit -q -m "Add b"
+FAIL_ON='test' expect 1 "pre-commit refuses a commit whose tests fail" npmshim git -C "$p" commit -q -m "Add b"
 git -C "$p" reset -q
 expect 0 "disk-guard leaves a project without Rust alone" "$p/.practices/bin/disk-guard"
 mv "$p/.practices/bin/lint" "$p/.practices/bin/lint.real"

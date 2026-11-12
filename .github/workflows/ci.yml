@@ -38,11 +38,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-      - name: shellcheck
-        run: |
-          shellcheck -x -P SCRIPTDIR scripts/lib.sh scripts/lint scripts/check-* scripts/claude-hook \
-            scripts/disk-guard scripts/install-hooks hooks/* bin/install tests/run tests/example tests/links
-          shellcheck -s sh scripts/prune-caches scripts/sweep-target
+      # The same static checks the repository's pre-commit hook runs (tests/check).
+      - name: shellcheck and links
+        run: tests/check static
       - name: actionlint (workflows, and the actions' scripts)
         run: |
           bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash) 1.7.12
@@ -60,8 +58,6 @@ jobs:
               exit 1
             fi
           done
-      - name: Docs' relative links
-        run: tests/links
       - name: No session IDs in the pushed commits
         if: github.event_name == 'push'
         env:

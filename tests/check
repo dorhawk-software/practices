@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# This repository's own gate: CI's static checks (shellcheck on every
+# script, every relative link), then the kit's tests. Quiet when it passes.
+# The pre-commit hook in .githooks runs it (once per clone:
+# `git config core.hooksPath .githooks`); CI's static job calls
+# `tests/check static`, so the two can't drift.
+#
+#   tests/check          # shellcheck, links, tests/run
+#   tests/check static   # shellcheck and links only (CI)
+#
+# Until 2026-11-12 these ran only in CI: a commit that failed shellcheck
+# was pushed, and its release commit had to wait for a fix.
+set -uo pipefail
+cd "$(dirname "$0")/.." || exit 2
+fail=0
+run() {
+    local out
+    if ! out=$("$@" 2>&1); then
+        printf '%s failed:\n%s\n\n' "$*" "$out"
+        fail=1
+    fi
+}
+run shellcheck -x -P SCRIPTDIR scripts/lib.sh scripts/lint scripts/check-* scripts/claude-hook \
+    scripts/disk-guard scripts/install-hooks hooks/* bin/install tests/run tests/example tests/links tests/check \
+    .githooks/pre-commit
+run shellcheck -s sh scripts/prune-caches scripts/sweep-target
+run tests/links
+if [ "${1:-}" != static ]; then
+    run tests/run
+fi
+exit $fail

@@ -9,6 +9,11 @@ newest first, in the kinds common/changelog.md describes.
 
 ### New
 
+- **This repository has a local gate.** `tests/check` runs shellcheck on
+  every script, the links and `tests/run`; `.githooks/pre-commit` runs it
+  and CI's static job calls it. A shellcheck failure in `tests/run` had
+  reached main because the checks ran only in CI.
+
 - **JavaScript and TypeScript projects get the gate.** In a project with a
   package.json, `.practices/bin/lint` runs `tsc --noEmit` (with a
   tsconfig.json) and the npm scripts in `NPM_CHECKS` (default `lint`);
