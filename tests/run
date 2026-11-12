@@ -184,6 +184,68 @@ printf 'Fix\n\nClaude-Session: https://claude.ai/code/session_01AbCdEfGhIjKlMnOp
 expect 1 "the commit-msg hook refuses a session link" nocargo git -C "$p" commit -q --allow-empty -F "$work/m8"
 [ ! -e "$work/cargo-runs" ] && ok || bad "cargo ran in a project without Rust" "$(cat "$work/cargo-runs")"
 
+# --- a JavaScript/TypeScript project: the gate, sizes, the hooks
+p=$(project)
+rm -rf "$p/crates"
+printf '{"name":"app","scripts":{}}\n' >"$p/package.json"
+printf '{}\n' >"$p/tsconfig.json"
+mkdir -p "$p/src" "$p/__tests__" "$work/npmshim"
+log=$work/npm-calls
+# fake npm and npx: they log their arguments and fail when told to
+for tool in npm npx; do
+    printf '#!/bin/sh\necho "%s $*" >>"%s"\ncase " $* " in *" $FAIL_ON "*) echo "%s failed: $*"; exit 1 ;; esac\nexit 0\n' \
+        "$tool" "$log" "$tool" >"$work/npmshim/$tool"
+    chmod +x "$work/npmshim/$tool"
+done
+npmshim() { PATH="$work/npmshim:$PATH" FAIL_ON="${FAIL_ON:-none}" "$@"; }
+printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
+"$p/.practices/bin/install-hooks" >/dev/null
+: >"$log"
+expect 0 "a JS project's gate passes" npmshim "$p/.practices/bin/lint"
+grep -q 'npx --no-install tsc --noEmit' "$log" && grep -q 'npm run --silent lint' "$log" && ! grep -q cargo "$log" && ok ||
+    bad "a JS project's gate runs tsc and npm run lint, and no cargo" "$(cat "$log")"
+FAIL_ON=lint expect 1 "a failing npm check fails the gate" npmshim "$p/.practices/bin/lint"
+printf 'PRIVATE_TERMS=none\nNPM_CHECKS="lint changelog:check"\n' >"$p/.practices/config"
+: >"$log"
+npmshim "$p/.practices/bin/lint" >/dev/null
+grep -q 'npm run --silent changelog:check' "$log" && ok || bad "NPM_CHECKS names the npm scripts the gate runs" "$(cat "$log")"
+lines 700 >"$p/src/ok.ts"
+lines 701 >"$p/src/Big.tsx"
+expect 1 "a 701-line .tsx fails the size check" "$p/.practices/bin/check-size"
+mv "$p/src/Big.tsx" "$p/__tests__/big.tsx"
+expect 0 "a test file may reach SIZE_TESTS" "$p/.practices/bin/check-size"
+lines 1001 >"$p/__tests__/big.tsx"
+expect 1 "a test file past SIZE_TESTS fails" "$p/.practices/bin/check-size"
+rm "$p/__tests__/big.tsx"
+lines 900 >"$p/src/strings.generated.ts"
+printf 'PRIVATE_TERMS=none\nSIZE_EXCLUDE=%s\n' "'\\.generated\\.ts\$'" >"$p/.practices/config"
+expect 0 "SIZE_EXCLUDE leaves generated files out" "$p/.practices/bin/check-size"
+printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
+rm "$p/src/strings.generated.ts"
+git -C "$p" add -A
+: >"$log"
+expect 0 "a JS commit goes through the hooks" npmshim git -C "$p" commit -q -m "Start the app"
+grep -q 'npm run --silent test' "$log" && grep -q 'npm run --silent lint' "$log" && ok ||
+    bad "pre-commit runs the gate and the tests when JS files are committed" "$(cat "$log")"
+echo 'export const b = 2;' >"$p/src/b.ts"
+git -C "$p" add src/b.ts
+FAIL_ON=test expect 1 "pre-commit refuses a commit whose tests fail" npmshim git -C "$p" commit -q -m "Add b"
+git -C "$p" reset -q
+expect 0 "disk-guard leaves a project without Rust alone" "$p/.practices/bin/disk-guard"
+mv "$p/.practices/bin/lint" "$p/.practices/bin/lint.real"
+printf '#!/bin/sh\necho ran >>"%s"\n' "$work/js-lint-runs" >"$p/.practices/bin/lint"
+chmod +x "$p/.practices/bin/lint"
+for c in 'npm test' 'npm run verify' 'nice -n 19 npx jest --silent' 'npx --no-install tsc --noEmit' 'npm run lint'; do
+    rm -f "$work/js-lint-runs"
+    printf '{"tool_input":{"command":"%s"}}' "$c" | "$p/.practices/bin/claude-hook" >/dev/null 2>&1
+    [ -s "$work/js-lint-runs" ] && ok || bad "claude-hook runs lint after: $c"
+done
+for c in 'npm install' 'npm run start' 'npx react-native start'; do
+    rm -f "$work/js-lint-runs"
+    printf '{"tool_input":{"command":"%s"}}' "$c" | "$p/.practices/bin/claude-hook" >/dev/null 2>&1
+    [ ! -e "$work/js-lint-runs" ] && ok || bad "claude-hook leaves lint alone after: $c"
+done
+
 # --- bin/install keeps what the project owns
 p=$(project)
 touch "$p/Cargo.toml"

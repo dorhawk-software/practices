@@ -105,9 +105,23 @@ is the source of everything Rust here; its commit links are in each doc.
 
 ## Phase 7: other languages
 
-- **`typescript/`, from Obálka** (React Native): conventions, lints, coverage,
-  React Native's own practices, templates; actions `ts-setup`, `ts-lint`.
-  Folded in with [the same method](guides/fold-in-a-project.md).
+- **`typescript/` and `mobile/`, from Obálka** (React Native): folded in
+  with [the same method](guides/fold-in-a-project.md), started 2026-11-12
+  ([FROM-OBALKA.md](FROM-OBALKA.md)).
+  - [x] Docs: [typescript/](typescript/), [mobile/](mobile/),
+    [gates](common/gates.md), [crash reports](common/crash-reports.md),
+    and new sections in testing, commits, CLAUDE.md and design before
+    build.
+  - [ ] Actions `ts-setup`, `ts-lint` and a reusable `ts-ci.yml`.
+  - [ ] The changelog check (two languages, store limits, checked after
+    folding) as a shared tool, filling phase 2's changelog check.
+  - [ ] A reusable mobile release workflow: verify, iOS and Android
+    builds, the signing keychain, store uploads, the artefact check.
+  - [ ] The secret scan with its canary as a composite action.
+  - [ ] Obálka's own fixes from the audit (its not-now list): the release
+    script's push check and rehearsal, actions pinned by commit, the
+    canary on the scan's own binary, CI running the changelog check,
+    coverage floors, the size allowlist worked down.
 - **`web/`, from the dorhawk.software website:** conventions, deploy,
   templates.
 - **`ui/`, more pages:** tern's design canvas rules (an agreed design only,

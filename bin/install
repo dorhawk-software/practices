@@ -15,9 +15,10 @@
 #   .practices/config, .github/workflows/practices.yml (pulls updates);
 #   and in a Rust project (a Cargo.toml at the root)
 #   .practices/coverage-floors, and with --templates clippy.toml,
-#   deny.toml, rust-toolchain.toml, .github/dependabot.yml,
-#   .claude/settings.json. CLAUDE.md is the project's too: install only
-#   adds the line that loads .practices/rules.md, once.
+#   deny.toml, rust-toolchain.toml, .github/dependabot.yml; in any
+#   project with --templates, .claude/settings.json (the Claude Code
+#   hook). CLAUDE.md is the project's too: install only adds the line
+#   that loads .practices/rules.md, once.
 # Cargo.toml's lints it can't merge safely: it prints what to paste.
 #
 # Any project gets the language-neutral part: the privacy check, the
@@ -57,7 +58,9 @@ EOF
 # rules the kit was built for, offline.
 rm -rf "${kit:?}/docs"
 mkdir -p "$kit/docs"
-cp -R "$here"/common "$here"/ui "$here"/rust "$here"/guides "$kit/docs/"
+for dir in common ui rust typescript mobile guides; do
+    [ -d "$here/$dir" ] && cp -R "$here/$dir" "$kit/docs/"
+done
 cp "$here"/README.md "$here"/CHANGELOG.md "$here"/ROADMAP.md "$kit/docs/"
 
 # rules.md: every rule's heading, one line each, grouped by practice. It is
@@ -84,12 +87,19 @@ The skills in .claude/skills (practices-*) walk through the main jobs.
 EOF
     digest common/agent-working-rules.md common/commits.md common/changelog.md \
         common/not-now.md common/testing.md common/claude-md.md \
-        common/privacy-public-repos.md common/releases.md common/ci-caching.md
+        common/privacy-public-repos.md common/releases.md common/ci-caching.md \
+        common/gates.md common/crash-reports.md
     digest ui/design-before-build.md ui/identity-pass.md ui/visual-craft.md \
         ui/keyboard-shortcuts.md ui/window-buttons.md
     if [ -f "$project/Cargo.toml" ]; then
         digest rust/conventions.md rust/lints.md rust/coverage.md
         if grep -rqs 'gpui' "$project/Cargo.toml"; then digest rust/gpui.md; fi
+    fi
+    if [ -f "$project/package.json" ]; then
+        digest typescript/conventions.md typescript/lints.md typescript/testing.md
+    fi
+    if [ -d "$project/ios" ] || [ -d "$project/android" ]; then
+        digest mobile/releases.md mobile/devices.md mobile/ci.md mobile/lifecycle.md
     fi
 } >"$kit/rules.md"
 
@@ -142,15 +152,17 @@ if [ -n "$rust" ] && [ ! -e "$kit/coverage-floors" ]; then
     echo "created: .practices/coverage-floors (add each crate's measured share)"
 fi
 
+if [ -n "$templates" ]; then
+    own templates/claude-settings.json .claude/settings.json
+fi
 if [ -n "$templates" ] && [ -z "$rust" ]; then
-    echo "no Cargo.toml: no Rust templates copied (the only language with templates yet)"
+    echo "no Cargo.toml: no Rust templates copied"
 fi
 if [ -n "$templates" ] && [ -n "$rust" ]; then
     own rust/templates/clippy.toml clippy.toml
     own rust/templates/deny.toml deny.toml
     own rust/templates/rust-toolchain.toml rust-toolchain.toml
     own rust/templates/dependabot.yml .github/dependabot.yml
-    own rust/templates/claude-settings.json .claude/settings.json
     if ! grep -q '^\[workspace.lints' "$project/Cargo.toml" 2>/dev/null; then
         echo
         echo "Paste into Cargo.toml (and give each crate \`[lints] workspace = true\`):"

@@ -64,6 +64,26 @@ the same commit where it lives in the repo.
 
 **Check.** In review of a UI commit: is the design updated?
 
+## Read the design's source, never a picture
+
+**What.** Values for a build (colours, spacing, sizes, radii, copy) come from the design's source: its code, its tokens, its inspector. A screenshot is only for checking the result.
+
+**Why.** Obálka's owner, 2026-07-14: never derive the design from a picture. A port read from renders had "reinterpreted" the design in many places: a card's fill, a subtitle's missing field, an accent colour.
+
+**Apply.** Open the design file's source and copy its literals. When the design tool has an API or a file the agent can read, use that.
+
+**Check.** Every value in the change can be found in the design's source.
+
+## When the agent can't edit the design: a prompt and a sync-back list
+
+**What.** If the design tool is one the agent can't or mustn't edit, design changes go to the owner as a ready-to-paste prompt, with a status ("sent", "returned <date>", "what came back"). Differences the build had to make are listed for the design to take back.
+
+**Why.** Obálka's design lives in a tool the owner edits; the agent fixes the code to match and hands design changes over as prompts. Its sync-back lists kept the design and the app from drifting apart.
+
+**Apply.** A `design-prompts.md` and a `design-sync-back.md` beside the feature record. Here, "keep the design in sync" means: the design is updated in the same piece of work, by whoever may edit it.
+
+**Check.** Every open sync-back item has a prompt sent for it.
+
 ## Match one to one, verified by screenshot
 
 **What.** The build matches the design's spacing, sizes, colours and copy.

@@ -5,6 +5,28 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+### New
+
+- **JavaScript and TypeScript projects get the gate.** In a project with a
+  package.json, `.practices/bin/lint` runs `tsc --noEmit` (with a
+  tsconfig.json) and the npm scripts in `NPM_CHECKS` (default `lint`);
+  pre-commit runs the gate and `NPM_TEST` (default `test`) when JS or TS
+  files are committed; the Claude Code hook runs the gate after `npm test`,
+  `npx jest`, `npx tsc` and the like. `check-size` counts `.ts`, `.tsx`,
+  `.js` and `.mjs` files too (tests up to `SIZE_TESTS`), and `SIZE_EXCLUDE`
+  leaves generated files out. Rust's checks run only where there's a
+  Cargo.toml, and disk-guard only guards cargo's build folder.
+- **TypeScript and mobile practices** (`typescript/`, `mobile/`), from the
+  Obálka fold-in: conventions, lints and Jest testing; store releases,
+  devices and walks, CI for iOS and Android, the app's lifecycle. Projects
+  with a package.json, an ios/ or an android/ folder get their rules in
+  `rules.md`.
+- **Gates that can fail** (`common/gates.md`) and **crash reports and
+  logs** (`common/crash-reports.md`), with new sections in testing,
+  commits, CLAUDE.md and design before build.
+- **The Claude Code hook settings for every project** (`--templates`), not
+  only Rust ones: `templates/claude-settings.json`.
+
 ### Fixed
 
 - **No example headings in `rules.md`.** The digest listed a heading from

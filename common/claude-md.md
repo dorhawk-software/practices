@@ -71,6 +71,26 @@ name in a public repo (see [privacy-public-repos.md](privacy-public-repos.md)).
 
 **Check.** In review: does each new "always" or "never" have an origin?
 
+## The owner's words, quoted and dated
+
+**What.** A feature record starts with an input line: the owner's words, quoted, with the date. Decisions inside it say which option was picked and when.
+
+**Why.** Obálka's specs each begin with an "Input" line, for example: Owner, 2026-11-11, "can it detect this situation". Months later, an agent can tell what was asked from what was guessed.
+
+**Apply.** `**Input**: Owner, <date>: "<their words>"` at the top of each spec, issue or milestone entry. Roles only in a public repository.
+
+**Check.** Every feature record has an input line.
+
+## Known gaps beside the rule, not a reworded rule
+
+**What.** When the product falls short of a written principle, a dated "known gap" note goes under the principle. The principle keeps its wording. Claiming less than the product does is as wrong as claiming more.
+
+**Why.** Obálka's constitution had drifted from what shipped: it called a sign-in method "unavailable" while the app offered it. Its amendments now record gaps under each principle, dated, and the principle stays as decided.
+
+**Apply.** `> Known gap (<date>): <what falls short>; <what closes it>.` A gap leaves once it's closed.
+
+**Check.** Each principle's known gaps are dated and none is older than its plan.
+
 ## "Until <date>" notes keep the old behaviour visible
 
 **What.** When behaviour changes, the current statement keeps a short

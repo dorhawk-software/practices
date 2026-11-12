@@ -28,7 +28,7 @@ each, who owns which file, and how a change here reaches every project.
 
  actions/*, .github/workflows/rust-*.yml ◀── uses: …@v1 ── .github/workflows/*.yml
 
- rust/templates/claude-settings.json ── --templates ─▶ .claude/settings.json
+ templates/claude-settings.json ───── --templates ─▶ .claude/settings.json
                                                     (PostToolUse ─▶ .practices/bin/claude-hook)
 
  .claude-plugin/marketplace.json ◀── /plugin install ── Claude Code
@@ -237,7 +237,7 @@ time limits from measurements): [common/ci-caching.md](../common/ci-caching.md).
 ## The Claude Code hook
 
 The lint and disk hook lives in each project's own `.claude/settings.json`,
-copied from [rust/templates/claude-settings.json](../rust/templates/claude-settings.json)
+copied from [templates/claude-settings.json](../templates/claude-settings.json)
 by `bin/install --templates`:
 
 ```json

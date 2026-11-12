@@ -99,6 +99,49 @@ Links point at commits in [Crake](https://github.com/dorhawk-software/crake), wh
 
 **Check.** A fix for a bug a person reported names its test in the commit body.
 
+## Fakes refuse what they weren't told
+
+**What.** A fake fails on any call the test didn't set up, and its message names the call. A fake HTTP server fails on a request it has no response for, naming the URL.
+
+**Why.** A permissive fake hides calls nobody meant to make. In [Obálka](https://github.com/dorhawk-software/obalka), every server call is a legal act (signing in, marking mail delivered), so its fake transport throws "FakeTransport.X was called but not configured".
+
+**Apply.** Build fakes from a table of configured answers; the default answer fails with the method's name. For TypeScript, see [typescript/testing.md](../typescript/testing.md).
+
+**Check.** Remove one configured answer from a test: it fails, naming the call.
+
+## A guard test per incident, proven able to fail
+
+**What.** A bug that tests couldn't see where it happened (on a phone, in a release build, on another file system) gets a guard: a test that scans the source or config for the cause. Its header names the incident. The guard also checks that it scanned a real set of files, and runs itself against the original bad input.
+
+**Why.** Obálka keeps about 40 such guards. One forbids a removed sign-in method from returning (owner decision, 2026-09-28). One forbids JavaScript globals the phone's engine lacks, after a backup restore shipped broken. One forbids file names that differ only by case ([3cbb48f](https://github.com/dorhawk-software/obalka/commit/3cbb48f)). The self-test against the original text caught a guard whose word boundary only worked in ASCII, on Czech text.
+
+**Apply.**
+1. Header: the incident, the date, the rule, the fix.
+2. Assert the scan found more than a handful of files, so it can't pass on nothing.
+3. Feed it the text that started it, and assert it fails.
+
+**Check.** Each guard has a self-test with the original input.
+
+## Golden fixtures written by the old code
+
+**What.** A stored format (a backup, a database, a file) has fixtures written by the version of the code that first wrote that format, kept in the repository. Today's reader must open every one.
+
+**Why.** A fixture written by today's code only proves today's writer agrees with today's reader. Obálka's fixture script checks out the commit for each schema version in a worktree and writes the fixture there. Its first two fixtures can't be regenerated: the history squash lost their commits, which its README says.
+
+**Apply.** A script that takes a schema version, finds its commit, refuses if the version doesn't match, and writes the fixture. Record the commit, key and parameters next to the fixture. Use test keys that no secret scanner mistakes for real ones.
+
+**Check.** One fixture per schema version, each with its source commit.
+
+## Two implementations, one known answer
+
+**What.** When the same format has two implementations (a native one and a fallback), both are tested against the same known answers, including output captured from the real device.
+
+**Why.** An archive sealed on one phone must open on another build. Obálka uses its native crypto only after a launch-time check against the pure-JavaScript version, and its tests open bytes sealed by the native path on an emulator.
+
+**Apply.** Store device-captured vectors as fixtures with their date and device. Run the known-answer check at start-up before trusting the fast path.
+
+**Check.** The fallback opens every device-captured vector byte for byte.
+
 ## Coverage floors only rise
 
 See [rust/coverage.md](../rust/coverage.md). The rule holds in any language: a floor per unit, raised as tests grow, never lowered to let a change through.

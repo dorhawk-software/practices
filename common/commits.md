@@ -71,6 +71,26 @@ It refuses `Claude-Session:` trailers and claude.ai session URLs, and it
 runs the private-terms check on the message. `.practices/bin/lint` fails
 when the hooks aren't installed.
 
+## Stable IDs survive a rewritten history
+
+**What.** Subjects and docs cite stable IDs from the project's own records (a spec number, a requirement, a task) next to commit hashes: "Keep the password date in step (030 FR-008)".
+
+**Why.** Obálka squashed its history before going public. Every commit hash its specs cited died; the spec, requirement and task IDs survived ([754d5ca](https://github.com/dorhawk-software/obalka/commit/754d5ca)).
+
+**Apply.** Give each feature record an ID. Put it in brackets at the end of the subject when the commit implements part of it.
+
+**Check.** `git log --oneline | grep -c '([0-9]\{3\}'` grows with the features.
+
+## Trailers come last
+
+**What.** `Co-Authored-By:` and any other trailer are the last lines of the message, after one blank line. Nothing follows them: no sign-off block, no signature.
+
+**Why.** Git reads trailers only from the final paragraph. Obálka's messages ended with the owner's name and address after the trailer, so `git interpret-trailers --parse` found no trailer in any of its 26 commits. The author field already carries the identity. The owner chose to drop the block (2026-11-12).
+
+**Apply.** End the body, a blank line, then the trailers.
+
+**Check.** `git log -1 --format=%B | git interpret-trailers --parse` prints the `Co-Authored-By` line.
+
 ## One commit identity per repository
 
 **What.** Each repository sets its own `user.email` (and `user.name`), so

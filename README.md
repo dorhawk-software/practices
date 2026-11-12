@@ -57,6 +57,8 @@ as a pull request the project's own workflow opens.
 | [CLAUDE.md and docs](common/claude-md.md) | Rules and pointers in CLAUDE.md, detail in docs/engineering, every rule dated. |
 | [Privacy in public repos](common/privacy-public-repos.md) | Made-up names, documentation addresses, and a denylist the hooks refuse. |
 | [Working rules for coding agents](common/agent-working-rules.md) | Low CPU priority, a disk floor, rebuild before "restart", keep going on a plan. |
+| [Gates that can fail](common/gates.md) | A canary proves each check works; findings say how to fix them; audit and list licences from what ships. |
+| [Crash reports and logs](common/crash-reports.md) | Consent before the SDK starts; every hook checked in the vendor's code; an allow-list scrubber; expected refusals unreported. |
 
 ### UI design ([ui/](ui))
 
@@ -76,8 +78,24 @@ as a pull request the project's own workflow opens.
 | [Code conventions](rust/conventions.md) | One workspace; unsafe in one crate; OS code behind small modules; errors as sentences. | review, `check-unsafe`, `check-size` |
 | [GPUI desktop apps](rust/gpui.md) | Headless window tests, a journey kit, demo switches, frame timing, macOS window buttons, a patched GPUI kept current. | tests, CI |
 
-Coming: `typescript/` (from Obálka, a React Native app) and `web/` (from
-the dorhawk.software website). The roadmap lists them.
+### TypeScript ([typescript/](typescript))
+
+| Practice | In one line | Enforced by |
+| --- | --- | --- |
+| [Lints are errors](typescript/lints.md) | tsc and ESLint, errors only, every file visited; no names that clash by case; 700-line files. | `.practices/bin/lint` |
+| [Testing with Jest](typescript/testing.md) | Native modules as in-memory fakes; fakes refuse unset calls; no real network; coverage measured. | tests |
+| [Code conventions](typescript/conventions.md) | Braces always; strict types; errors as typed codes; no direct console; patches with a reason, pinned. | ESLint, review |
+
+### Mobile apps ([mobile/](mobile))
+
+| Practice | In one line |
+| --- | --- |
+| [Releases and the stores](mobile/releases.md) | Version from the tag, build number from the run; a throwaway signing keychain; the artefact checked; promotion by hand. |
+| [CI for iOS and Android](mobile/ci.md) | Every platform built before every release; Xcode and toolchains pinned from the project's own files. |
+| [Devices and walks](mobile/devices.md) | Never test on a device with real data; done means walked on each platform; field crashes become tests. |
+| [Lifecycle and screens](mobile/lifecycle.md) | Modals close on background; single-flight actions; explain before a permission; no layout jumps. |
+
+Coming: `web/` (from the dorhawk.software website). The roadmap lists it.
 
 ## What's in the repository
 
