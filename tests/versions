@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# The plugin's version is the practices' version. Claude Code updates an
+# installed plugin only when its version changes, so a plugin left at an old
+# version never brings its new skills to anyone. This checks that
+# plugin/.claude-plugin/plugin.json and .claude-plugin/marketplace.json both
+# give the newest released version in CHANGELOG.md. Quiet when it passes;
+# tests/check runs it, so CI and the pre-commit hook do.
+# Added 2026-11-12: the plugin was numbered on its own, so practices 1.2.0
+# and 1.3.0 shipped it as 1.1.0, which read as stale next to the tags, and
+# nothing said when the plugin's number had to move.
+set -uo pipefail
+cd "$(dirname "$0")/.." || exit 2
+
+released=$(sed -n 's/^## \([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\) .*/\1/p' CHANGELOG.md | head -n 1)
+if [ -z "$released" ]; then
+    echo "CHANGELOG.md has no released version (a \"## 1.2.3 (date)\" heading)."
+    exit 1
+fi
+fail=0
+for file in plugin/.claude-plugin/plugin.json .claude-plugin/marketplace.json; do
+    found=$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "$file")
+    if [ -z "$found" ]; then
+        echo "$file gives no version; it should say \"version\": \"$released\"."
+        fail=1
+    elif [ "$found" != "$released" ]; then
+        echo "$file says version $found, but the newest release in CHANGELOG.md is $released. Set it to $released in the release commit."
+        fail=1
+    fi
+done
+exit $fail

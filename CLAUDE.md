@@ -27,15 +27,19 @@ README.md is the map; read it first.
   comment), choosing releases at least two weeks old.
 - **Never break `@v1`.** A change that would break a project using the
   actions or workflows is a new major version.
+- **A release moves the plugin's version too**: plugin.json and
+  marketplace.json say the release's version, in the release commit.
 - Commits: the subject is the outcome; the body says why. Co-Authored-By
   is fine; never a session ID or session link (CI refuses them).
 
 ## Checks
 
 ```sh
-tests/check     # the gate: shellcheck on every script, the links, tests/run
+tests/check     # the gate: shellcheck, links, readme, versions, tests/run
 tests/run       # the kit's checks on throwaway projects (seconds)
 tests/links     # every relative link in the docs resolves
+tests/readme    # README names every top-level entry, practice, guide and script
+tests/versions  # the plugin's version is the newest release in CHANGELOG.md
 tests/example   # the kit end to end on examples/rust-workspace (needs Rust)
 ```
 

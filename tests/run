@@ -197,6 +197,7 @@ for tool in npm npx; do
         echo '#!/bin/sh'
         echo "echo \"$tool \$*\" >>\"$log\""
         echo "case \" \$* \" in *\" \$FAIL_ON \"*) echo \"$tool failed: \$*\"; exit 1 ;; esac"
+        echo 'echo "lots of test output"'
         echo 'exit 0'
     } >"$work/npmshim/$tool"
     chmod +x "$work/npmshim/$tool"
@@ -229,6 +230,8 @@ rm "$p/src/strings.generated.ts"
 git -C "$p" add -A
 : >"$log"
 expect 0 "a JS commit goes through the hooks" npmshim git -C "$p" commit -q -m "Start the app"
+PATH="$work/npmshim:$PATH" FAIL_ON=none git -C "$p" commit -q --amend -m "Start the app" >"$work/commit-out" 2>&1
+! grep -q 'lots of test output' "$work/commit-out" && ok || bad "pre-commit is quiet when the tests pass" "$(cat "$work/commit-out")"
 grep -q 'npm run --silent test' "$log" && grep -q 'npm run --silent lint' "$log" && ok ||
     bad "pre-commit runs the gate and the tests when JS files are committed" "$(cat "$log")"
 echo 'export const b = 2;' >"$p/src/b.ts"

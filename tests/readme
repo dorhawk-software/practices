@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# README.md is the map of this repository, so it must name what's in it:
+#   - every tracked top-level folder and file, in "What's in the repository"
+#     (README.md, LICENSE and .gitignore excepted; FROM-<project>.md files
+#     may be named together as FROM-*.md);
+#   - every practice (common/, ui/, rust/, typescript/, mobile/, any
+#     <language>/ with a conventions.md) and every guide, as a link;
+#   - every script the kit ships (scripts/), in the scripts table.
+# Quiet when it passes. tests/check runs it, so CI and the pre-commit hook
+# do. Added 2026-11-12, after the tree went a release without typescript/
+# and mobile/.
+set -uo pipefail
+cd "$(dirname "$0")/.." || exit 2
+fail=0
+miss() {
+    echo "README.md: $1"
+    fail=1
+}
+
+# The names a tree line gives, in its left column ("scripts/, hooks/   the
+# kit" names scripts/ and hooks/), one per line.
+names=$(awk '/^## What.s in the repository/ { on = 1; next } on && /^## / { exit }
+    on && !/^```/ && NF { sub(/  .*/, ""); n = split($0, part, /, */); for (i = 1; i <= n; i++) print part[i] }' README.md)
+[ -n "$names" ] || miss "has no \"What's in the repository\" section."
+while IFS= read -r entry; do
+    case "$entry" in README.md | LICENSE | .gitignore) continue ;; esac
+    name=$entry
+    [ -d "$entry" ] && name="$entry/"
+    printf '%s\n' "$names" | grep -qxF -- "$name" && continue
+    case "$entry" in
+        FROM-*.md) printf '%s\n' "$names" | grep -qxF 'FROM-*.md' && continue ;;
+    esac
+    # A path under it ("bin/install", ".github/workflows/") names it too.
+    if [ -d "$entry" ]; then
+        case $'\n'"$names" in *$'\n'"$entry/"*) continue ;; esac
+    fi
+    miss "\"What's in the repository\" doesn't name $name."
+done < <(git ls-files | cut -d/ -f1 | sort -u)
+
+for dir in */; do
+    dir=${dir%/}
+    case "$dir" in common | ui | guides) ;; *) [ -f "$dir/conventions.md" ] || continue ;; esac
+    for f in "$dir"/*.md; do
+        [ -f "$f" ] || continue
+        case "$f" in ui/README.md) continue ;; esac
+        grep -qF -- "($f" README.md || miss "doesn't link $f."
+    done
+done
+
+for script in scripts/*; do
+    name=$(basename "$script")
+    [ "$name" = lib.sh ] && continue
+    grep -qE "^\\| [^|]*\`$name\`" README.md || miss "the scripts table doesn't list \`$name\`."
+done
+exit $fail

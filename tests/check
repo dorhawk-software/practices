@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # This repository's own gate: CI's static checks (shellcheck on every
-# script, every relative link), then the kit's tests. Quiet when it passes.
+# script, every relative link, README's map, the plugin's version), then
+# the kit's tests. Quiet when it passes.
 # The pre-commit hook in .githooks runs it (once per clone:
 # `git config core.hooksPath .githooks`); CI's static job calls
 # `tests/check static`, so the two can't drift.
 #
-#   tests/check          # shellcheck, links, tests/run
-#   tests/check static   # shellcheck and links only (CI)
+#   tests/check          # shellcheck, links, readme, versions, tests/run
+#   tests/check static   # all but tests/run (CI)
 #
 # Until 2026-11-12 these ran only in CI: a commit that failed shellcheck
 # was pushed, and its release commit had to wait for a fix.
@@ -21,10 +22,12 @@ run() {
     fi
 }
 run shellcheck -x -P SCRIPTDIR scripts/lib.sh scripts/lint scripts/check-* scripts/claude-hook \
-    scripts/disk-guard scripts/install-hooks hooks/* bin/install tests/run tests/example tests/links tests/check \
+    scripts/disk-guard scripts/install-hooks hooks/* bin/install tests/run tests/example tests/links tests/check tests/readme tests/versions \
     .githooks/pre-commit
 run shellcheck -s sh scripts/prune-caches scripts/sweep-target
 run tests/links
+run tests/readme
+run tests/versions
 if [ "${1:-}" != static ]; then
     run tests/run
 fi
