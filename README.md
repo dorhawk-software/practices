@@ -57,14 +57,14 @@ as a pull request the project's own workflow opens.
 | [CLAUDE.md and docs](common/claude-md.md) | Rules and pointers in CLAUDE.md, detail in docs/engineering, every rule dated. |
 | [Privacy in public repos](common/privacy-public-repos.md) | Made-up names, documentation addresses, and a denylist the hooks refuse. |
 | [Working rules for coding agents](common/agent-working-rules.md) | Low CPU priority, a disk floor, rebuild before "restart", keep going on a plan. |
-| [Gates that can fail](common/gates.md) | A canary proves each check works; findings say how to fix them; audit and list licences from what ships. |
+| [Gates that can fail](common/gates.md) | A canary proves each check works; findings say how to fix them; a size limit is met by splitting; audit and list licences from what ships. |
 | [Crash reports and logs](common/crash-reports.md) | Consent before the SDK starts; every hook checked in the vendor's code; an allow-list scrubber; expected refusals unreported. |
 
 ### UI design ([ui/](ui))
 
 | Practice | In one line |
 | --- | --- |
-| [Design before build](ui/design-before-build.md) | Proposals with options first; build what was chosen, one to one. |
+| [Design before build](ui/design-before-build.md) | Proposals with options first; build what was chosen, one to one, measured; off-scale values go to the owner. |
 | [Window buttons](ui/window-buttons.md) | macOS draws its own on the left and the header makes room; the app's own on the right elsewhere. |
 | [Keyboard shortcuts](ui/keyboard-shortcuts.md) | Bind the system's main modifier (⌘ on a Mac), and show shortcuts the way the system writes them. |
 | [An identity pass](ui/identity-pass.md) | Research the identity first (audience, job, inspiration, market, facts); then three agreed iterations: the identity, a few parts, the whole app re-audited from an inventory proven complete. |

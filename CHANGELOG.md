@@ -5,6 +5,21 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+### Changed
+
+- **A size limit is met by splitting the file, never by trimming it.**
+  A file at its allowlist count is split first; shortened wording or a
+  dropped plural form to make room is refused (`common/gates.md`).
+- **A value the design's scale lacks goes to the owner.** Add the step or
+  move the board; never hide the value where the lint doesn't look
+  (`ui/design-before-build.md`).
+- **"Match one to one" measures as well as looks.** Render the board at
+  the device's pixel ratio and compare rows of pixels: a frame drawn twice
+  as wide passed side by side.
+- **Red before green, for a design port.** The code may come first; each
+  assertion is then proven by a mutation, listed in the commit
+  (`common/testing.md`).
+
 ## 1.3.1 (2026-11-12)
 
 ### Fixed

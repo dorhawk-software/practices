@@ -94,12 +94,44 @@ before anyone is shown the result.
 sample data makes exact comparison possible (Crake's `CRAKE_DEMO`, tern's
 `TERN_FAKE` and `TERN_SHOW`). See [testing.md](../common/testing.md).
 
+Eyes accept a line drawn twice as wide. Obálka's compose stamp has a
+1 pt translucent frame; Android drew it 6 px wide on a 2.625x screen,
+where an opaque one is 3. Side by side it looked right; measured, it
+was not ([530f8da](https://github.com/dorhawk-software/obalka/commit/530f8da)).
+
 **Apply.** Open the app in demo mode and capture the window. Compare it
 side by side with the design, and fix the differences before showing it.
 Capture sparingly: screen-portal captures flash the user's screen, so read
 a window's own pixels where you can.
 
-**Check.** The handoff includes the side-by-side capture.
+Then measure. Render the board at the device's pixel ratio and read rows
+of pixels across the same parts of both: line weights, insets, heights.
+Any image tool that dumps a row of pixels will do (ffmpeg's `crop` to
+`rawvideo`, for one).
+
+**Check.** The handoff includes the side-by-side capture and the measured
+line weights and insets of each new object.
+
+## A value the scale doesn't have is a question for the owner
+
+**What.** An agreed board may use a spacing, size or radius the project's
+scale lacks. Then ask the owner: add the step to the scale, or move the
+board to the nearest step. Never put the value where the lint doesn't
+look.
+
+**Why.** Obálka's empty-inbox board spaced its envelope 56 and 34 from
+its neighbours; the scale has neither. The first build put both in a
+theme file, which the spacing lint skips. Another agreed board drew the
+same layout at 48 and 32: one layout, four numbers. Hidden values are
+how a scale stops being one.
+
+**Apply.** List each off-scale value with its board and its nearest
+steps, and ask once. Record the answer where it lives: a new step in the
+theme and the design system, or the board moved on the canvas. The same
+layout on several boards gets one set of values.
+
+**Check.** Every number in a lint-exempt folder is a named step, or an
+object's own geometry with its board named beside it.
 
 ## Review a proposal in its place, with fresh eyes
 

@@ -91,6 +91,25 @@ idea for file lengths. Use it for any countable rule.
 
 **Check.** Fix one finding: the gate asks you to lower the baseline.
 
+## A size limit is met by splitting, never by trimming
+
+**What.** When a file at its size limit needs more, split it first.
+Never shorten what users read, drop a plural form or pick another
+implementation just so the change fits.
+
+**Why.** Obálka's strings file sat exactly at its allowlist count. A
+weekday under each day number came from the platform's calendar instead
+of the app's strings ([26ff3d5](https://github.com/dorhawk-software/obalka/commit/26ff3d5)). A
+freshness line folded "před 5 minutami" into "před 5 min". The gate
+passed both times; the wording and the design paid.
+
+**Apply.** Before adding to a file in `.practices/size-allowlist`, look
+at its room. With none, split it in the same commit (a strings file by
+feature, a screen by its parts), lower its count, then make the change.
+
+**Check.** No commit that adds to a capped file also shortens user text
+or drops a plural form; the reviewer reads the diff of that file.
+
 ## Audit only what ships; re-check every accepted advisory
 
 **What.** A dependency audit blocks on advisories in code that ships, not
