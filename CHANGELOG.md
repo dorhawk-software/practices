@@ -5,6 +5,8 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+## 1.3.0 (2026-11-12)
+
 ### New
 
 - **JavaScript and TypeScript projects get the gate.** In a project with a
