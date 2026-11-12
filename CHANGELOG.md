@@ -5,6 +5,8 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+## 1.2.0 (2026-11-12)
+
 ### New
 
 - **Agents get the practices with the kit.** `bin/install` now copies the
