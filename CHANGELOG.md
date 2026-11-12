@@ -5,6 +5,12 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+### Fixed
+
+- **No example headings in `rules.md`.** The digest listed a heading from
+  a code example ("Unreleased" in common/changelog.md) as a rule; it
+  reads headings outside code blocks only.
+
 ## 1.2.0 (2026-11-12)
 
 ### New

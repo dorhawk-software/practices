@@ -208,6 +208,7 @@ grep -qxF '@.practices/rules.md' "$p/CLAUDE.md" && grep -q 'Our rules.' "$p/CLAU
 grep -q '^- Red before green$' "$p/.practices/rules.md" && grep -q 'identity-pass.md' "$p/.practices/rules.md" && ok ||
     bad "rules.md lists every practice's rules" "$(cat "$p/.practices/rules.md")"
 ! grep -q 'rust/conventions.md' "$p/.practices/rules.md" && ok || bad "rules.md leaves Rust out of a project without Cargo.toml"
+! grep -qx -e '- Unreleased' "$p/.practices/rules.md" && ok || bad "rules.md skips headings inside code examples"
 [ -f "$p/.practices/docs/ui/visual-craft.md" ] && [ -f "$p/.practices/docs/common/testing.md" ] && ok ||
     bad "install copies the practices into .practices/docs"
 [ -f "$p/.claude/skills/practices-ui-design/SKILL.md" ] && [ ! -e "$p/.claude/skills/fold-in-a-project" ] && ok ||

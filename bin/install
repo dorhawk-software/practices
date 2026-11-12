@@ -67,7 +67,9 @@ digest() { # digest FILE...: a section per file, a line per "## " heading
     for f in "$@"; do
         title=$(sed -n 's/^# //p' "$here/$f" | head -n 1)
         printf '\n## %s (.practices/docs/%s)\n\n' "$title" "$f"
-        sed -n 's/^## \(.*\)/- \1/p' "$here/$f" | grep -vx -e '- Check' -e '- Apply' || true
+        # headings outside fenced code only (an example's "## Unreleased" isn't a rule)
+        awk '/^```/ { fenced = !fenced; next } !fenced && /^## / { sub(/^## /, "- "); print }' "$here/$f" |
+            grep -vx -e '- Check' -e '- Apply' || true
     done
 }
 {
