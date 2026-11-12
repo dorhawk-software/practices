@@ -101,6 +101,30 @@ still building iOS on every push.
 
 **Apply.** In the release script, after the checks and before the tag:
 `xcodebuild` (device SDK, Debug, unsigned) and `./gradlew assembleRelease`
-for one architecture. Stop on failure; nothing is tagged.
+(it also bundles the JavaScript, which no push build checks), each followed
+by the artefact check for every architecture the app ships. Stop on
+failure; nothing is tagged. Keep the build folders outside the repository.
 
 **Check.** A release run's output shows both builds before the tag line.
+
+## A build made as a check publishes nothing
+
+**What.** A build run to check something (a local gate, a rehearsal, a
+compile check) uploads nothing: no source maps or symbols to the crash
+reporter, no store upload, no tag.
+
+**Why.** The first run of Obálka's local release check built Android in
+Release, and the crash reporter's Gradle plugin uploaded that build's
+source maps with the token in a local properties file
+(Obálka, 2026-11-12). Nothing broke, but an unreleased build now sits in
+the crash reporter as if it were a release.
+
+**Apply.**
+1. In every check script, switch the uploads off explicitly
+   (`SENTRY_DISABLE_AUTO_UPLOAD=true` for Sentry's iOS and Android
+   build steps).
+2. Read each build plugin's upload switch in its own code, not its docs
+   ([crash-reports.md](../common/crash-reports.md)).
+3. Run the check once and search its log for "upload".
+
+**Check.** The check script's log has no upload lines.
