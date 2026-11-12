@@ -37,6 +37,11 @@ practices/bin/install --templates path/to/your-project
 cd path/to/your-project && .practices/bin/install-hooks && .practices/bin/lint
 ```
 
+Then restart your agent session. Every new session loads the rules (a line
+each, from `.practices/rules.md`), reads the detail in `.practices/docs/`,
+and has the practices' skills in `.claude/skills/`. Updates arrive weekly
+as a pull request the project's own workflow opens.
+
 ## The practices
 
 ### Any project ([common/](common))
@@ -87,7 +92,6 @@ bin/install        puts the kit into a project, or updates it
 actions/           composite GitHub Actions (rust-setup, rust-lint, ...)
 .github/workflows/ reusable workflows (rust-ci, rust-advisories, ...)
 plugin/            the Claude Code plugin (skills)
-projects.json      the projects that receive kit updates as pull requests
 tests/             the kit's own tests (CI runs them on Linux and macOS)
 ```
 
@@ -139,8 +143,8 @@ gate finds, and fold in another project:
 
 Tags follow semantic versioning: `v1.2.3`, plus a moving `v1` for the
 newest 1.x. Projects reference actions and workflows `@v1` and get
-non-breaking changes. Kit updates arrive as pull requests in the projects
-in [projects.json](projects.json). Changes are in [CHANGELOG.md](CHANGELOG.md).
+non-breaking changes. Each project pulls kit updates itself, weekly, as a
+pull request ([how it works](guides/how-it-works.md#updates-each-project-pulls-its-own)). Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Licence
 

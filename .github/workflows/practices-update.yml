@@ -1,0 +1,88 @@
+# Reusable: a project pulls the newest practices release itself. On its own
+# schedule, it compares .practices/VERSION with the newest vX.Y.Z tag of
+# the same major, runs that release's bin/install, and opens a pull request
+# with the result, then starts CI on it (a pull request opened with
+# GITHUB_TOKEN starts no workflow by itself). A new major is only named in
+# the log: moving to it is the project's own change.
+#
+# Nothing to register here and no token to make: the project's own
+# GITHUB_TOKEN does it. The repository (or organisation) must allow GitHub
+# Actions to create pull requests (Settings, Actions, General).
+#
+#   on: { schedule: [{ cron: "41 5 * * 1" }], workflow_dispatch: {} }
+#   jobs:
+#     practices:
+#       uses: dorhawk-software/practices/.github/workflows/practices-update.yml@v1
+#       permissions: { contents: write, pull-requests: write, actions: write }
+name: Practices update
+
+on:
+  workflow_call:
+    inputs:
+      ci-workflow:
+        description: The workflow file to start on the pull request's branch ("" for none).
+        type: string
+        default: ci.yml
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: newest
+        name: The newest release of this project's major
+        run: |
+          current=$(cat .practices/VERSION 2>/dev/null || echo none)
+          base=${current%%-*}
+          major=${base%%.*}
+          tags=$(git ls-remote --tags --refs https://github.com/dorhawk-software/practices 'v*.*.*' |
+            sed 's|.*refs/tags/||' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)
+          newest=$(printf '%s\n' "$tags" | grep -E "^${major}\." | tail -n 1)
+          latest=$(printf '%s\n' "$tags" | tail -n 1)
+          echo "this project: $current; newest $major.x: ${newest:-none}; newest overall: $latest"
+          if [ "$latest" != "$newest" ]; then
+            echo "::notice::practices $latest is out: a new major, so moving to it is your change (its CHANGELOG says what breaks)."
+          fi
+          if [ -z "$newest" ] || [ "$(printf '%s\n%s\n' "$base" "$newest" | sort -V | tail -n 1)" = "$base" ]; then
+            echo "Up to date."
+            exit 0
+          fi
+          git clone -q --depth 1 --branch "$newest" https://github.com/dorhawk-software/practices "$RUNNER_TEMP/practices"
+          "$RUNNER_TEMP/practices/bin/install" .
+          echo "version=$newest" >>"$GITHUB_OUTPUT"
+      - if: steps.newest.outputs.version != ''
+        id: pr
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          branch: practices-update
+          add-paths: |
+            .practices/
+            .claude/skills/
+            CLAUDE.md
+          title: Practices ${{ steps.newest.outputs.version }}
+          commit-message: |
+            Practices ${{ steps.newest.outputs.version }}
+
+            The kit, its rules, docs and skills, from
+            dorhawk-software/practices. What changed: its CHANGELOG.md.
+          body: >-
+            Practices ${{ steps.newest.outputs.version }}: the kit
+            (.practices/bin, hooks), the rules agents load (.practices/rules.md),
+            the docs (.practices/docs) and the kit's skills (.claude/skills).
+            What the project owns stays. What changed and why:
+            https://github.com/dorhawk-software/practices/blob/${{ steps.newest.outputs.version }}/CHANGELOG.md
+            After merging, restart running agent sessions so they load the
+            new rules and skills.
+      - if: steps.pr.outputs.pull-request-number != '' && inputs.ci-workflow != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_WORKFLOW: ${{ inputs.ci-workflow }}
+        run: gh workflow run "$CI_WORKFLOW" --ref practices-update

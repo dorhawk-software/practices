@@ -7,6 +7,21 @@ newest first, in the kinds common/changelog.md describes.
 
 ### New
 
+- **Agents get the practices with the kit.** `bin/install` now copies the
+  practices into `.practices/docs/`, writes `.practices/rules.md` (a line
+  per rule, about 120) and the line `@.practices/rules.md` in CLAUDE.md,
+  so every session loads them, and puts the skills in `.claude/skills/`:
+  new ones for UI design, testing, commits, releases, CI and docs, beside
+  the gate and adopt skills. It ends by saying to restart the agent
+  session. Before, only the scripts reached a project, and agents saw the
+  rules only where someone had copied them into CLAUDE.md.
+- **Each project pulls its own updates.** `bin/install` adds
+  `.github/workflows/practices.yml`, which calls the new reusable
+  `practices-update.yml` weekly: the newest release of the same major, as
+  a pull request, with CI started on it. No token and no list of
+  projects. `projects.json` and `sync-projects.yml` are gone: the push
+  sync needed a token that was never set, so no project ever got a sync
+  pull request.
 - **An identity pass, through the whole app** (`ui/identity-pass.md`).
   Ideally the identity is researched before the first screen: audience,
   the product's job and process, inspiration, the market, and the facts

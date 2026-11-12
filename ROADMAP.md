@@ -34,7 +34,7 @@ is the source of everything Rust here; its commit links are in each doc.
 - [x] [Example workspace](examples/rust-workspace/)
 - [x] Composite actions `rust-setup`, `rust-lint`, `rust-coverage`,
   `prune-caches`; reusable workflows `rust-ci.yml`, `rust-advisories.yml`,
-  `rust-toolchain-bump.yml`; the sync workflow and `projects.json`
+  `rust-toolchain-bump.yml`; the update workflow (pulled by each project, `practices-update.yml`)
 - [x] The Claude Code plugin's skills
 - [ ] Crake switched to the kit, with no loss in what its CI catches; then
   the `v1` tag

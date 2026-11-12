@@ -16,14 +16,9 @@ detail in docs/engineering/ (common/claude-md.md).
 
 ## Practices
 
-Each line is the rule; the practices repository has the why and the how.
+The shared practices, a line per rule (the detail is in .practices/docs/):
+@.practices/rules.md
 
-- Lints are errors: `.practices/bin/lint` after every build (the Claude
-  hook runs it). Fix, never silence (rust/lints.md).
-- Coverage floors per crate in `.practices/coverage-floors`; raise them as
-  tests grow, never lower one (rust/coverage.md).
+This project's own settings:
+- Coverage floors per crate in `.practices/coverage-floors`.
 - Every number has a name (`MAX_CHEERS`), or a comment saying why not.
-- Every user-facing change adds a line under "Unreleased" in CHANGELOG.md,
-  in the same commit (common/changelog.md).
-- Whatever we decide not to do now goes in docs/engineering/not-now.md, in
-  the same commit (common/not-now.md).

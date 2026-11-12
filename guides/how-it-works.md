@@ -1,8 +1,9 @@
 # How it works
 
 The practices reach a project in four ways: **documents** people and agents
-read, a **kit** of scripts synced into the project, **GitHub Actions** the
-project calls, and a **Claude Code plugin** agents load. This page explains
+read, a **kit** synced into the project (scripts, the rules agents load,
+the docs, the skills), **GitHub Actions** the project calls, and a
+**Claude Code plugin** for projects without the kit. This page explains
 each, who owns which file, and how a change here reaches every project.
 
 ## What flows where
@@ -10,12 +11,15 @@ each, who owns which file, and how a change here reaches every project.
 ```text
  dorhawk-software/practices                         a project (e.g. tern)
  ─────────────────────────                          ─────────────────────
- common/*.md, ui/*.md,
- rust/*.md ────────────── read, linked from ──────▶ CLAUDE.md (one line each)
-
- scripts/*, hooks/*  ──── bin/install ────────────▶ .practices/bin/*     synced
-                          (or a sync PR)            .practices/hooks/*   synced
+ common/*.md, ui/*.md, ── bin/install ────────────▶ .practices/docs/*    synced
+ rust/*.md, guides/*.md   (or an update PR)         .practices/rules.md  synced
+                                                    (CLAUDE.md loads it:
+                                                     @.practices/rules.md)
+ plugin/skills/* ───────────────────────────────────▶ .claude/skills/*   synced
+ scripts/*, hooks/*  ───────────────────────────────▶ .practices/bin/*     synced
+                                                    .practices/hooks/*   synced
                                                     .practices/VERSION   synced
+ templates/practices-update.yml ── if absent ─────▶ .github/workflows/practices.yml
  templates/config ─────── first install only ─────▶ .practices/config    project's
  rust/templates/* ─────── --templates, if absent ─▶ clippy.toml, deny.toml,
                                                     rust-toolchain.toml,
@@ -30,7 +34,7 @@ each, who owns which file, and how a change here reaches every project.
  .claude-plugin/marketplace.json ◀── /plugin install ── Claude Code
    plugin/ (skills only)
 
- projects.json ── sync-projects.yml ── opens a PR ──▶ each listed project
+ .github/workflows/practices-update.yml ◀── weekly, from the project ── opens its update PR
 ```
 
 Every project gets the language-neutral part: `check-private`,
@@ -50,21 +54,46 @@ CI for the same reason, and the other way round.
 
 | Path in the project | Owner | Changed by |
 | --- | --- | --- |
-| `.practices/bin/` | the kit | every `bin/install` or sync PR replaces it whole |
+| `.practices/bin/` | the kit | every `bin/install` or update PR replaces it whole |
 | `.practices/hooks/` | the kit | the same |
 | `.practices/VERSION` | the kit | the practices commit or tag it came from |
 | `.practices/README.md` | the kit | says what's synced and what isn't |
+| `.practices/docs/` | the kit | the practices themselves, at this version |
+| `.practices/rules.md` | the kit | one line per rule, grouped by practice; CLAUDE.md loads it every session |
+| `.practices/skills` | the kit | the names of the kit's skills in `.claude/skills/` |
+| `.claude/skills/<kit's>` | the kit | replaced whole; a project's own skill of the same name is kept |
+| `CLAUDE.md` | the project | install adds the line `@.practices/rules.md` once, or creates the file with it |
+| `.github/workflows/practices.yml` | the project | created once: pulls updates weekly |
 | `.practices/config` | the project | created once from [templates/config](../templates/config), then never touched |
 | `.practices/coverage-floors` | the project | created once with a header in a Rust project; you add the crates |
 | `.practices/size-allowlist` | the project | you, when adopting the size limit ([adopt guide](adopt-in-a-rust-project.md)) |
 | `.practices/lint.d/*` | the project | your own extra lint steps |
 
 Commit `.practices/` whole. The project then works offline, on a fresh
-clone, and in CI with no extra download, and a sync PR shows exactly what
-changed in the scripts.
+clone, and in CI with no extra download, and an update PR shows exactly what
+changed in the scripts and the rules.
 
-**Never edit `.practices/bin` in a project.** The next sync replaces it.
-Change the script here, with a test in `tests/run`, and sync.
+**Never edit `.practices/bin`, `docs` or `rules.md` in a project.** The
+next update replaces them. Change them here, with a test in `tests/run`,
+and release.
+
+### What an agent gets
+
+After `bin/install`, a new agent session in the project has:
+1. **Every rule, every session.** CLAUDE.md loads `.practices/rules.md`:
+   a line per rule (about 120, under 6k characters), each group naming its
+   file in `.practices/docs/`.
+2. **The detail when the task needs it.** The skills in `.claude/skills/`
+   (`practices-ui-design`, `practices-testing`, `practices-commits`,
+   `practices-releases`, `practices-ci`, `practices-docs`,
+   `practices-gate`, `adopt-practices`) trigger on the job and read the
+   matching docs.
+3. **The gate.** The hooks, unchanged.
+
+A running session doesn't load new rules or skills: `bin/install` ends by
+saying to restart it, and so does every update PR. A skill triggers only
+when its description matches the task, so every rule that must hold is
+also in `rules.md`.
 
 ### The scripts
 
@@ -101,30 +130,35 @@ linter live there.
   `v2`.
 - Projects call the actions and workflows as `@v1`. They get fixes without
   a change of their own, and a breaking change only when they move to `@v2`.
-- The kit in `.practices/` changes only through a sync PR, so a project
-  never gets new script behaviour without seeing it in a diff.
+- The kit changes only through an update PR (or a `bin/install` run by
+  hand), so a project never gets new behaviour without seeing it in a
+  diff.
 
-## The sync
+## Updates: each project pulls its own
 
-`projects.json` lists the repositories that take the kit:
+There is no list of projects here. Each project runs
+`.github/workflows/practices.yml` (made by `bin/install`), weekly and by
+hand. It calls
+[practices-update.yml](../.github/workflows/practices-update.yml), which:
+1. reads `.practices/VERSION` and finds the newest `vX.Y.Z` tag of the
+   same major;
+2. when it is newer, runs that release's `bin/install` on the project;
+3. opens (or updates) the pull request `practices-update` with
+   `.practices/`, `.claude/skills/` and `CLAUDE.md`;
+4. starts the project's CI on it (input `ci-workflow`, default `ci.yml`).
 
-```json
-{ "projects": [
-    { "repo": "dorhawk-software/crake" },
-    { "repo": "dorhawk-software/tern" }
-] }
+A new major is only named in the log: moving to it is the project's own
+change. It needs no token: the project's `GITHUB_TOKEN`, with `contents`,
+`pull-requests` and `actions` write. The repository or organisation must
+allow GitHub Actions to create pull requests (Settings, Actions,
+General). In a private repository it costs about a minute a week.
+
+By hand, anywhere:
+
+```sh
+git clone --depth 1 https://github.com/dorhawk-software/practices "$TMPDIR/practices"
+"$TMPDIR/practices/bin/install" .
 ```
-
-`.github/workflows/sync-projects.yml` runs on each release (and by hand). For
-each listed project it checks the repository out, runs `bin/install` on it,
-and when anything changed, opens (or updates) a pull request. The project's
-own CI then runs on that pull request, so a change here is proven in every
-project before it lands there.
-
-It needs the secret `PRACTICES_SYNC_TOKEN`: a fine-grained personal access
-token limited to the listed repositories, with **Contents: read and write**
-and **Pull requests: read and write**. Without it, the workflow says so and
-does nothing.
 
 ## The reusable workflows
 
@@ -231,7 +265,10 @@ Claude Code, with or without the plugin, and it never runs twice.
 
 This repository is also a Claude Code plugin marketplace,
 `dorhawk-practices`, defined in `.claude-plugin/marketplace.json`. Its
-plugin `practices` lives in `plugin/` and carries **skills only**:
+plugin `practices` lives in `plugin/` and carries **skills only**. A
+project with the kit already has them in `.claude/skills/`; the plugin is
+for projects without the kit, and for `fold-in-a-project`, which works on
+this repository:
 
 - `adopt-practices`: walks an agent through the
   [adopt guide](adopt-in-a-rust-project.md) in a project.

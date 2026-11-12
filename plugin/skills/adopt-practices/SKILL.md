@@ -59,15 +59,18 @@ improve:
 `.github/workflows/ci.yml` calls
 `dorhawk-software/practices/.github/workflows/rust-ci.yml@v1` (the example
 in examples/rust-workspace/.github/workflows/). Add the schedule-driven
-`rust-advisories.yml` and `rust-toolchain-bump.yml`. Ask the person to add
-the repository to the practices' projects.json, so kit updates arrive as
-pull requests.
+`rust-advisories.yml` and `rust-toolchain-bump.yml`. Install already made
+`.github/workflows/practices.yml`, which pulls kit updates weekly as pull
+requests; ask the person to allow GitHub Actions to create pull requests
+in the repository's settings (Settings, Actions, General).
 
 ## 5. Write it down
 
-- CLAUDE.md: a short "Practices" section: lints are errors, the gate,
-  the hooks, the not-now rule, pointing at .practices/README.md and the
-  practices docs. Rules plus pointers, not detail.
+- CLAUDE.md: install added `@.practices/rules.md`, which loads every
+  rule. Add only the project's own settings around it (its floors, its
+  allowlist, its CI budget), never a copy of a shared rule.
+- Tell the person to restart the agent session: a running one doesn't
+  load the new rules and skills.
 - The not-now list: every allowlisted file and expected function, as
   work to come back to.
 - Commit in steps the person can review: the kit, then the fixes, then CI.

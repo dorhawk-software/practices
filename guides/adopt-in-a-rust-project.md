@@ -293,8 +293,10 @@ differ. CI installs what `rust-setup` lists; GPUI's packages come with
 
 ## 10. Write it down
 
-- `CLAUDE.md`: one line per adopted practice pointing here, and the project's
-  own settings ([common/claude-md.md](../common/claude-md.md)).
+- `CLAUDE.md`: `bin/install` added `@.practices/rules.md`, which loads every
+  shared rule. Add only the project's own settings, and delete older copies
+  of shared rules ([common/claude-md.md](../common/claude-md.md)).
+- Restart the agent session, so it loads the rules and the skills.
 - `docs/engineering/not-now.md`: the big files, the long functions, the
   crates under a low floor, each with what's left
   ([common/not-now.md](../common/not-now.md)).

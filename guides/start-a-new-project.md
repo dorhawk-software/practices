@@ -46,11 +46,17 @@ One paragraph: what it is, who it's for, what it never does.
 - docs/engineering/: the detail behind each section here.
 
 ## Practices (github.com/dorhawk-software/practices)
-- Tests never touch this computer: common/testing.md.
-- Whatever is decided "not now" goes in docs/engineering/not-now.md, same commit.
-- Every user-facing change adds a CHANGELOG line under Unreleased, same commit.
-- (The language's own lines, from its page in step 7.)
+
+The shared practices, a line per rule:
+@.practices/rules.md
+
+This project's own settings:
+- (Its coverage floors, size allowlist, CI budget: only what differs.)
 ```
+
+The `@.practices/rules.md` line loads every shared rule into each session
+(step 4's `bin/install` adds it when it's missing). Don't copy shared
+rules into CLAUDE.md: the copy goes stale when the practices change.
 
 Every rule records where it came from and when: "(asked for 2026-11-11)".
 An agent can then tell a hard rule from a past choice.
@@ -95,8 +101,15 @@ git clone https://github.com/dorhawk-software/practices ~/src/practices
 - Neither runs a compiler or needs more than git and bash. When Rust files
   are committed, pre-commit also runs the Rust gate; other languages have
   no gate in the kit yet (step 7).
-- Commit `.practices/` whole; `install-hooks` runs once per clone
+- Commit `.practices/` whole, with `.claude/skills/` and
+  `.github/workflows/practices.yml`; `install-hooks` runs once per clone
   ([how it works](how-it-works.md)).
+- `bin/install` also gives agents the rules (`.practices/rules.md`), the
+  docs (`.practices/docs/`) and the skills (`.claude/skills/`). Restart
+  the agent session afterwards: a running one doesn't load them.
+- `.github/workflows/practices.yml` pulls new releases weekly as a pull
+  request. Allow GitHub Actions to create pull requests in the
+  repository's settings (Settings, Actions, General).
 
 ## 5. CI: decide what it costs
 

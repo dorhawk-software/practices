@@ -195,5 +195,44 @@ echo "# mine" >"$p/deny.toml"
 "$here/bin/install" --templates "$p" >/dev/null
 [ "$(cat "$p/deny.toml")" = "# mine" ] && ok || bad "install never overwrites a project's template copy"
 
+# --- bin/install gives agents the rules, the docs and the skills
+p=$(project)
+printf '# Mine\n\nOur rules.\n' >"$p/CLAUDE.md"
+rm -rf "$p/.claude/skills" "$p/.practices/skills" # as before the kit had skills
+mkdir -p "$p/.claude/skills/ours" "$p/.claude/skills/practices-testing"
+echo ours >"$p/.claude/skills/ours/SKILL.md"
+echo ours >"$p/.claude/skills/practices-testing/SKILL.md"
+out=$("$here/bin/install" "$p")
+grep -qxF '@.practices/rules.md' "$p/CLAUDE.md" && grep -q 'Our rules.' "$p/CLAUDE.md" && ok ||
+    bad "install adds the line that loads rules.md and keeps CLAUDE.md" "$(cat "$p/CLAUDE.md")"
+grep -q '^- Red before green$' "$p/.practices/rules.md" && grep -q 'identity-pass.md' "$p/.practices/rules.md" && ok ||
+    bad "rules.md lists every practice's rules" "$(cat "$p/.practices/rules.md")"
+! grep -q 'rust/conventions.md' "$p/.practices/rules.md" && ok || bad "rules.md leaves Rust out of a project without Cargo.toml"
+[ -f "$p/.practices/docs/ui/visual-craft.md" ] && [ -f "$p/.practices/docs/common/testing.md" ] && ok ||
+    bad "install copies the practices into .practices/docs"
+[ -f "$p/.claude/skills/practices-ui-design/SKILL.md" ] && [ ! -e "$p/.claude/skills/fold-in-a-project" ] && ok ||
+    bad "install copies the kit's skills, not fold-in-a-project" "$(ls "$p/.claude/skills")"
+[ "$(cat "$p/.claude/skills/practices-testing/SKILL.md")" = ours ] && ! grep -qx practices-testing "$p/.practices/skills" && ok ||
+    bad "install keeps a project's skill with the kit's name"
+case $out in *"Restart your agent session"*) ok ;; *) bad "install says to restart the agent session" "$out" ;; esac
+printf 'gone\n' >>"$p/.practices/skills"
+mkdir -p "$p/.claude/skills/gone"
+"$here/bin/install" "$p" >/dev/null
+[ "$(grep -cxF '@.practices/rules.md' "$p/CLAUDE.md")" = 1 ] && ok || bad "install adds the CLAUDE.md line only once"
+[ ! -e "$p/.claude/skills/gone" ] && [ -f "$p/.claude/skills/ours/SKILL.md" ] && ok ||
+    bad "an update removes the kit's old skills and keeps the project's"
+touch "$p/Cargo.toml"
+"$here/bin/install" "$p" >/dev/null
+grep -q 'rust/conventions.md' "$p/.practices/rules.md" && ! grep -q 'rust/gpui.md' "$p/.practices/rules.md" && ok ||
+    bad "rules.md adds Rust's rules to a Rust project, GPUI's only with GPUI"
+rm -rf "$p/CLAUDE.md"
+"$here/bin/install" "$p" >/dev/null
+grep -qxF '@.practices/rules.md' "$p/CLAUDE.md" && ok || bad "install creates a CLAUDE.md that loads rules.md"
+grep -q 'practices-update.yml@v1' "$p/.github/workflows/practices.yml" && ok ||
+    bad "install adds the workflow that pulls updates"
+echo "# ours" >"$p/.github/workflows/practices.yml"
+"$here/bin/install" "$p" >/dev/null
+[ "$(cat "$p/.github/workflows/practices.yml")" = "# ours" ] && ok || bad "install keeps the project's update workflow"
+
 echo "$passed passed, $failed failed"
 [ $failed = 0 ]

@@ -46,10 +46,10 @@ jobs:
       - name: actionlint (workflows, and the actions' scripts)
         run: |
           bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash) 1.7.12
-          ./actionlint -color .github/workflows/*.yml examples/rust-workspace/.github/workflows/*.yml
+          ./actionlint -color .github/workflows/*.yml examples/rust-workspace/.github/workflows/*.yml templates/practices-update.yml
       - name: JSON files parse, the plugin has what Claude Code reads
         run: |
-          for f in projects.json .claude-plugin/marketplace.json plugin/.claude-plugin/plugin.json; do
+          for f in .claude-plugin/marketplace.json plugin/.claude-plugin/plugin.json; do
             jq empty "$f" || exit 1
           done
           jq -e '.name and .owner.name and (.plugins | length > 0)' .claude-plugin/marketplace.json >/dev/null
