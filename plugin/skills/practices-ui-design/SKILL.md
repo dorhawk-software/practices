@@ -15,6 +15,7 @@ The practices are in `.practices/docs/`, this project's copy, pinned to its kit 
 3. `ui/design-before-build.md`: variants on the design canvas, the owner
    picks, build one to one, keep canvas and code in sync.
 4. When they apply: `ui/keyboard-shortcuts.md`, `ui/window-buttons.md`,
+   `ui/drag-and-drop.md`,
    and for GPUI apps `rust/gpui.md`.
 
 Also read the project's own design source (its CLAUDE.md names it: a
@@ -48,6 +49,8 @@ sometimes edits it.
 - Install it and it just works (common/it-just-works.md): no technical
   switch in the window; the product decides, says why, can undo. Settings
   hold preferences only.
+- Drag and drop shows one calm panel over the target with what dropping
+  does, the resting hint faded, nothing glowing (ui/drag-and-drop.md).
 - Show variants and recommend one; never build an open choice unasked.
 - After a pick, strip the other variants from the canvas.
 - Real context: the real frame, both themes, the longest language.

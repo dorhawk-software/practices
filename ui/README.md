@@ -10,6 +10,7 @@ the web) lives with its language, linked from these pages.
 | [Window buttons](window-buttons.md) | macOS draws its own on the left and the header makes room; the app's own on the right elsewhere. |
 | [An identity pass](identity-pass.md) | Research the identity first (audience, job, inspiration, market, facts); then three agreed iterations: the identity, a few parts, the whole app re-audited. |
 | [Visual craft](visual-craft.md) | Tone, not outlines; matching stroke ends; one drawing per object; compact; an 11 px floor; one anatomy per job. |
+| [Drag and drop](drag-and-drop.md) | One calm panel over the target says what dropping does; the resting hint fades; nothing glows. |
 | [Keyboard shortcuts](keyboard-shortcuts.md) | Bind the system's main modifier (⌘ on a Mac); show shortcuts as each system writes them: ⇧⌘K, Ctrl+Shift+K. |
 
 ## What belongs here

@@ -67,6 +67,7 @@ as a pull request the project's own workflow opens.
 | --- | --- |
 | [Design before build](ui/design-before-build.md) | Proposals with options first; build what was chosen, one to one, measured and checked pixel by pixel; off-scale values go to the owner. |
 | [Window buttons](ui/window-buttons.md) | macOS draws its own on the left and the header makes room; the app's own on the right elsewhere. |
+| [Drag and drop](ui/drag-and-drop.md) | One calm panel over the target says what dropping does; the resting hint fades; nothing glows. |
 | [Keyboard shortcuts](ui/keyboard-shortcuts.md) | Bind the system's main modifier (⌘ on a Mac), and show shortcuts the way the system writes them. |
 | [An identity pass](ui/identity-pass.md) | Research the identity first (audience, job, inspiration, market, facts); then three agreed iterations: the identity, a few parts, the whole app re-audited from an inventory proven complete. |
 | [Visual craft](ui/visual-craft.md) | Tone, not outlines; matching stroke ends; one drawing per object, reaching its edges; the system's own sign for a system act; compact; facts ranked, the rest one tap away; an 11 px floor. |

@@ -7,6 +7,13 @@ newest first, in the kinds common/changelog.md describes.
 
 ### New
 
+- **Drag and drop: one calm panel says what will happen.** Taken from
+  tern's compose window, which the owner called "the optimal
+  representation of drag and drop", after the Windows-app runner's
+  light-up strip. A dashed panel over the target in the soft accent,
+  the action's icon in a circle, a verb phrase and one line of scope;
+  the resting hint fades (`ui/drag-and-drop.md`).
+
 - **Hard stop: the name and the mark read clean.** A capital letter in
   the Windows-app runner's first name, and the egg that replaced it in
   the wordmark, set a derogatory slang word apart; seven rounds and
