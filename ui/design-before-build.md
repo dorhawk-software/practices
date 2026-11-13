@@ -125,7 +125,7 @@ agent had walked, captured and called matching:
 
 - an envelope's creases poked past its rounded corners;
 - a 4 px blue rim showed above a flap that should reach the top edge;
-- a header drew a hairline that no board draws;
+- the search header drew a hairline its board does not draw;
 - the search field had an outline and no glyph, where the board drew a
   glyph and no outline;
 - every text field showed the system's Roboto, not the product's face.
@@ -138,6 +138,14 @@ one commit, each with a test
 
 The design can be wrong too: the board had the same crease overshoot. The
 code was fixed and the board went on the sync-back list.
+
+A fix can overshoot as well. The first one took the hairline off every
+header, because the agent read the shared header class and not the
+inline style each board sets on it; every board but the search's draws
+the line. It went back the next day, with a test for each side
+([a37862e](https://github.com/dorhawk-software/obalka/commit/a37862e)).
+Check a fix against every design that shows the part, not only the one
+where the fault was found.
 
 **Apply.**
 1. Capture at the device's full resolution. Crop each object to its own
