@@ -56,6 +56,11 @@ sometimes edits it.
   restraint, not plain; layout-only options are a wireframe, said so.
 - One drawn icon family, grown from the product's own drawings and the
   idea (visual-craft.md); two families shown, one recommended. Real
-  third-party logos the product may show, never stand-ins.
+  third-party logos the product may show, never stand-ins: sourced,
+  credited on the board, a made-up product for any failure state
+  (identity-pass.md, "The real things the product handles").
+- Before showing: every typeface renders as the face it names in the
+  owner's browser (measured), every state is drawn in every theme, and
+  the product's copy on the mock is true (identity-pass.md, steps 7–9).
 - Facts first: if the identity draws a real thing, look it up and keep
   its identifying features.

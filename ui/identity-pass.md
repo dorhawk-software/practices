@@ -225,6 +225,40 @@ as this product, not as the platform's default template. Every icon on
 it comes from the family. The handoff says which objects each variant
 uses.
 
+### The real things the product handles
+
+**What.** When the product shows other people's things (apps, files,
+services, accounts), the mocks show real ones: real app icons, real
+names, real file types. Never a drawn stand-in for something that
+exists. Each one is sourced and credited on the board.
+
+**Why.** CuckOo (2026-11-13) runs Windows apps. Five rounds showed drawn
+stand-ins (a blue square for Enterprise Architect, "ACME Accounting
+2009"), though the Musts already said "never stand-ins". The owner had
+to ask: "use actual app logos, i wanna see how they are incorporated".
+The real icons raised the design questions the stand-ins hid: Windows
+icons come in any shape and macOS jails them on a grey tile; a black and
+white icon breaks a colour-matching rule; a red one reads as an alarm.
+
+**Apply.**
+1. Pick the real things your users bring: the owner's own first (an
+   app on their Mac, their CrossOver bottle), then common ones.
+2. Source each one, best first: the owner's own copy (an icon extracted
+   from the installed app), the maker's site, Wikimedia Commons. Treat a
+   download as untrusted: its own folder, read it before you embed it
+   (no scripts or outside references in an SVG), check it is the right
+   asset (an app icon, not a wordmark).
+3. Credit the sources on the board in one line, and say the artwork is
+   its makers', shown only to design the presentation.
+4. Where the identity derives anything from them (colours from an icon),
+   write the rule down and show the edge cases: no colour, an alarm
+   colour, an odd shape.
+5. Never show a real maker's product failing without a real test. The
+   failure state uses a made-up product, and the board says so.
+
+**Check.** No drawn stand-in for anything that exists. Every real asset
+has its source on the board.
+
 ## Iteration 3: the whole app, re-audited and polished
 
 **What.** Only once iteration 2 is agreed, redesign the whole
@@ -373,8 +407,24 @@ in the whole proposal.
    text in the wrong language, states the code no longer has.
 5. Check every claim in captions against the code.
 6. Look for the plain spots: a stock symbol where the family should
-   be, a grey placeholder where a real logo exists, a monogram for a
-   thing that has a mark.
+   be, a grey placeholder or drawn stand-in where a real logo exists
+   (yours or a third party's, [above](#the-real-things-the-product-handles)),
+   a monogram for a thing that has a mark.
+7. Check that every typeface renders as the face it names, in the
+   browser the owner opens it in. Measure it (`document.fonts.check`, or
+   a sample's width against the fallback's). A system-only face such as
+   SF Pro Rounded can't be reached by name in Chrome: load the local font
+   file with `@font-face`, or show a capture. On CuckOo the
+   "recommended" SF Pro Rounded sample showed Helvetica Bold.
+8. Show every state in every theme, not only the happy one. On CuckOo
+   only "It runs" was drawn dark; dark copies of the other states had a
+   filled "undone" dot, ghost buttons as loud as Open, and a failure
+   reason in the success colour.
+9. Check the product's own copy on the mock as you would a release:
+   advice, promises and reasons must be true. CuckOo's mock advised a
+   Windows VM for an x86 driver, which Windows on Apple silicon can't
+   load, and promised changes stay "not on your Mac" while the app's
+   2 GB sat on the Mac.
 
 **Check.** The handoff message says these checks ran, on the rendered
 page, and what they found.

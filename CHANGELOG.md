@@ -13,6 +13,16 @@ newest first, in the kinds common/changelog.md describes.
   identity". Iteration 2 now requires the drawn icons, palette, type and
   the idea's objects in every variant; layout-only options are a labelled
   wireframe (`ui/identity-pass.md`, the UI skill's Musts).
+- **The real things the product handles.** CuckOo's mocks showed drawn
+  stand-ins for real Windows apps for five rounds; the owner had to ask
+  for the real icons, which raised design questions the stand-ins hid.
+  Real third-party assets now come with sources, credits, written
+  derivation rules and a made-up product for failure states
+  (`ui/identity-pass.md`).
+- **Before you show anything: three more checks.** The named typeface
+  must render (Chrome showed Helvetica for SF Pro Rounded), every state
+  is drawn in every theme (dark broke on the unshown states), and the
+  mock's own product copy must be true (`ui/identity-pass.md`, steps 7–9).
 
 ## 1.4.0 (2026-11-13)
 
