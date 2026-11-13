@@ -5,6 +5,8 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+## 1.4.0 (2026-11-13)
+
 ### Changed
 
 - **Every string names its face, and Android proves it.** A UI kit's
