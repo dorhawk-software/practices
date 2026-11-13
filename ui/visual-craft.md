@@ -244,6 +244,31 @@ shows when is chosen with care (obalka 556e19e).
 shortened fact, show where the full one is: the tap, the next screen, the
 spoken label.
 
+## A number says what it counts
+
+**What.** A bare number reads as the value of the nearest label. So
+every number on screen says what it counts ("Takes 2.1 GB", "3 fixes"),
+and never sits right after a label or control it doesn't belong to.
+Put the number with its own subject, or give it its own noun.
+
+**Why.** CuckOo's window footer (2026-11-13) read "Technical log
+2.1 GB". The 2.1 GB was the app's size on disk, but it sat after the
+log link, so it read as a 2.1 GB log. The owner: "this kinda seems as if
+the technical log was 2.1 GB large, which is a nonsense, obviously". Two
+reviewers and the designer had passed it, because each knew what the
+number meant.
+
+**Apply.**
+1. For every number on screen, cover what you know and read only its
+   neighbours: what does it count?
+2. Give it a noun or a verb when the neighbour is wrong: "Takes 2.1 GB",
+   "640 MB in all", "3 fixes".
+3. Keep actions apart from facts: a link or a button looks like one, and
+   a fact is not glued to it. A divider or space between unrelated items.
+
+**Check.** Read each number aloud with the word before it. The sentence
+is true.
+
 ## Nothing anyone reads under 11 px
 
 **What.** Text that carries information is at least 11 px: dates, tags,

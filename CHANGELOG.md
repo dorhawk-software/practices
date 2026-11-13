@@ -7,6 +7,11 @@ newest first, in the kinds common/changelog.md describes.
 
 ### New
 
+- **A number says what it counts.** CuckOo's footer read "Technical log
+  2.1 GB": the app's size looked like the log's, and two reviewers missed
+  it. Every number now carries its noun, and facts stay apart from
+  actions (`ui/visual-craft.md`; step 10 of "Before you show anything").
+
 - **Install it and it just works.** The owner's promise for every
   Dorhawk product, written down: the product decides what it can from a
   signal, says why and can undo; settings are preferences, never

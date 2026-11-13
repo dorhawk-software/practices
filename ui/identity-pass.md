@@ -425,6 +425,10 @@ in the whole proposal.
    Windows VM for an x86 driver, which Windows on Apple silicon can't
    load, and promised changes stay "not on your Mac" while the app's
    2 GB sat on the Mac.
+10. Read every number with its neighbours, as a stranger would
+    ([visual-craft.md](visual-craft.md#a-number-says-what-it-counts)).
+    CuckOo's footer showed "Technical log 2.1 GB": the app's size read as
+    the log's.
 
 **Check.** The handoff message says these checks ran, on the rendered
 page, and what they found.
