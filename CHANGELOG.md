@@ -20,6 +20,12 @@ newest first, in the kinds common/changelog.md describes.
   stay apart from actions (`ui/visual-craft.md`; step 10 of "Before you
   show anything").
 
+- **What it leaves behind says whose it is.** The Windows-app runner's
+  board put each app's work in "Documents › Enterprise Architect"; the
+  owner pointed out nobody would know it was the runner's and would
+  delete it. Folders a product makes where the user looks now sit under
+  one folder named after it, with its icon (`common/it-just-works.md`).
+
 - **Install it and it just works.** The owner's promise for every
   Dorhawk product, written down: the product decides what it can from a
   signal, says why and can undo; settings are preferences, never

@@ -65,3 +65,32 @@ CrossOver's "Advanced settings" are the example to avoid.
 
 **Check.** The Settings window holds only preferences. Nothing in it
 needs a technical term to explain.
+
+## What it leaves behind says whose it is
+
+**What.** Every folder or file the product puts where the user looks
+(Documents, the Desktop, Downloads, the home folder) is named after the
+product, or sits inside a folder that is, and carries its icon where the
+system allows. Someone who finds it a year later, with no memory of
+making it, can tell which product it belongs to and that it holds their
+work.
+
+**Why.** The Windows-app runner's board recommended giving each app a
+folder "Documents › Enterprise Architect". The owner: "a person could be
+like 'hmm, i dont remember needing any documents for EA' and just
+deleting the directory". A folder nobody remembers making is a folder
+someone deletes, with the work inside it. Documents › the product ›
+the app keeps the work findable, backed up and synced, and says whose
+it is.
+
+**Apply.**
+1. List every path the product creates outside its own hidden places
+   (Library, caches): on install, on first run, and per item.
+2. Give each one a parent folder named after the product, and the
+   product's icon on that folder where the platform allows it.
+3. Read each path cold, as someone tidying up a year later: does it say
+   who made it and what is inside?
+
+**Check.** After a full run of the product, every new item outside its
+hidden places sits under one folder with the product's name.
+
