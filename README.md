@@ -48,6 +48,7 @@ as a pull request the project's own workflow opens.
 
 | Practice | In one line |
 | --- | --- |
+| [It just works](common/it-just-works.md) | Install it and it works: the product decides from signals, says why, and can undo; settings are preferences, never workarounds. |
 | [Commits](common/commits.md) | The subject is the outcome; the body says why, with numbers and proof; never a session ID. |
 | [Changelog](common/changelog.md) | Written by hand for users, in five kinds, in the same commit as the change. |
 | [Releases](common/releases.md) | Only a green main is released, by one command; a rehearsal publishes nothing. |

@@ -39,6 +39,9 @@ sometimes edits it.
 
 ## Musts
 
+- Install it and it just works (common/it-just-works.md): no technical
+  switch in the window; the product decides, says why, can undo. Settings
+  hold preferences only.
 - Show variants and recommend one; never build an open choice unasked.
 - After a pick, strip the other variants from the canvas.
 - Real context: the real frame, both themes, the longest language.

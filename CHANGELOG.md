@@ -7,6 +7,12 @@ newest first, in the kinds common/changelog.md describes.
 
 ### New
 
+- **Install it and it just works.** The owner's promise for every
+  Dorhawk product, written down: the product decides what it can from a
+  signal, says why and can undo; settings are preferences, never
+  technical workarounds (`common/it-just-works.md`). From CuckOo, after
+  CrossOver's renderer, DLSS and MSync switches.
+
 - **Every variant carries the identity, from the first round.** CuckOo's
   first identity round read "quiet like Apple's utilities" as plain:
   greys, stock symbols, no egg. The owner called it "virtually no
