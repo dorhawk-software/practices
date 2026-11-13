@@ -7,6 +7,14 @@ newest first, in the kinds common/changelog.md describes.
 
 ### Changed
 
+- **Every string names its face, and Android proves it.** A UI kit's
+  buttons and fields drew in the system's face; handing the kit the face
+  passed the test and still drew Roboto on Android. Wrap the kit once,
+  draw the label in the platform's Text if the kit re-resolves it, and
+  check letter shapes on the device (`mobile/lifecycle.md`).
+- **A dimmed control fades as one piece.** Android fades each child of a
+  view on its own, so a dimmed button's label came out grey on grey;
+  `needsOffscreenAlphaCompositing` fades it whole (`mobile/lifecycle.md`).
 - **A drawing laid over an object reaches the object's edges.** Folds and
   sheens go in a layer pinned to all four sides, not in the padded
   content. An envelope's folds stopped 16 px short of every corner
