@@ -251,12 +251,12 @@ every number on screen says what it counts ("Takes 2.1 GB", "3 fixes"),
 and never sits right after a label or control it doesn't belong to.
 Put the number with its own subject, or give it its own noun.
 
-**Why.** CuckOo's window footer (2026-11-13) read "Technical log
-2.1 GB". The 2.1 GB was the app's size on disk, but it sat after the
-log link, so it read as a 2.1 GB log. The owner: "this kinda seems as if
-the technical log was 2.1 GB large, which is a nonsense, obviously". Two
-reviewers and the designer had passed it, because each knew what the
-number meant.
+**Why.** The Windows-app runner's window footer (2026-11-13) read
+"Technical log 2.1 GB". The 2.1 GB was the app's size on disk, but it
+sat after the log link, so it read as a 2.1 GB log. The owner: "this
+kinda seems as if the technical log was 2.1 GB large, which is a
+nonsense, obviously". Two reviewers and the designer had passed it,
+because each knew what the number meant.
 
 **Apply.**
 1. For every number on screen, cover what you know and read only its

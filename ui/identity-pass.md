@@ -93,18 +93,20 @@ stand alone, and in slang, not only in dictionaries. Any such reading is
 a hard stop: the mark isn't shown again, and the name and mark are
 reworked before anything else ships.
 
-**Why.** CuckOo (2026-11-13). The capital O in the name and the egg that
-replaced it in the wordmark both cut the word after "Cuck", a
-derogatory term. Seven design rounds, two reviewers per round and the
-designer all missed it, because each read the bird's name they knew.
-The owner caught it: "a Cuck with an egg … this is a hard stop for me".
-The name was already on dorhawk.software.
+**Why.** Dorhawk's Windows-app runner (2026-11-13), first named after a
+bird. A capital letter in the middle of the name, and the egg that
+replaced that letter in the wordmark, both set its first letters apart
+as a derogatory slang word. Seven design rounds, two reviewers per round
+and the designer all missed it, because each read the bird's name they
+knew. The owner caught it: "this is a hard stop for me". The name was
+already on dorhawk.software.
 
 **Apply.**
 1. Before a name is agreed, and again before any mark is drawn, list
    every way it can be cut: each prefix and suffix, each part a capital
-   or a mark sets apart, each hyphen, line break and truncation
-   ("Cuck…" in a narrow sidebar), and the name with a letter replaced.
+   or a mark sets apart, each hyphen, line break and truncation (the
+   first letters alone in a narrow sidebar), and the name with a letter
+   replaced.
 2. Read each part as a stranger would: a slang dictionary, a plain web
    search for the part alone, and in every language of the owner and the
    market (Czech, English and German for Dorhawk at least).
@@ -237,13 +239,13 @@ identity's colours and type, and the idea's objects, each doing its job.
 Variants differ in how they carry the identity, never in whether they do.
 A quiet reference means restraint, not absence.
 
-**Why.** CuckOo's brief (2026-11-13) named Apple's small utilities and
-Things as references. Round one read "quiet" as plain: system greys, a
-coloured dot, stock symbols, a numbered list. All three parts had three
-variants, and none used the egg, the icons or the colours. The owner:
-"it is so plain, where are some icons? … virtually no identity at all".
-A whole round was lost. Things itself has its own blue, icons, type and
-motion.
+**Why.** The Windows-app runner's brief (2026-11-13) named Apple's small
+utilities and Things as references. Round one read "quiet" as plain:
+system greys, a coloured dot, stock symbols, a numbered list. All three
+parts had three variants, and none used the egg, the icons or the
+colours. The owner: "it is so plain, where are some icons? … virtually
+no identity at all". A whole round was lost. Things itself has its own
+blue, icons, type and motion.
 
 **Apply.**
 1. Before drawing, list what each variant must carry: the icon family
@@ -270,13 +272,14 @@ services, accounts), the mocks show real ones: real app icons, real
 names, real file types. Never a drawn stand-in for something that
 exists. Each one is sourced and credited on the board.
 
-**Why.** CuckOo (2026-11-13) runs Windows apps. Five rounds showed drawn
-stand-ins (a blue square for Enterprise Architect, "ACME Accounting
-2009"), though the Musts already said "never stand-ins". The owner had
-to ask: "use actual app logos, i wanna see how they are incorporated".
-The real icons raised the design questions the stand-ins hid: Windows
-icons come in any shape and macOS jails them on a grey tile; a black and
-white icon breaks a colour-matching rule; a red one reads as an alarm.
+**Why.** The Windows-app runner (2026-11-13) runs Windows apps. Five
+rounds showed drawn stand-ins (a blue square for Enterprise Architect,
+"ACME Accounting 2009"), though the Musts already said "never
+stand-ins". The owner had to ask: "use actual app logos, i wanna see how
+they are incorporated". The real icons raised the design questions the
+stand-ins hid: Windows icons come in any shape and macOS jails them on a
+grey tile; a black and white icon breaks a colour-matching rule; a red
+one reads as an alarm.
 
 **Apply.**
 1. Pick the real things your users bring: the owner's own first (an
@@ -448,25 +451,25 @@ in the whole proposal.
    be, a grey placeholder or drawn stand-in where a real logo exists
    (yours or a third party's, [above](#the-real-things-the-product-handles)),
    a monogram for a thing that has a mark.
-7. Check that every typeface renders as the face it names, in the
+7. 7. Check that every typeface renders as the face it names, in the
    browser the owner opens it in. Measure it (`document.fonts.check`, or
    a sample's width against the fallback's). A system-only face such as
-   SF Pro Rounded can't be reached by name in Chrome: load the local font
-   file with `@font-face`, or show a capture. On CuckOo the
-   "recommended" SF Pro Rounded sample showed Helvetica Bold.
-8. Show every state in every theme, not only the happy one. On CuckOo
-   only "It runs" was drawn dark; dark copies of the other states had a
-   filled "undone" dot, ghost buttons as loud as Open, and a failure
-   reason in the success colour.
-9. Check the product's own copy on the mock as you would a release:
-   advice, promises and reasons must be true. CuckOo's mock advised a
-   Windows VM for an x86 driver, which Windows on Apple silicon can't
-   load, and promised changes stay "not on your Mac" while the app's
-   2 GB sat on the Mac.
-10. Read every number with its neighbours, as a stranger would
+   SF Pro Rounded can't be reached by name in Chrome: load the local
+   font file with `@font-face`, or show a capture. On the Windows-app
+   runner the "recommended" SF Pro Rounded sample showed Helvetica Bold.
+8. 8. Show every state in every theme, not only the happy one. On the
+   Windows-app runner only "It runs" was drawn dark; dark copies of the
+   other states had a filled "undone" dot, ghost buttons as loud as
+   Open, and a failure reason in the success colour.
+9. 9. Check the product's own copy on the mock as you would a release:
+   advice, promises and reasons must be true. The Windows-app runner's
+   mock advised a Windows VM for an x86 driver, which Windows on Apple
+   silicon can't load, and promised changes stay "not on your Mac" while
+   the app's 2 GB sat on the Mac.
+10. 10. Read every number with its neighbours, as a stranger would
     ([visual-craft.md](visual-craft.md#a-number-says-what-it-counts)).
-    CuckOo's footer showed "Technical log 2.1 GB": the app's size read as
-    the log's.
+    The Windows-app runner's footer showed "Technical log 2.1 GB": the
+    app's size read as the log's.
 11. Read the name and the wordmark as a stranger would, every part a
     capital, a mark or a crop sets apart
     ([above](#the-name-and-the-mark-read-clean-a-hard-stop)). A bad

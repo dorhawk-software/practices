@@ -12,12 +12,12 @@ technical choice. Whatever the product can decide from a signal, it
 decides itself. It says each decision in one sentence (what, and the
 fact that triggered it), and the user can undo it.
 
-**Why.** Crake finds what a VPN needs by itself. CuckOo started from what
-the owner disliked in CrossOver: advanced settings asking them to pick a
-graphics layer, DLSS, MSync or high-resolution mode ("quite confusing"),
-and moving Enterprise Architect to another display and resizing it to
-get full screen ("all in all quite cumbersome"). Each switch moves the
-product's job to the user.
+**Why.** Crake finds what a VPN needs by itself. The Windows-app runner
+started from what the owner disliked in CrossOver: advanced settings
+asking them to pick a graphics layer, DLSS, MSync or high-resolution
+mode ("quite confusing"), and moving Enterprise Architect to another
+display and resizing it to get full screen ("all in all quite
+cumbersome"). Each switch moves the product's job to the user.
 
 **Apply.**
 1. List every choice a user meets from download to first success: the

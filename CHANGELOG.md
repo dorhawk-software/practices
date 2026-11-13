@@ -7,38 +7,41 @@ newest first, in the kinds common/changelog.md describes.
 
 ### New
 
-- **Hard stop: the name and the mark read clean.** CuckOo's capital O,
-  and the egg that replaced it in the wordmark, set "Cuck" apart, a
-  derogatory term; seven rounds and their reviewers missed it. Every cut
-  of a name and mark is now read in slang and in each language before
-  it is agreed, and a bad reading withdraws the mark (`ui/identity-pass.md`,
-  the UI skill's first Must).
+- **Hard stop: the name and the mark read clean.** A capital letter in
+  the Windows-app runner's first name, and the egg that replaced it in
+  the wordmark, set a derogatory slang word apart; seven rounds and
+  their reviewers missed it. Every cut of a name and mark is now read in
+  slang and in each language before it is agreed, and a bad reading
+  withdraws the mark (`ui/identity-pass.md`, the UI skill's first Must).
 
-- **A number says what it counts.** CuckOo's footer read "Technical log
-  2.1 GB": the app's size looked like the log's, and two reviewers missed
-  it. Every number now carries its noun, and facts stay apart from
-  actions (`ui/visual-craft.md`; step 10 of "Before you show anything").
+- **A number says what it counts.** The Windows-app runner's footer
+  read "Technical log 2.1 GB": the app's size looked like the log's, and
+  two reviewers missed it. Every number now carries its noun, and facts
+  stay apart from actions (`ui/visual-craft.md`; step 10 of "Before you
+  show anything").
 
 - **Install it and it just works.** The owner's promise for every
   Dorhawk product, written down: the product decides what it can from a
   signal, says why and can undo; settings are preferences, never
-  technical workarounds (`common/it-just-works.md`). From CuckOo, after
-  CrossOver's renderer, DLSS and MSync switches. Its checks cover every
-  surface the user sees, the splash and dialogs too: CrossOver shows
-  Enterprise Architect's splash huge and its main window right.
+  technical workarounds (`common/it-just-works.md`). From the
+  Windows-app runner, after CrossOver's renderer, DLSS and MSync
+  switches. Its checks cover every surface the user sees, the splash and
+  dialogs too: CrossOver shows Enterprise Architect's splash huge and
+  its main window right.
 
-- **Every variant carries the identity, from the first round.** CuckOo's
-  first identity round read "quiet like Apple's utilities" as plain:
-  greys, stock symbols, no egg. The owner called it "virtually no
-  identity". Iteration 2 now requires the drawn icons, palette, type and
-  the idea's objects in every variant; layout-only options are a labelled
-  wireframe (`ui/identity-pass.md`, the UI skill's Musts).
-- **The real things the product handles.** CuckOo's mocks showed drawn
-  stand-ins for real Windows apps for five rounds; the owner had to ask
-  for the real icons, which raised design questions the stand-ins hid.
-  Real third-party assets now come with sources, credits, written
-  derivation rules and a made-up product for failure states
-  (`ui/identity-pass.md`).
+- **Every variant carries the identity, from the first round.** The
+  Windows-app runner's first identity round read "quiet like Apple's
+  utilities" as plain: greys, stock symbols, none of the idea's objects.
+  The owner called it "virtually no identity". Iteration 2 now requires
+  the drawn icons, palette, type and the idea's objects in every
+  variant; layout-only options are a labelled wireframe
+  (`ui/identity-pass.md`, the UI skill's Musts).
+- **The real things the product handles.** The Windows-app runner's
+  mocks showed drawn stand-ins for real Windows apps for five rounds;
+  the owner had to ask for the real icons, which raised design questions
+  the stand-ins hid. Real third-party assets now come with sources,
+  credits, written derivation rules and a made-up product for failure
+  states (`ui/identity-pass.md`).
 - **Before you show anything: three more checks.** The named typeface
   must render (Chrome showed Helvetica for SF Pro Rounded), every state
   is drawn in every theme (dark broke on the unshown states), and the
