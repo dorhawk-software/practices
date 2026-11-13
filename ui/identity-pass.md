@@ -83,6 +83,44 @@ reason: real postal objects people recognise.
 **Check.** The design doc names the identifying features and shows the
 drawing at its smallest size with them still visible.
 
+## The name and the mark read clean (a hard stop)
+
+**What.** A name, its spelling and every mark built from it must not
+read as a slur, an insult, profanity or a sexual or derogatory term, in
+any way it can be read: as a whole, in any part a capital, a gap, a
+swapped letter, a colour change, a line break, a crop or an icon makes
+stand alone, and in slang, not only in dictionaries. Any such reading is
+a hard stop: the mark isn't shown again, and the name and mark are
+reworked before anything else ships.
+
+**Why.** CuckOo (2026-11-13). The capital O in the name and the egg that
+replaced it in the wordmark both cut the word after "Cuck", a
+derogatory term. Seven design rounds, two reviewers per round and the
+designer all missed it, because each read the bird's name they knew.
+The owner caught it: "a Cuck with an egg … this is a hard stop for me".
+The name was already on dorhawk.software.
+
+**Apply.**
+1. Before a name is agreed, and again before any mark is drawn, list
+   every way it can be cut: each prefix and suffix, each part a capital
+   or a mark sets apart, each hyphen, line break and truncation
+   ("Cuck…" in a narrow sidebar), and the name with a letter replaced.
+2. Read each part as a stranger would: a slang dictionary, a plain web
+   search for the part alone, and in every language of the owner and the
+   market (Czech, English and German for Dorhawk at least).
+3. Read the drawn mark at every size, covering what you know: what does
+   a stranger read first? A letter replaced by a picture leaves the rest
+   as a word of its own.
+4. If anything reads badly, stop: withdraw the mark from every board and
+   page, tell the owner plainly, and propose names and marks that can't
+   be cut that way. Don't soften it or argue it's unlikely.
+5. Record the check in the identity brief: the cuts read, the sources,
+   the date.
+
+**Check.** The identity brief lists every cut of the name and mark, each
+read clean, with sources. No part of the name stands alone as a word
+unless that word was checked.
+
 ## Iteration 1: establish the identity
 
 The identity brief above, then the two rules below: the bar, and how far
@@ -429,6 +467,10 @@ in the whole proposal.
     ([visual-craft.md](visual-craft.md#a-number-says-what-it-counts)).
     CuckOo's footer showed "Technical log 2.1 GB": the app's size read as
     the log's.
+11. Read the name and the wordmark as a stranger would, every part a
+    capital, a mark or a crop sets apart
+    ([above](#the-name-and-the-mark-read-clean-a-hard-stop)). A bad
+    reading is a hard stop.
 
 **Check.** The handoff message says these checks ran, on the rendered
 page, and what they found.

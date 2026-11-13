@@ -39,6 +39,12 @@ sometimes edits it.
 
 ## Musts
 
+- **Hard stop: the name and the mark read clean** (identity-pass.md).
+  No part a capital, a swapped letter, a gap, a crop or a line break sets
+  apart may read as a slur, an insult, profanity or a sexual or
+  derogatory term, in slang or in any of the owner's and market's
+  languages. Check before a name is agreed and before any mark is drawn;
+  on a bad reading, withdraw the mark everywhere and tell the owner.
 - Install it and it just works (common/it-just-works.md): no technical
   switch in the window; the product decides, says why, can undo. Settings
   hold preferences only.

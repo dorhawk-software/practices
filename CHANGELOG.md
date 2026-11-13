@@ -7,6 +7,13 @@ newest first, in the kinds common/changelog.md describes.
 
 ### New
 
+- **Hard stop: the name and the mark read clean.** CuckOo's capital O,
+  and the egg that replaced it in the wordmark, set "Cuck" apart, a
+  derogatory term; seven rounds and their reviewers missed it. Every cut
+  of a name and mark is now read in slang and in each language before
+  it is agreed, and a bad reading withdraws the mark (`ui/identity-pass.md`,
+  the UI skill's first Must).
+
 - **A number says what it counts.** CuckOo's footer read "Technical log
   2.1 GB": the app's size looked like the log's, and two reviewers missed
   it. Every number now carries its noun, and facts stay apart from
