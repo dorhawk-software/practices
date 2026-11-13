@@ -6,7 +6,7 @@ the web) lives with its language, linked from these pages.
 
 | Practice | In one line |
 | --- | --- |
-| [Design before build](design-before-build.md) | Proposals with options first; build what was chosen, one to one; the design kept in sync. |
+| [Design before build](design-before-build.md) | Proposals with options first; build what was chosen, one to one, checked pixel by pixel; the design kept in sync. |
 | [Window buttons](window-buttons.md) | macOS draws its own on the left and the header makes room; the app's own on the right elsewhere. |
 | [An identity pass](identity-pass.md) | Research the identity first (audience, job, inspiration, market, facts); then three agreed iterations: the identity, a few parts, the whole app re-audited. |
 | [Visual craft](visual-craft.md) | Tone, not outlines; matching stroke ends; one drawing per object; compact; an 11 px floor; one anatomy per job. |

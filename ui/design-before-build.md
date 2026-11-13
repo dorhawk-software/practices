@@ -112,6 +112,63 @@ Any image tool that dumps a row of pixels will do (ffmpeg's `crop` to
 **Check.** The handoff includes the side-by-side capture and the measured
 line weights and insets of each new object.
 
+## Pixel by pixel: the owner's eye is the bar
+
+**What.** Before a built screen is called done, every object on it is
+checked at the device's full resolution, cropped beside the same crop of
+the design. The bar is that the owner finds nothing. Matching the layout
+is not enough: edges, lines, glyphs, the typeface and every string are
+checked one by one.
+
+**Why.** On 2026-11-13 Obálka's owner found five faults on screens the
+agent had walked, captured and called matching:
+
+- an envelope's creases poked past its rounded corners;
+- a 4 px blue rim showed above a flap that should reach the top edge;
+- a header drew a hairline that no board draws;
+- the search field had an outline and no glyph, where the board drew a
+  glyph and no outline;
+- every text field showed the system's Roboto, not the product's face.
+
+Each one was visible in a capture the agent had already looked at, but
+only shrunk to 800 px. The owner asked for "extreme attention to detail"
+and "pixel perfection" from then on (2026-11-13). All five were fixed in
+one commit, each with a test
+([561d039](https://github.com/dorhawk-software/obalka/commit/561d039)).
+
+The design can be wrong too: the board had the same crease overshoot. The
+code was fixed and the board went on the sync-back list.
+
+**Apply.**
+1. Capture at the device's full resolution. Crop each object to its own
+   picture at 1:1 or larger. Never judge from a thumbnail.
+2. Crop the same object from the design, rendered at the device's pixel
+   ratio, and put the two side by side.
+3. Check each object against this list:
+   - **Edges.** Nothing runs past a rounded corner or a clip. A fill
+     that should reach an edge reaches it, with no rim of what is under it.
+   - **Lines.** Each hairline, outline and divider is in the design. Each
+     one the design draws is there.
+   - **Glyphs.** Each icon in the design is there, from the same family,
+     in the same ink.
+   - **Type.** The face that actually renders, letter by letter. Fields,
+     placeholders and buttons fall back to the system font when no face
+     is set.
+   - **Words.** Each string appears once, in the design's wording and
+     punctuation.
+   - **Both themes**, and the longest language.
+4. A walk that forces a state with a temporary code swap can show things
+   the app never does. Say so before showing that capture, and restore
+   the swap.
+5. A fault in the design itself is fixed in the code and goes on the
+   sync-back list ([above](#when-the-agent-cant-edit-the-design-a-prompt-and-a-sync-back-list)).
+6. Each fault the owner finds becomes a test that fails without the fix
+   ([testing.md](../common/testing.md), "A guard test per incident,
+   proven able to fail"). A new kind of fault becomes an item in step 3.
+
+**Check.** The handoff names each object checked at 1:1 against its
+design crop. The commit counts the owner's catches. The goal is zero.
+
 ## A value the scale doesn't have is a question for the owner
 
 **What.** An agreed board may use a spacing, size or radius the project's

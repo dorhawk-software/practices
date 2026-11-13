@@ -64,7 +64,7 @@ as a pull request the project's own workflow opens.
 
 | Practice | In one line |
 | --- | --- |
-| [Design before build](ui/design-before-build.md) | Proposals with options first; build what was chosen, one to one, measured; off-scale values go to the owner. |
+| [Design before build](ui/design-before-build.md) | Proposals with options first; build what was chosen, one to one, measured and checked pixel by pixel; off-scale values go to the owner. |
 | [Window buttons](ui/window-buttons.md) | macOS draws its own on the left and the header makes room; the app's own on the right elsewhere. |
 | [Keyboard shortcuts](ui/keyboard-shortcuts.md) | Bind the system's main modifier (⌘ on a Mac), and show shortcuts the way the system writes them. |
 | [An identity pass](ui/identity-pass.md) | Research the identity first (audience, job, inspiration, market, facts); then three agreed iterations: the identity, a few parts, the whole app re-audited from an inventory proven complete. |

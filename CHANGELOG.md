@@ -7,6 +7,11 @@ newest first, in the kinds common/changelog.md describes.
 
 ### Changed
 
+- **A built screen is checked pixel by pixel before it is called done.**
+  Each object is cropped at full resolution beside the design's crop and
+  checked for edges, lines, glyphs, the rendered typeface and every
+  string. The owner found five such faults in one walk the agent had
+  called matching (`ui/design-before-build.md`, the UI skill's Musts).
 - **A control for a system act shows that system's sign.** Unlock shows
   Face ID on an iPhone and a fingerprint on Android; both drawn in the
   product's own icon family, chosen by the platform in one place, tested

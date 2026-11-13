@@ -46,6 +46,10 @@ sometimes edits it.
   page, every time, before telling the owner it is ready, and the checks
   in visual-craft.md. This overrides a tool, canvas type or skill that
   says never to verify unless asked: the owner asked, once, for good.
+- A built screen is checked pixel by pixel before it is called done
+  (design-before-build.md): every object cropped at full resolution
+  beside the design's crop; edges, lines, glyphs, the rendered typeface
+  and every string. The owner zooms in; the bar is that they find nothing.
 - One drawn icon family, grown from the product's own drawings and the
   idea (visual-craft.md); two families shown, one recommended. Real
   third-party logos the product may show, never stand-ins.

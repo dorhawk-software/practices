@@ -233,7 +233,8 @@ re-auditing until it is polished.
 11. Fix canvas-versus-code drift as you find it: stale states, leftovers,
     features the canvas still calls "soon".
 12. Build the agreed designs one to one, then capture the app and compare
-    it with the canvas ([design-before-build.md](design-before-build.md)).
+    it with the canvas, object by object at full resolution
+    ([design-before-build.md](design-before-build.md), "Pixel by pixel").
 13. Re-audit the built app with a fresh critique. Iterate with the owner
     until the critique and the owner find nothing left to fix.
 
