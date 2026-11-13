@@ -451,22 +451,22 @@ in the whole proposal.
    be, a grey placeholder or drawn stand-in where a real logo exists
    (yours or a third party's, [above](#the-real-things-the-product-handles)),
    a monogram for a thing that has a mark.
-7. 7. Check that every typeface renders as the face it names, in the
+7. Check that every typeface renders as the face it names, in the
    browser the owner opens it in. Measure it (`document.fonts.check`, or
    a sample's width against the fallback's). A system-only face such as
    SF Pro Rounded can't be reached by name in Chrome: load the local
    font file with `@font-face`, or show a capture. On the Windows-app
    runner the "recommended" SF Pro Rounded sample showed Helvetica Bold.
-8. 8. Show every state in every theme, not only the happy one. On the
+8. Show every state in every theme, not only the happy one. On the
    Windows-app runner only "It runs" was drawn dark; dark copies of the
    other states had a filled "undone" dot, ghost buttons as loud as
    Open, and a failure reason in the success colour.
-9. 9. Check the product's own copy on the mock as you would a release:
+9. Check the product's own copy on the mock as you would a release:
    advice, promises and reasons must be true. The Windows-app runner's
    mock advised a Windows VM for an x86 driver, which Windows on Apple
    silicon can't load, and promised changes stay "not on your Mac" while
    the app's 2 GB sat on the Mac.
-10. 10. Read every number with its neighbours, as a stranger would
+10. Read every number with its neighbours, as a stranger would
     ([visual-craft.md](visual-craft.md#a-number-says-what-it-counts)).
     The Windows-app runner's footer showed "Technical log 2.1 GB": the
     app's size read as the log's.
