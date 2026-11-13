@@ -20,6 +20,12 @@ newest first, in the kinds common/changelog.md describes.
   stay apart from actions (`ui/visual-craft.md`; step 10 of "Before you
   show anything").
 
+- **Decoration never half-hides what you read or click.** The
+  Windows-app runner's rows scrolled behind a drawn nest: the label was
+  barely readable on it, and half-hidden rows looked clipped. Lists now
+  end above drawings with the system's fade, and text sits on flat
+  surfaces (`ui/visual-craft.md`).
+
 - **What it leaves behind says whose it is.** The Windows-app runner's
   board put each app's work in "Documents › Enterprise Architect"; the
   owner pointed out nobody would know it was the runner's and would

@@ -269,6 +269,32 @@ because each knew what the number meant.
 **Check.** Read each number aloud with the word before it. The sentence
 is true.
 
+## Decoration never half-hides what you read or click
+
+**What.** A row, a label or a control is either whole or clearly
+leaving (a fade at a scroll edge, the way the system does it). It is
+never cut by an illustration in front of it, and text never sits on a
+drawing's mid-tones. A playful overlap reads as a rendering fault.
+
+**Why.** The Windows-app runner's sidebar (2026-11-13) let app rows
+scroll behind the nest's front rim, "like eggs settling in". It was the
+owner's own idea and read well in words; drawn, the owner called it
+"horrible": "Drop an installer" was barely visible on the nest's ochre,
+and the half-tucked app icon looked "like almost being clipped". Two
+reviewers had passed it.
+
+**Apply.**
+1. Where content scrolls under a drawn shape, end the list above the
+   shape instead, with the platform's own fade.
+2. Put text on a flat surface of the window, not on an illustration; if
+   it must sit on one, give it its own solid plate and check 4.5:1.
+3. Before recommending an idea that came as words, draw it at the real
+   size, mid-scroll and at rest, and judge the picture, not the idea.
+
+**Check.** Screenshot the scroll at several offsets. No frame shows a
+row partly covered by a drawing, and every label passes contrast
+against the exact pixels behind it.
+
 ## Nothing anyone reads under 11 px
 
 **What.** Text that carries information is at least 11 px: dates, tags,
