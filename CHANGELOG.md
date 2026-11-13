@@ -23,7 +23,9 @@ newest first, in the kinds common/changelog.md describes.
   Dorhawk product, written down: the product decides what it can from a
   signal, says why and can undo; settings are preferences, never
   technical workarounds (`common/it-just-works.md`). From CuckOo, after
-  CrossOver's renderer, DLSS and MSync switches.
+  CrossOver's renderer, DLSS and MSync switches. Its checks cover every
+  surface the user sees, the splash and dialogs too: CrossOver shows
+  Enterprise Architect's splash huge and its main window right.
 
 - **Every variant carries the identity, from the first round.** CuckOo's
   first identity round read "quiet like Apple's utilities" as plain:

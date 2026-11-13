@@ -31,6 +31,11 @@ product's job to the user.
 4. Check the outcome the user cares about, not only that the step ran.
    For example, the window fits the screen and the text is sharp, not
    just "the setting is on".
+5. Check every surface the user sees, not only the main one: the
+   splash, dialogs, sheets, error windows, the first and the second
+   launch. CrossOver shows Enterprise Architect's main window at the
+   right size and its splash huge: the first thing the user sees says
+   nobody looked (owner: "shows not enough attention to detail").
 
 **Check.** A fresh install on a clean user account reaches first
 success with no choices beyond what the operating system demands.
