@@ -50,6 +50,10 @@ sometimes edits it.
   (design-before-build.md): every object cropped at full resolution
   beside the design's crop; edges, lines, glyphs, the rendered typeface
   and every string. The owner zooms in; the bar is that they find nothing.
+- Every variant carries the whole identity, from round one: the drawn
+  icons, the palette, the type, the idea's objects (identity-pass.md,
+  "Every variant carries the identity"). A quiet reference means
+  restraint, not plain; layout-only options are a wireframe, said so.
 - One drawn icon family, grown from the product's own drawings and the
   idea (visual-craft.md); two families shown, one recommended. Real
   third-party logos the product may show, never stand-ins.

@@ -5,6 +5,15 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+### New
+
+- **Every variant carries the identity, from the first round.** CuckOo's
+  first identity round read "quiet like Apple's utilities" as plain:
+  greys, stock symbols, no egg. The owner called it "virtually no
+  identity". Iteration 2 now requires the drawn icons, palette, type and
+  the idea's objects in every variant; layout-only options are a labelled
+  wireframe (`ui/identity-pass.md`, the UI skill's Musts).
+
 ## 1.4.0 (2026-11-13)
 
 ### Changed

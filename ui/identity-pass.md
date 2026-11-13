@@ -174,7 +174,9 @@ enough to call the product done; that is iteration 3.
    Another said a flow looked like another app. The app already framed
    it correctly; only the canvas lagged.
 4. Draw two or three variants for each open choice, in place, with real
-   context. Real context means the real header, the real status bar, real
+   context. Every variant carries the whole identity
+   ([below](#every-variant-carries-the-identity)): a variant that differs
+   only in layout is a wireframe, not an identity option. Real context means the real header, the real status bar, real
    copy, both themes. The owner judges spacing from it.
 5. Recommend one variant per choice and say why in one line.
 6. Ask with concrete options. Ask at most four questions at a time.
@@ -188,6 +190,40 @@ enough to call the product done; that is iteration 3.
 **Check.** Every choice on the canvas has exactly one design left. The
 critique report and its verdicts are saved where the next pass can read
 them.
+
+### Every variant carries the identity
+
+**What.** From the first round of iteration 2, every variant shown uses
+the agreed identity in full. That means the drawn icon family, the
+identity's colours and type, and the idea's objects, each doing its job.
+Variants differ in how they carry the identity, never in whether they do.
+A quiet reference means restraint, not absence.
+
+**Why.** CuckOo's brief (2026-11-13) named Apple's small utilities and
+Things as references. Round one read "quiet" as plain: system greys, a
+coloured dot, stock symbols, a numbered list. All three parts had three
+variants, and none used the egg, the icons or the colours. The owner:
+"it is so plain, where are some icons? … virtually no identity at all".
+A whole round was lost. Things itself has its own blue, icons, type and
+motion.
+
+**Apply.**
+1. Before drawing, list what each variant must carry: the icon family
+   (two families in round one), the palette, the type, and which of the
+   idea's objects appear in this part and with what job.
+2. Read each reference for what makes it recognisable, not only for its
+   calm. Write one line per reference: "Things: calm, and its own blue,
+   checkbox and type."
+3. Vary the treatment between variants: how much colour, which object
+   leads, line or filled icons. Don't vary whether the identity is there.
+4. Structure-only choices (what goes where) are settled first, as a
+   wireframe that says so. Don't present them as identity options.
+5. Run "Before you show anything" on round one too, step 6 above all.
+
+**Check.** Cover the product's name: each variant is still recognisable
+as this product, not as the platform's default template. Every icon on
+it comes from the family. The handoff says which objects each variant
+uses.
 
 ## Iteration 3: the whole app, re-audited and polished
 
