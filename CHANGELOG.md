@@ -7,6 +7,10 @@ newest first, in the kinds common/changelog.md describes.
 
 ### Changed
 
+- **A drawing laid over an object reaches the object's edges.** Folds and
+  sheens go in a layer pinned to all four sides, not in the padded
+  content. An envelope's folds stopped 16 px short of every corner
+  because the drawing was sized inside the padding (`ui/visual-craft.md`).
 - **What a screen says is ranked.** Text that carries different facts is
   split: the fact a person looks for leads, the rest goes quieter, short
   or behind a tap, and nothing is dropped. A sender's legal form had the

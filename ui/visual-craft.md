@@ -86,6 +86,32 @@ places.
 **Check.** Put every appearance of the object side by side at its real
 size. They read as the same thing.
 
+## A drawing over an object reaches its edges
+
+**What.** Folds, seams, tints and sheens drawn over an object span the
+object's whole box, not the room left inside its padding. A line that
+runs to a corner ends on the corner.
+
+**Why.** Obálka's envelope draws two folds from its bottom corners. The
+drawing sat inside the envelope with a width and height of 100 %. In
+React Native those resolve inside the padding. So each fold started 16
+to 18 px in from its corner, on every envelope in the app. Tests passed
+and the shape looked right at a glance. The owner saw it on a phone: the
+creases were "borked".
+
+**Apply.**
+1. Put the drawing in its own layer, pinned to all four edges of the
+   object (absolute, 0 on every side), outside the content's padding.
+2. Size the drawing to that layer. Never size it from the content box.
+3. Give the drawing the object's own outline in its coordinates: the
+   corners in the path are the object's corners.
+4. Check this on every object that carries a drawing, not just the one
+   that showed the fault. One shared component fixed three screens.
+
+**Check.** A full-resolution crop of each corner where a line ends. The
+line meets the corner, with no gap. A test asserts the drawing's layer
+has no padding and sits at 0 on every side.
+
 ## A line weight per family
 
 **What.** Marks shown together share a line weight. A mascot drawn at
