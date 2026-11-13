@@ -183,6 +183,41 @@ something done.
 **Check.** No band of empty space above the first content, and none at
 the bottom of a board.
 
+## Rank what the screen says
+
+**What.** Text that carries different facts is split and ranked, not run
+together. What a person looks for leads. What can wait goes quieter,
+shorter, or behind a tap. Nothing is dropped: the full fact stays one tap
+away, and a screen reader always hears it whole.
+
+**Why.** On Obálka, a data-box service sends a self-employed sender as one
+string: "Jan Novák - podnikající fyzická osoba". The envelope printed it
+as one heading. The legal form was as loud as the name and took three
+lines of a 120 px block. The owner asked for the name first, and a rule:
+too much at once confuses, so detail comes when it is needed, and what
+shows when is chosen with care (obalka 556e19e).
+
+**Apply.**
+1. For each text, list the facts in it: a name, a legal form, an ID, a
+   date, a place.
+2. Rank them by what the reader is looking for on this screen. A list row
+   needs the name. A detail may need the ID.
+3. Give the first fact the strong role. Put the rest on a quieter line, in
+   a smaller role and a softer colour.
+4. Shorten what readers know by its short form ("PFO", not "podnikající
+   fyzická osoba"). A tap, a tooltip or a long press shows it in full.
+5. Never drop a fact to save room. The screen reader's label says it in
+   full, and one tap or one level deeper shows it.
+6. Rank by what tells things apart, not by habit. Obálka's address keeps
+   the town bold and the street quiet: the town tells three Jan Nováks
+   apart.
+7. Decide what shows where, and when, on purpose. Write the ranking down
+   in the design doc, with the reason.
+
+**Check.** No text block mixes facts at one weight. For each quieter or
+shortened fact, show where the full one is: the tap, the next screen, the
+spoken label.
+
 ## Nothing anyone reads under 11 px
 
 **What.** Text that carries information is at least 11 px: dates, tags,

@@ -7,6 +7,10 @@ newest first, in the kinds common/changelog.md describes.
 
 ### Changed
 
+- **What a screen says is ranked.** Text that carries different facts is
+  split: the fact a person looks for leads, the rest goes quieter, short
+  or behind a tap, and nothing is dropped. A sender's legal form had the
+  name's weight and three lines of it (`ui/visual-craft.md`).
 - **A built screen is checked pixel by pixel before it is called done.**
   Each object is cropped at full resolution beside the design's crop and
   checked for edges, lines, glyphs, the rendered typeface and every
