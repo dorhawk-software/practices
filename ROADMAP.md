@@ -16,7 +16,8 @@ is the source of everything Rust here; its commit links are in each doc.
 - [x] UI docs: [design before build](ui/design-before-build.md),
   [window buttons](ui/window-buttons.md),
   [keyboard shortcuts](ui/keyboard-shortcuts.md),
-  [an identity pass](ui/identity-pass.md), [visual craft](ui/visual-craft.md)
+  [an identity pass](ui/identity-pass.md), [visual craft](ui/visual-craft.md),
+  [dates, times and numbers](ui/pickers.md), [consent](ui/consent.md)
 - [x] Rust docs: [conventions](rust/conventions.md), [lints](rust/lints.md),
   [coverage](rust/coverage.md), [GPUI](rust/gpui.md)
 - [x] Templates: lints, clippy, deny (GPL and closed-source lists), toolchain,
@@ -130,6 +131,18 @@ is the source of everything Rust here; its commit links are in each doc.
 - **`ui/`, more pages:** tern's design canvas rules (an agreed design only,
   captures of the built app, every screen checked in each language), and
   what Obálka and the website teach about UI.
+- **`scripts/ui-audit`, from Scops:** the UI rules' geometry, measured.
+  Scops' misses of 2026-11-15 (targets 2 px apart, buttons in the home
+  indicator, a halo 4 px from text, an off-centre line, two pickers of
+  different sizes, a typed time) were all geometry. A person on a
+  scaled-down board can't see them; a script finds them in seconds.
+  - [ ] One runner over every board that fails the build: contrast,
+    sizes and tap targets, overflow, gaps between targets, safe areas,
+    visible edge to text, centring, same control same look, typed values
+    that should be pickers. Each check gets a case in `tests/run`.
+  - [ ] `ui/frames/`: verified phone frames (iOS status bar and Dynamic
+    Island, the lock screen with a Live Activity, Android's status bar
+    with an ongoing notification), taken from the platforms' own kits.
 - **Starts when:** Rust has settled (phase 1 proven in Crake and tern).
 
 ## Known gaps
@@ -151,3 +164,6 @@ convention. Each one leaves this list when it's built.
   is published (phase 5).
 - Scenario suites (one test per scenario, run everywhere) are a documented
   pattern; the shared macro is phase 4.
+- The geometry checks in `ui/visual-craft.md` and `ui/pickers.md` (gaps,
+  safe areas, halos, centring, typed values) are a project's own scripts
+  until `scripts/ui-audit` is built (phase 7).

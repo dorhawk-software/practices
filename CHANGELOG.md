@@ -7,6 +7,56 @@ newest first, in the kinds common/changelog.md describes.
 
 ### New
 
+- **Geometry is measured, not eyeballed.** Scops, a baby-sleep app,
+  stacked "Edit" tiles 2 px apart and put buttons on 21 of 85 screens
+  inside the home indicator. Its lamp halo came within 4 px of text,
+  and a centred line hugged one side. Reviewers on scaled-down boards
+  missed all of them. Separate targets now keep 8 px apart, both safe
+  areas belong to the frame, spacing counts from the visible edge, and
+  centred text sits on its axis. Each check is a measurement, and
+  reviewers get 1:1 crops (`ui/visual-craft.md`). A shared
+  `scripts/ui-audit` is on the roadmap.
+
+- **Dates, times and numbers are picked, never typed.** Scops typed a
+  birth date, and the age beside it never changed (it was wrong on the
+  board too). Values are now picked and what's derived recomputes.
+  Calendars jump to a year and month and show the neighbouring days,
+  muted. Suggested choices never fence anyone in, and a class of bug is
+  fixed across every board in one pass (new `ui/pickers.md`).
+
+- **Consent without pressure.** Never pre-selected, two equal answers,
+  "No, thanks" without guilt, and what is sent said next to them (new
+  `ui/consent.md`).
+
+- **One reading only.** "At most 20 minutes" left Scops' owner unsure
+  what it limited. Every number and limit now names its subject and
+  what happens when it runs out. Partial views say they are partial,
+  and the next question is answered on the screen where it arises
+  (`ui/visual-craft.md`).
+
+- **Depth from the product's own concept.** Scops was "very flat"; its
+  depth now comes from the owl's night lamp, never from another
+  product's signature, and shadows fall away from the light. A global
+  layer may not erase a meaningful ring: draw those with `outline`
+  (`ui/visual-craft.md`).
+
+- **The identity pass asks how the user feels.** The brief names the
+  user's emotional state, and every screen is read as the user in their
+  worst moment. Claims about health, safety or results cite a source
+  and promise nothing. The inventory lists none, one, many and at once,
+  and a failed state for every attempt. Fonts live in the repository,
+  every copy change is rendered again, and a companion mark may stay
+  through a long moment (`ui/identity-pass.md`).
+
+- **Words and controls that agree.** Full forms in gender and case,
+  declined names, past tenses in the user's gender, and every gender on
+  the board. A choice changes everything it owns, icons and dependent
+  fields too, and like controls keep one look after a click. Icons go
+  on every row and main button (`ui/visual-craft.md`).
+
+- **Independent review before every round** is now one of the UI
+  skill's Musts, with the claims verified before anything is fixed.
+
 - **Drag and drop: one calm panel says what will happen.** Taken from
   tern's compose window, which the owner called "the optimal
   representation of drag and drop", after the Windows-app runner's

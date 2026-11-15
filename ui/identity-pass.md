@@ -38,7 +38,12 @@ different processes.
 **Apply.** Before the first screen of a new product, write a one-page
 identity brief:
 1. **Audience.** Who uses it, how often, in what setting and light, with
-   what at stake (their money, their mail, their network).
+   what at stake (their money, their mail, their network). Their
+   emotional state at the moment of use (guilt, fear, exhaustion), and
+   what helps them in that moment. Scops' round 1 (2026-11-14) was built
+   for trust, not comfort. The owner called it "very plain": its users
+   are mostly mothers who used to rock their baby to sleep, at night,
+   often feeling guilty.
 2. **The job and the process.** What the app does, step by step, from
    the user's side. The identity should fit this process, not a
    category.
@@ -155,10 +160,15 @@ looks like a toy loses trust.
 4. Put identity into those few objects only, never into every piece of
    data. A date stays a date.
 5. Test each idea against "would I trust this app with my bank's
-   letters?". If not, cut it.
+   letters?". If not, cut it. Use this test where trust in data is the
+   point.
+6. Test every screen as the user in their worst moment: does it calm
+   them, or push them? For an audience under strain (Scops: a parent at
+   3 a.m.), this test leads.
 
 **Check.** You can name the idea in one sentence and list its objects,
-each with its one job. No object appears without a job.
+each with its one job. No object appears without a job. Each screen
+passes the worst-moment test.
 
 ### Scale of change follows the identity; scope is always the whole app
 
@@ -205,14 +215,19 @@ enough to call the product done; that is iteration 3.
 **Apply.**
 1. Survey every screen and board first. Read each one's source, not only
    its picture. Note where the identity is strong, generic, or missing.
-2. Run an independent critique of the whole surface before proposing:
-   two isolated reviewers, one doing a design review and one running an
-   automated detector. Neither sees the other's output.
+2. Run an independent critique of the whole surface before proposing,
+   and before every round you show, the first included: two isolated
+   reviewers, one doing a design review and one running an automated
+   detector. Neither sees the other's output. Give the design reviewer
+   1:1 crops of the dense areas, not only scaled-down sheets: at a
+   third, a 2 px gap is invisible. Scops' round 1 (2026-11-14) skipped
+   the critique.
 3. Verify every factual claim in the critique against the code before you
-   report it. Reviewers get facts wrong. On tern, a reviewer said three
-   undo windows disagreed. They were one window caught at three moments.
-   Another said a flow looked like another app. The app already framed
-   it correctly; only the canvas lagged.
+   report it, and before you fix anything. Reviewers get facts wrong. On
+   tern, a reviewer said three undo windows disagreed. They were one
+   window caught at three moments. Another said a flow looked like
+   another app. The app already framed it correctly; only the canvas
+   lagged. On Scops, the design reviewer was wrong about contrast twice.
 4. Draw two or three variants for each open choice, in place, with real
    context. Every variant carries the whole identity
    ([below](#every-variant-carries-the-identity)): a variant that differs
@@ -380,20 +395,35 @@ look beside the new one.
    named by its title or trigger. The count on the list equals the count
    in the code.
 3. **Split by state.** A screen with more than one state, flow or dialog
-   gets a line for each. "The backup screen" is not a line.
-4. **Get a second inventory.** Someone who has not seen yours (a person
+   gets a line for each. "The backup screen" is not a line. For every
+   entity, list none, one, many and at once: two children falling
+   asleep together, two parents on two phones. For anything with a
+   time, also list repeating, one-off and imported (from the phone's
+   calendar). On Scops (2026-11-14), several children and two parents
+   surfaced midway, after most screens were drawn. It could add only
+   weekly events; the owner asked for a date, then for calendar sync.
+4. **Every attempt has a way back.** Every attempt (a nap, an upload, a
+   payment) has a failed state. It says what happens next, offers a
+   second way, and shows the consequence ("bedtime 35 minutes earlier
+   tonight"). It never reads as a verdict. Scops drew the nap that worked
+   and a dead end that said "go out". The real day went: failed, played,
+   a second attempt, a pram nap, an earlier bedtime. None of it was
+   designed.
+5. **Get a second inventory.** Someone who has not seen yours (a person
    or a fresh agent) builds one from the code with the same headings.
    Compare line by line. Every difference is a gap in one of the lists
    or a mistake; resolve each before grading.
-5. **No grade without a picture.** Grade from a capture of the app or a
+6. **No grade without a picture.** Grade from a capture of the app or a
    board on the canvas. Quiet chrome is drawn too; the owner judges
    whether it holds the identity.
-6. **Record the proof** in the checklist: the files swept, the counts
+7. **Record the proof** in the checklist: the files swept, the counts
    per shared piece, and who made the second inventory.
 
 **Check.** Every UI file and string group maps to a line. The checklist
 records the counts, and they match the code. The two inventories' diff is
-resolved. No line says "matches" without a capture or a board.
+resolved. No line says "matches" without a capture or a board. Every
+entity has its none, one, many and at-once lines, and every attempt its
+failed state.
 
 ## Where the product's mark appears
 
@@ -419,9 +449,15 @@ sending countdown. Nothing else got the bird.
 5. Quiet is not plain. Away from the mark, the product's drawn icons,
    the idea's object and the real logos of what it connects to carry the
    identity (visual-craft.md, "A drawn icon set, grown from the idea").
+6. When the product's main job is one long emotional moment (a night, a
+   wait), the mark may stay on screen the whole time, as a companion. At
+   rest it only breathes. It moves only at its own moments. In Scops the
+   whole night is the moment: the owl stays from put-down to morning,
+   which is what the owner wanted (2026-11-14).
 
 **Check.** You can list every place the mark appears, and each one is one
-of the idea's moments.
+of the idea's moments. A companion mark that stays on screen moves only
+at those moments.
 
 ## Before you show anything
 
@@ -457,6 +493,11 @@ in the whole proposal.
    SF Pro Rounded can't be reached by name in Chrome: load the local
    font file with `@font-face`, or show a capture. On the Windows-app
    runner the "recommended" SF Pro Rounded sample showed Helvetica Bold.
+   Keep the product's font files in its repository (or design system),
+   so boards render offline. With no network, Google Fonts did not
+   load, and a whole Scops round was checked in a fallback face. If a
+   font can't load, say so in the handoff; never call that render
+   verified.
 8. Show every state in every theme, not only the happy one. On the
    Windows-app runner only "It runs" was drawn dark; dark copies of the
    other states had a filled "undone" dot, ghost buttons as loud as
@@ -474,6 +515,24 @@ in the whole proposal.
     capital, a mark or a crop sets apart
     ([above](#the-name-and-the-mark-read-clean-a-hard-stop)). A bad
     reading is a hard stop.
+12. Check every claim about health, safety or results. Each one cites
+    its source on the board, says exactly what was measured, and goes
+    no further than the data. Nothing promises an outcome. Scops' second
+    review found "one night won't spoil anything" and "better within a
+    week" with no source, and "stress-free" where the study measured
+    only cortisol.
+13. Render again after every copy change: a copy change is a layout
+    change. Big numbers never wrap (`white-space: nowrap`), and their
+    caption goes under them, not beside them. On Scops, clarifying "12
+    min of 45" into a longer caption pushed "12 min" onto two lines.
+14. Fix a class of bug in one pass, across all boards. When one typed
+    time, cramped gap or erased ring turns up, search every board for
+    the same kind before you show
+    ([pickers.md](pickers.md#picked-not-typed)).
+15. After a global style change (depth, shadows, a theme), run the whole
+    audit again: gaps between targets, safe areas, the space around
+    halos, meaningful rings
+    ([visual-craft.md](visual-craft.md#separate-targets-keep-their-distance)).
 
 **Check.** The handoff message says these checks ran, on the rendered
 page, and what they found.

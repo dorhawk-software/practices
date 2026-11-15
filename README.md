@@ -69,8 +69,10 @@ as a pull request the project's own workflow opens.
 | [Window buttons](ui/window-buttons.md) | macOS draws its own on the left and the header makes room; the app's own on the right elsewhere. |
 | [Drag and drop](ui/drag-and-drop.md) | One calm panel over the target says what dropping does; the resting hint fades; nothing glows. |
 | [Keyboard shortcuts](ui/keyboard-shortcuts.md) | Bind the system's main modifier (⌘ on a Mac), and show shortcuts the way the system writes them. |
-| [An identity pass](ui/identity-pass.md) | Research the identity first (audience, job, inspiration, market, facts); then three agreed iterations: the identity, a few parts, the whole app re-audited from an inventory proven complete. |
-| [Visual craft](ui/visual-craft.md) | Tone, not outlines; matching stroke ends; one drawing per object, reaching its edges; the system's own sign for a system act; compact; facts ranked, the rest one tap away; an 11 px floor. |
+| [An identity pass](ui/identity-pass.md) | Research the identity first (audience and their emotional state, job, inspiration, market, facts); then three agreed iterations: the identity, a few parts, the whole app re-audited from an inventory proven complete. |
+| [Visual craft](ui/visual-craft.md) | Tone, not outlines; depth from the product's own concept; one reading only; 8 px between targets; both safe areas in the frame; compact; facts ranked; an 11 px floor. |
+| [Dates, times and numbers](ui/pickers.md) | Picked, never typed, with what's derived recomputed; calendars jump to a year and show neighbouring days; suggestions never fence. |
+| [Consent without pressure](ui/consent.md) | Never pre-selected; two equal answers, no guilt; what is sent, said next to them; one tap to change your mind. |
 
 ### Rust ([rust/](rust))
 

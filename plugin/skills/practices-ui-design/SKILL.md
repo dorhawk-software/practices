@@ -15,7 +15,7 @@ The practices are in `.practices/docs/`, this project's copy, pinned to its kit 
 3. `ui/design-before-build.md`: variants on the design canvas, the owner
    picks, build one to one, keep canvas and code in sync.
 4. When they apply: `ui/keyboard-shortcuts.md`, `ui/window-buttons.md`,
-   `ui/drag-and-drop.md`,
+   `ui/drag-and-drop.md`, `ui/pickers.md`, `ui/consent.md`,
    and for GPUI apps `rust/gpui.md`.
 
 Also read the project's own design source (its CLAUDE.md names it: a
@@ -76,3 +76,22 @@ sometimes edits it.
   the product's copy on the mock is true (identity-pass.md, steps 7–9).
 - Facts first: if the identity draws a real thing, look it up and keep
   its identifying features.
+- Independent review before every round you show, the first included:
+  two isolated reviewers, one design and one automated, the design one
+  given 1:1 crops of dense areas. Verify their claims before you fix
+  anything (identity-pass.md, iteration 2, steps 2–3).
+- The brief names the user's emotional state at the moment of use; read
+  every screen as the user in their worst moment (identity-pass.md).
+- Claims about health, safety or results cite a source, say what was
+  measured, and promise no outcome (identity-pass.md, step 12).
+- Geometry is measured, not eyeballed: 8 px between separate targets,
+  nothing tappable within 34 px of the bottom edge, 16 px from a visible
+  halo to text, centred text on its column's axis. Re-run all of it
+  after any global style change (visual-craft.md).
+- One reading only: every number and limit names its subject and what
+  happens when it runs out (visual-craft.md).
+- Dates, times and counts are picked, never typed; derived text
+  recomputes; suggestions never fence (ui/pickers.md). A class of bug is
+  fixed across every board in one pass.
+- Consent is never pre-selected; both answers equal, "no" without guilt
+  (ui/consent.md).

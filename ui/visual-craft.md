@@ -2,7 +2,14 @@
 
 The rules for drawing an interface that looks made, not generated. They
 apply to any product and any toolkit. The process that uses them is in
-[identity-pass.md](identity-pass.md).
+[identity-pass.md](identity-pass.md). Entering dates, times and numbers
+is in [pickers.md](pickers.md); asking for consent is in
+[consent.md](consent.md).
+
+Many of these rules are geometry: a gap, a distance from an edge, an
+axis. A person reviewing a scaled-down board cannot see a 2 px gap, and
+a script finds it in seconds. So each geometry rule's check is a
+measurement, and the reviewers also get 1:1 crops of the dense areas.
 
 Each rule names the incident behind it. Product details are labelled
 examples.
@@ -34,9 +41,18 @@ the tone-only version of all of them.
    ground, so its edge holds where shadows are weak.
 6. Before showing a design, count every border. Justify each one that
    remains, or replace it.
+7. Draw a ring that carries meaning (today, focus, the selected item)
+   with a property no global layer owns: `outline`, not `box-shadow`.
+   Scops' depth layer (2026-11-15) set `box-shadow` on every button. It
+   erased the ring that marked today in the date picker, and nobody saw
+   it until a screenshot.
+8. After adding a global layer (depth, shadows, a theme), check every
+   meaningful mark it could touch: today's date, focus, the selected
+   item.
 
 **Check.** Search the styles for borders and inset rings. Each one left
-is a focus ring, a checkbox, or has a written reason.
+is a focus ring, a checkbox, or has a written reason. After a global
+layer lands, a capture of each meaningful mark still shows it.
 
 ## Every stroke end matches
 
@@ -153,10 +169,52 @@ the icons are the part of the identity the user sees on every screen.
 5. Third-party marks (bank, card or store logos) are not redrawn. Use the
    real ones the product already has the right to show, each on its own
    neutral tile, and say where they came from.
+6. Use icons generously. Every settings row, list item and main button
+   carries one from the family. On Scops (2026-11-14) the owner asked
+   for icons everywhere, settings first.
 
 **Check.** No icon on any screen is a system or stock symbol unless the
 design doc says why. Each icon of the family, side by side at 24 and at
-48, reads as one hand. The weight is in the families list above.
+48, reads as one hand. The weight is in the families list above. A
+list row or button without an icon has a written reason.
+
+## Depth and texture from a concept
+
+**What.** A mobile design has depth and, where the identity allows,
+texture. The depth comes from one concept that belongs to the product.
+It never comes from generic shadows or from another product's signature.
+
+**Why.** The owner found Scops, a baby-sleep app, "very flat, without
+detail" (2026-11-14). The first depth round looked alike in all three
+directions. The chosen one was Scops' own: the owl's night lamp lights
+the screen. The owner rejected split-flap clock tiles, because they are
+the signature of Shrike, another Dorhawk product.
+
+**Apply.**
+1. Name the concept first, from the product's own story. Scops: the
+   owl's lamp. Obálka: sheets of paper with weight.
+2. Let the concept decide the light and the layers:
+   - which way the light falls;
+   - what glows, what is raised and what is pressed in;
+   - what overlaps what (the owl sits over the edge of a card).
+3. Make controls feel touchable: a raised primary button, a pressed-in
+   selected state.
+4. Keep texture quiet: a fine grain over the screen, and a material
+   detail on the mascot (the owl's feathers).
+5. Show two or three depth directions on the same screens. Make them
+   different enough to compare at a glance.
+6. Never borrow another product's signature element. Compare with the
+   references before you show anything.
+7. Shadows fall away from the light. Scops' green buttons had a glow
+   that blurred 8 px above their top edge. The owner asked whether the
+   soft top and sharp bottom were intended. They were not.
+
+**Check.**
+- Each depth effect is explained by the concept in one sentence.
+- Nothing on screen is recognisable as another product's signature.
+- No glow or drop shadow reaches above the top edge of something lit
+  from above. There it reads as a blurred edge.
+- Text still passes contrast on every raised and pressed surface.
 
 ## The system's own sign for the system's own act
 
@@ -209,6 +267,79 @@ something done.
 **Check.** No band of empty space above the first content, and none at
 the bottom of a board.
 
+## Separate targets keep their distance
+
+**What.** Two separate tappable things are at least 8 px apart, edge to
+edge. Three cases are exceptions, because they read as one control:
+- a segmented control;
+- a grid of like cells (calendar days);
+- list rows inside one card, divided by lines.
+
+A row of separate actions is not an exception. It becomes a list: the
+whole row is the target, with "Edit ›" as its label.
+
+**Why.** Scops' name step (2026-11-15) stacked three "Upravit" (Edit)
+tiles 2 px apart. The owner: they look crammed together. It had been
+there since round 1. The automated audit checked size, contrast and
+overflow, but never the gap between targets. The reviewers saw boards
+scaled to a third, where 2 px is invisible. The depth layer made it
+worse: it turned flat chips into raised tiles, and raised tiles need air.
+
+**Apply.**
+1. Keep at least 8 px between separate targets. Give raised buttons
+   more.
+2. For a repeated action on rows, make the row the button: a divider
+   between rows, the action as quiet text at the end.
+3. After any global style change (depth, shadows), measure the spacing
+   again.
+
+**Check.** A script measures the edge-to-edge gap between every pair of
+tappable elements. It flags anything under 8 px, except the three cases
+above. The reviewers get 1:1 crops of dense areas, not only scaled-down
+sheets.
+
+## Spacing is measured from what you see
+
+**What.** Spacing is measured to the visible edge of an object: a glow,
+a halo, a shadow, a disc behind a mascot. It is not measured to the
+bounding box. When a global layer makes an object look bigger, every
+spacing around it is checked again.
+
+**Why.** Scops added a lamp disc behind its owl (2026-11-15). It reached
+the top of the owl's drawing, where there used to be empty space. On 22
+screens the disc came within 3 to 13 px of the text above. The owner saw
+it on the first night: the gap above the halo looked smaller than
+anywhere else. One change caused it, not 22 separate mistakes.
+
+**Apply.**
+1. Build room for effects into the object itself. Scops' owl has room
+   above the disc in its own viewBox, so every screen gained the gap at
+   once.
+2. Keep at least 16 px between a visible edge and the nearest text.
+
+**Check.** A script measures the gap from the top of each mascot's
+visible shape to the text above it.
+
+## Centred means on the axis
+
+**What.** A centred line of text sits on the centre axis of its column.
+Centred lines inside a box that hugs one side are not centred. In a
+column where everything else is left-aligned, a lone centred line is
+wrong too: it follows the column.
+
+**Why.** On Scops' first-night screen (2026-11-15), "Děláte to z
+lásky…" ("You do this out of love…") had centred lines in a narrower box
+hugging the left edge. It looked "as if it wanted to be in the middle,
+but somehow isn't". Everything else on that screen was left-aligned.
+
+**Apply.**
+1. A centred block takes its column's full width, or is centred in it.
+2. In a left-aligned column, align every line to the left.
+
+**Check.** A script flags centred text blocks whose box is more than
+3 px off the column's axis. It skips labels inside buttons and rows,
+whose icon offsets them on purpose.
+
 ## Rank what the screen says
 
 **What.** Text that carries different facts is split and ranked, not run
@@ -244,6 +375,21 @@ shows when is chosen with care (obalka 556e19e).
 shortened fact, show where the full one is: the tap, the next screen, the
 spoken label.
 
+## A shortcut view says it is a shortcut
+
+**What.** A view that shows only part of a range names the part ("next
+two weeks") and offers the whole ("Full month ›").
+
+**Why.** Scops (2026-11-15) offered a one-off event's next 14 days as two
+rows. The owner asked whether it grows on tap. Nothing said there was
+more.
+
+**Apply.** Give every partial view a title that names its part, and an
+action that opens the whole.
+
+**Check.** For every list, strip or grid that shows part of a range, the
+screen names the part and links the whole.
+
 ## A number says what it counts
 
 **What.** A bare number reads as the value of the nearest label. So
@@ -268,6 +414,48 @@ because each knew what the number meant.
 
 **Check.** Read each number aloud with the word before it. The sentence
 is true.
+
+## One reading only
+
+**What.** Every word, number and control on a screen has one meaning. A
+limit says what it limits and what happens when it runs out.
+
+**Why.** After a failed nap, Scops (2026-11-14) told the parent: "try
+again, at most 20 minutes". The owner could not tell if the 20 minutes
+meant playtime or the second attempt, and had to ask. That is the cost:
+a tired parent at 14:30 has no one to ask.
+
+**Apply.**
+1. Read each line as a newcomer. Write down every meaning it can have.
+   More than one: rewrite it.
+2. A number names its subject and its consequence: "if he isn't asleep
+   in 20 minutes, end the attempt", not "at most 20 minutes".
+3. A counter says what it counts against: "12 min, of the 45 he has to
+   fall asleep", not "12 min of 45".
+4. A setting reads as a sentence: "If he isn't asleep, end after
+   45 min", not "Longest: 45 min".
+5. Fix the wording everywhere it appears: the guide, the button, the
+   counter and the setting.
+
+**Check.** Show each screen to someone who hasn't seen it. They explain
+every number and limit in their own words, with no follow-up question.
+
+## A counting mark keeps one scale
+
+**What.** A mark that counts something (one tick is one minute) has one
+scale everywhere. When the marks don't fit, show fewer, never denser.
+
+**Why.** Scops (2026-11-14) draws minutes as ticks, and later as beads.
+Squeezing them to fit made the same mark mean something different on
+each screen.
+
+**Apply.**
+1. Write down each counting mark and its unit in the design doc.
+2. When a count doesn't fit, show the last marks and a number for the
+   rest. Never shrink the marks.
+
+**Check.** Every appearance of a counting mark, side by side, has the
+same size and spacing per unit.
 
 ## Decoration never half-hides what you read or click
 
@@ -331,6 +519,35 @@ the ink pill for all toasts; the sending one counts down in words.
 **Check.** The design doc lists each component's anatomy, and the canvas
 shows no second version.
 
+## A choice changes everything it owns
+
+**What.** When a choice changes, everything that belongs to it changes
+too: the fill, the text, the icon colours and any field filled from it.
+One kind of control has one look, before and after a click.
+
+**Why.** In the Scops prototype (2026-11-15), picking "Guests" swapped
+the button fills, but the icons kept their old colours. A light icon sat
+on a light chip, and the Name field still said "Swimming". The owner saw
+it as a contrast bug. In the year and month picker, the year buttons
+came out flat after a click while the months kept their depth. The
+prototype wrote the colour back in a form the depth layer no longer
+recognised. The years were also a different size (48 by 17 px, not 52
+by 16). The owner asked why two similar things looked different. There
+was no reason.
+
+**Apply.**
+1. Colour icons inside toggles with `currentColor`, and the accent with
+   a variable the toggle sets.
+2. List every field a choice fills, and update each one on change.
+3. Build like controls from one component: the years and months in a
+   picker are the same button.
+4. In a prototype, click every option in every group. Compare the
+   clicked prototype with the board, not only the untouched one.
+
+**Check.** A test clicks each option. It checks the contrast of its
+icon, the value of each dependent field, and that its size and style
+match its siblings'.
+
 ## Show it in real context
 
 **What.** Proposals are drawn inside the real frame: the real window
@@ -343,10 +560,59 @@ choosing, to judge the spacing. On tern, a flow drawn as loose cards
 looked like "another app". In the app it already sat in the right frame,
 and the drawing misled the review.
 
-**Apply.** Copy the frame from the live design or the app. Never redraw
-it from memory. Show a pseudo-locale for the longest strings.
+**Apply.**
+1. Copy the frame from the live design or the app. Never redraw it from
+   memory.
+2. A new product has no live design yet. Take the frame from the
+   platform's own design kit (Apple's design resources, Material's
+   kit), and say which one on the board. Scops' status bars were drawn
+   from memory (2026-11-14), because nothing else was at hand.
+3. For a phone, the frames include the status bar and Dynamic Island,
+   the lock screen with a Live Activity, and Android's status bar with
+   an ongoing notification.
+4. Show a pseudo-locale for the longest strings.
 
-**Check.** Every proposal shows its frame and both themes.
+**Check.** Every proposal shows its frame and both themes. The board
+names where its frame came from.
+
+## Both safe areas belong to the frame
+
+**What.** The phone frame reserves the system's areas at the top and at
+the bottom, in one shared place:
+- top: the status bar and the Dynamic Island;
+- bottom: the home indicator, 34 px on an iPhone.
+
+Content and buttons end above the bottom area, with at least 8 px to
+spare. A screen too dense to fit scrolls, with its main action pinned
+above the home indicator. It is never squeezed into the reserved area.
+
+**Why.** The owner noticed that Scops' "Pokračovat k volbě metody"
+(Continue to the method) sat almost on the bottom edge (2026-11-15). A
+search found 21 of 85 screens with a button 16 to 28 px from the bottom,
+inside the home indicator's area. There were three causes:
+1. **The frame was half done.** The generator drew the top safe area in
+   one shared place. The bottom one was drawn only inside the tab bar.
+   Screens without a tab bar had no home indicator, and each chose its
+   own bottom padding (14 to 28 px).
+2. **The boards don't scroll.** A fixed 844 px board pushes the designer
+   to make everything fit. Dense screens were squeezed instead of
+   scrolling.
+3. **The checks looked at the wrong edge.** The audit caught overflow
+   outside the board, not intrusion into the system's areas. The
+   reviewers saw scaled-down sheets without a home indicator.
+
+**Apply.**
+1. One frame component draws both safe areas on every phone board. It
+   always draws the home indicator, tab bar or not.
+2. Its layout reserves the bottom area: the content's bottom padding is
+   the safe area plus at least 8 px.
+3. If content doesn't fit, it scrolls. The main action is pinned above
+   the safe area, with a short fade over the scrolling content.
+4. Bottom sheets add the safe area to their bottom padding too.
+
+**Check.** A script measures every tappable element against the bottom
+edge and flags anything closer than 34 px. Every phone board shows the
+home indicator.
 
 ## Words in the product's voice
 
@@ -365,9 +631,42 @@ Nothing waits on you."
 3. Read every line aloud next to the most serious message the product
    handles. If it jars, rewrite it.
 4. Translate it, and check the translation for the same tone.
+5. In languages with gender and case, use full forms that agree, never
+   a neutral shortcut. Write "She woke up and is crying", not "Waking".
+6. Decline names. Guess the forms ("Elišce" from "Eliška"), and let the
+   user correct them.
+7. The user's own gender sets past tenses and adjectives. Czech: "jste
+   ho uložila / uložil / uložili" (you put him down).
+
+**Why the full forms.** The practices knew "the longest language", but
+not inflection. On Scops (2026-11-14) the owner asked for the harder
+full forms on purpose: they read as care.
 
 **Check.** No "OK" or "Yes" buttons. No jokes on screens that can show
-sensitive content.
+sensitive content. Every screen that mentions a person is on the board
+in every gender.
+
+## Answer the next question where it arises
+
+**What.** When a step can fail or leave the user unsure, the screen
+where it happens says what to do next. Not an FAQ, not a help page.
+
+**Why.** After a failed nap in Scops (2026-11-15), the owner had to ask
+what to do when the baby is sleepy again ten minutes later. The owner:
+"not in an FAQ, but right where they act". The fix put three steps on
+the "didn't fall asleep" screen. Ten minutes later, the app asks "Is he
+sleepy again?".
+
+**Apply.**
+1. For every action, write the question the user will ask right after
+   it.
+2. Answer it on that screen, in two or three steps, with the next action
+   as a button.
+3. If the answer depends on time ("in ten minutes"), the app comes back
+   and asks. The user doesn't have to remember.
+
+**Check.** Walk each flow and ask "what now?" after every action. The
+screen answers it.
 
 ## Motion with a reason
 
