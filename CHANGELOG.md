@@ -5,6 +5,8 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+## 1.5.0 (2026-11-15)
+
 ### New
 
 - **Geometry is measured, not eyeballed.** Scops, a baby-sleep app,
