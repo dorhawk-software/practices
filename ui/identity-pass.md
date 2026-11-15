@@ -128,6 +128,52 @@ already on dorhawk.software.
 read clean, with sources. No part of the name stands alone as a word
 unless that word was checked.
 
+## A mark holds at its smallest size
+
+**What.** A wordmark or logo may be drawn any way the idea asks: letters
+cut and sampled, several typefaces mixed like tracks in a DJ's set, the
+brand's object set into a letter or beside the word. Only what fails at
+the size the mark ships is ruled out. At its smallest size:
+- every stroke is 1 px or more;
+- no leftover piece of a cut stands apart (a dot that is meant, like an
+  i's, is fine);
+- the brand's own element (the egg, the bird) is 10 px or taller, big
+  enough to tell what it is;
+- the brand element touches the letters, or keeps at least a quarter of
+  a stroke clear of them. Nearly touching reads as a mistake.
+
+**Why.** Dorhawk's Windows-app runner, its wordmark (2026-11-15). The
+first drawing set the egg as a speck in the G's mouth: "the egg is soo
+tiny that literally nobody will be able to make it out", the owner said.
+A later remix cut each letter its own way. Through the curves of the n,
+e and s, the cuts left bars of 3.8 units where the stroke is 9: 0.9 px at
+the smallest size shown, grey fuzz. Another variant's cut left a sliver of
+the G's terminal floating above the bowl. The designer saw none of it at
+the board's large sizes; a reviewer measuring the pixels did.
+
+**Apply.**
+1. Draw freely. The rule constrains no style: one cut or five, one
+   typeface or several, the brand inside a letter or outside the word.
+2. Show the mark on its board where it ships smallest: a title bar, a
+   menu, an About window (24 px or less). That is where it is measured.
+3. Mark it for the check: `data-mark="name"` on the `<svg>`, and
+   `data-mark-brand` on the brand's own element inside it.
+4. When a finding comes back, change the drawing, not the board: move the
+   cut to where a stroke runs full width, take a piece whole or leave it,
+   enlarge the brand element in the mark.
+5. A mark that only ever ships large (a poster, a splash) says so:
+   `data-allow="mark: only ever shown on the launch poster"`.
+
+**Check.** `check-ui` (rule `mark`) finds each `svg[data-mark]`, takes the
+smallest size the board shows it at, and draws it alone and large on a
+flat ground, with and without its brand element. From the pixels it
+measures the thinnest stroke, the pieces that stand apart, the brand
+element's height and its distance from the letters, all scaled to that
+smallest size. A mark the board never shows at 24 px or less is a
+finding. It runs after edits and on Stop (claude-hook) and in pre-commit.
+Whether the mark is good is review; whether it reads clean is
+the hard stop above.
+
 ## Iteration 1: establish the identity
 
 The identity brief above, then the two rules below: the bar, and how far

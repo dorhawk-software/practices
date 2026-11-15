@@ -1,0 +1,4 @@
+<resources>
+  <!-- my, nás: a comment, never read -->
+  <string name="saved">Datum si uložíme.</string>
+</resources>

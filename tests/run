@@ -304,5 +304,129 @@ echo "# ours" >"$p/.github/workflows/practices.yml"
 "$here/bin/install" "$p" >/dev/null
 [ "$(cat "$p/.github/workflows/practices.yml")" = "# ours" ] && ok || bad "install keeps the project's update workflow"
 
+# --- check-ui: each check catches its planted fault, and only clean boards pass
+# (common/gates.md, "Prove the gate can fail"). Needs Node and Chrome: on a
+# machine without them these fail, as the gate itself does.
+p=$(project)
+mkdir -p "$p/design"
+expect 0 "check-ui with no boards passes, saying so" "$p/.practices/bin/check-ui"
+for f in "$here"/tests/ui/*.html; do
+    name=$(basename "$f" .html)
+    cp "$f" "$p/design/$name.html"
+    out=$("$p/.practices/bin/check-ui" "design/$name.html" 2>&1)
+    status=$?
+    case $name in
+    clean | allowed | covered | align-forward | mark-ok)
+        [ $status = 0 ] && ok || bad "check-ui passes tests/ui/$name.html" "$out" ;;
+    *)
+        rule=$name
+        case $name in contrast-gradient) rule=contrast ;; allow-unreasoned) rule=allow ;; align-stretched) rule=align ;; mark-*) rule=mark ;; esac
+        [ $status = 1 ] && printf '%s\n' "$out" | grep -q "^\[$rule\]" && ok ||
+            bad "check-ui catches tests/ui/$name.html as [$rule] (exit $status)" "$out" ;;
+    esac
+    rm "$p/design/$name.html"
+done
+cp "$here/tests/ui/contain.html" "$p/design/board.html"
+out=$("$p/.practices/bin/check-ui" 2>&1)
+case $out in *'"Choose a Folder…" runs'*'past the right of div.card'*) ok ;; *) bad "check-ui finds the boards by UI_BOARDS and names the element and the edge" "$out" ;; esac
+echo "UI_CHROME=$work/no-chrome" >>"$p/.practices/config"
+"$p/.practices/bin/check-ui" >/dev/null 2>&1
+st=$?
+[ $st = 2 ] && ok || bad "check-ui without Chrome fails (exit 2), never passes"
+printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
+
+# --- check-voice: every "we" in the copy, in each language and format it
+# reads; nothing in comments, keys, or the person's own words.
+p=$(project)
+expect 0 "check-voice with no copy files passes, saying so" "$p/.practices/bin/check-voice"
+cp -R "$here/tests/voice/clean/." "$p/"
+expect 0 "check-voice passes copy that speaks as the app" "$p/.practices/bin/check-voice"
+cp -R "$here/tests/voice/bad/." "$p/"
+out=$("$p/.practices/bin/check-voice" 2>&1)
+st=$?
+[ $st = 1 ] && ok || bad "check-voice fails on we in the copy (exit $st)" "$out"
+for want in 'strings.ts:2 [cs]' '"jsme"' '"Upozorníme"' '"my"' "\"we'll\"" '"us"' '"neprodáváme"' '"Our"' \
+    'Localizable.strings:1 [cs]' '"Odešleme"' 'strings.xml:3 [cs]' '"uložíme"' 'app.xcstrings:7 [cs]' '"Pošleme"' 'without its reason'; do
+    case $out in *"$want"*) ok ;; *) bad "check-voice finds $want" "$out" ;; esac
+done
+case $out in *'Welcome'* | *'comments for translators'* | *'never read'*) bad "check-voice reads only strings people see" "$out" ;; *) ok ;; esac
+
+# --- claude-hook: the UI gate after any edit to a board, and before the turn ends
+ev() { printf '{"hook_event_name":"%s","tool_name":"%s","tool_input":{"command":"%s"},"stop_hook_active":%s}' "$1" "$2" "${3:-}" "${4:-false}"; }
+p=$(project)
+mkdir -p "$p/design"
+cp "$here/tests/ui/clean.html" "$p/design/board.html"
+ev PostToolUse Write | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok || bad "claude-hook passes a clean board"
+cp "$here/tests/ui/contain.html" "$p/design/board.html" # a shell edit, no Edit tool
+out=$(ev PostToolUse Bash "cp a b" | "$p/.practices/bin/claude-hook" 2>&1)
+st=$?
+[ $st = 2 ] && case $out in *'[contain]'*) true ;; *) false ;; esac && ok ||
+    bad "claude-hook hands a board's findings back (exit 2) after a shell edit" "$out"
+ev PostToolUse Read | "$p/.practices/bin/claude-hook" >/dev/null 2>&1
+st=$?
+[ $st = 2 ] && ok || bad "claude-hook keeps reporting a failing board until it is fixed"
+out=$(ev Stop "" "" false | "$p/.practices/bin/claude-hook" 2>&1)
+st=$?
+[ $st = 2 ] && case $out in *'You may not stop yet'*) true ;; *) false ;; esac && ok ||
+    bad "the Stop hook blocks the turn's end while a board fails" "$out"
+out=$(ev Stop "" "" true | "$p/.practices/bin/claude-hook" 2>/dev/null)
+st=$?
+[ $st = 0 ] && case $out in *systemMessage*'still open in design/board.html'*) true ;; *) false ;; esac && ok ||
+    bad "blocked twice on the same findings, the agent may stop and the person is told" "$out"
+cp "$here/tests/ui/clean.html" "$p/design/board.html"
+ev PostToolUse Edit | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ev Stop "" "" false | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok ||
+    bad "once the board is fixed, edits and the turn's end pass"
+
+# The voice gate: after an edit, before the turn ends, before a commit, in lint.
+p=$(project)
+"$p/.practices/bin/install-hooks" >/dev/null
+mkdir -p "$p/src/i18n"
+printf "const en = {\n  'a': 'Saved.',\n};\n" >"$p/src/i18n/strings.ts"
+ev PostToolUse Edit | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok || bad "claude-hook passes copy without we"
+printf "const en = {\n  'a': 'We saved it.',\n};\n" >"$p/src/i18n/strings.ts"
+out=$(ev PostToolUse Edit | "$p/.practices/bin/claude-hook" 2>&1)
+st=$?
+[ $st = 2 ] && case $out in *'[voice]'*'"We"'*) true ;; *) false ;; esac && ok ||
+    bad "claude-hook hands we in the copy back to the agent" "$out"
+out=$(ev Stop "" "" false | "$p/.practices/bin/claude-hook" 2>&1)
+st=$?
+[ $st = 2 ] && case $out in *'You may not stop yet'*'[voice]'*) true ;; *) false ;; esac && ok ||
+    bad "the Stop hook blocks while the copy says we" "$out"
+out=$("$p/.practices/bin/lint" 2>&1)
+st=$?
+[ $st != 0 ] && case $out in *"the product's voice failed"*'"We"'*) true ;; *) false ;; esac && ok ||
+    bad "lint fails while the copy says we" "$out"
+git -C "$p" add src/i18n/strings.ts
+git -C "$p" commit -qm "Copy" >/dev/null 2>&1 && bad "pre-commit refuses copy that says we" || ok
+printf "const en = {\n  'a': 'Saved.',\n};\n" >"$p/src/i18n/strings.ts"
+git -C "$p" add src/i18n/strings.ts
+git -C "$p" commit -qm "Copy" >/dev/null 2>&1 && ok || bad "pre-commit lets copy without we through"
+
+# --- pre-commit: a failing board can't be committed; nor can unwired hooks
+p=$(project)
+"$p/.practices/bin/install-hooks" >/dev/null
+mkdir -p "$p/design"
+cp "$here/tests/ui/contain.html" "$p/design/board.html"
+git -C "$p" add design/board.html
+git -C "$p" commit -qm "Add a board" >/dev/null 2>&1 && bad "pre-commit refuses a board that fails check-ui" || ok
+cp "$here/tests/ui/clean.html" "$p/design/board.html"
+git -C "$p" add design/board.html
+git -C "$p" commit -qm "Add a board" >/dev/null 2>&1 && ok || bad "pre-commit lets a clean board through"
+mkdir -p "$p/.claude"
+cp "$here/templates/claude-settings.json" "$p/.claude/settings.json"
+expect 0 "check-hooks passes the template" "$p/.practices/bin/check-hooks"
+printf '{"hooks":{"PostToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"x/.practices/bin/claude-hook"}]}]}}\n' >"$p/.claude/settings.json"
+out=$("$p/.practices/bin/check-hooks" 2>&1)
+st=$?
+[ $st = 1 ] && case $out in *'after Edit'*'Stop'*) true ;; *) false ;; esac && ok ||
+    bad "check-hooks finds edits and Stop unwired" "$out"
+git -C "$p" add .claude/settings.json
+git -C "$p" commit -qm "Settings" >/dev/null 2>&1 && bad "pre-commit refuses settings that drop the hooks" || ok
+# shellcheck disable=SC2016 # $CLAUDE_PROJECT_DIR is for Claude Code to expand
+printf '{"hooks":{"PostToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"\\"$CLAUDE_PROJECT_DIR\\"/.practices/bin/claude-hook","timeout":900}]}]}}\n' >"$p/.claude/settings.json"
+cp "$p/.claude/settings.json" "$work/old-settings"
+"$here/bin/install" "$p" >/dev/null
+cmp -s "$p/.claude/settings.json" "$here/templates/claude-settings.json" && bad "install leaves settings the project changed alone" || ok
+
 echo "$passed passed, $failed failed"
 [ $failed = 0 ]

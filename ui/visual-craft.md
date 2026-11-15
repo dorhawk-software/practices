@@ -11,6 +11,16 @@ axis. A person reviewing a scaled-down board cannot see a 2 px gap, and
 a script finds it in seconds. So each geometry rule's check is a
 measurement, and the reviewers also get 1:1 crops of the dense areas.
 
+The measurements run on their own: `.practices/bin/check-ui` renders
+every design board (`UI_BOARDS`, `design/**/*.html` by default) in
+headless Chrome, at each width and in light and dark. It runs after every
+edit to a board and before the agent's turn ends (claude-hook), before
+each commit (pre-commit), and in CI. Its findings go back to the agent,
+grouped by rule, each with its fix. A deliberate exception is marked in
+the board, `data-allow="rule: the reason"`, and a mark without a reason
+is a finding too. What it checks, and what is still a reviewer's, is in
+[ENFORCEMENT.md](../ENFORCEMENT.md).
+
 Each rule names the incident behind it. Product details are labelled
 examples.
 
@@ -50,9 +60,10 @@ the tone-only version of all of them.
    meaningful mark it could touch: today's date, focus, the selected
    item.
 
-**Check.** Search the styles for borders and inset rings. Each one left
-is a focus ring, a checkbox, or has a written reason. After a global
-layer lands, a capture of each meaningful mark still shows it.
+**Check.** `check-ui` (ring) flags every ring drawn with `box-shadow`.
+Search the styles for borders: each one left is a focus ring, a checkbox,
+or has a written reason. After a global layer lands, a capture of each
+meaningful mark still shows it.
 
 ## Every stroke end matches
 
@@ -176,7 +187,9 @@ the icons are the part of the identity the user sees on every screen.
 **Check.** No icon on any screen is a system or stock symbol unless the
 design doc says why. Each icon of the family, side by side at 24 and at
 48, reads as one hand. The weight is in the families list above. A
-list row or button without an icon has a written reason.
+list row or button without an icon has a written reason. `check-ui` (icon)
+flags every button with words and no icon, unless it is marked
+`data-allow="icon: …"`.
 
 ## Depth and texture from a concept
 
@@ -213,7 +226,10 @@ the signature of Shrike, another Dorhawk product.
 - Each depth effect is explained by the concept in one sentence.
 - Nothing on screen is recognisable as another product's signature.
 - No glow or drop shadow reaches above the top edge of something lit
-  from above. There it reads as a blurred edge.
+  from above. There it reads as a blurred edge. `check-ui` (shadow)
+  flags a zero-offset halo, a shadow that falls up, and one whose offset
+  is under a quarter of its blur; a glow the concept explains is marked
+  `data-allow="shadow: …"`.
 - Text still passes contrast on every raised and pressed surface.
 
 ## The system's own sign for the system's own act
@@ -267,6 +283,106 @@ something done.
 **Check.** No band of empty space above the first content, and none at
 the bottom of a board.
 
+## Nothing runs past its surface
+
+**What.** Every button, label and line sits inside the surface it is
+drawn on: the panel, the card, the window. Nothing is cut off by a box
+too small for it. This holds at every width the board is shown at, and
+in both themes.
+
+**Why.** The Windows-app runner's folder panel (2026-11-15) got an icon
+on "Allow All of Documents", as the icon rule asks. The row grew 3 px
+wider than the panel, and "Not now" stuck out past its left edge. The
+agent called the board ready. Its own overflow script measured only
+height, and its gap check only left to right, so both passed. The owner
+saw it in five seconds. The rule was written, under "Pixel by pixel",
+but no script measured it.
+
+**Apply.**
+1. Let a row of buttons wrap, or make its surface wide enough for the
+   longest label in the longest language.
+2. After adding anything to a row (an icon, a word), measure the row
+   again at every width.
+3. A badge or tooltip that hangs over an edge on purpose, or a list
+   drawn mid-scroll, is marked in the board with its reason:
+   `data-allow="contain: the count badge sits over the corner it numbers"`.
+
+**Check.** `.practices/bin/check-ui` measures every element against the
+surface it is drawn on, and every clipping box against its content, at
+each width and theme. It runs after every edit to a board, before the
+agent's turn ends, and before each commit.
+
+## Buttons follow the column
+
+**What.** A row of buttons lines up with the text above it. In a column
+that starts at the leading edge (the left, in left-to-right text):
+- several buttons start at that edge too, or fill the column's whole
+  width as equal parts, so the row reads as deliberate;
+- one forward action (Continue, Next) may sit at the trailing edge,
+  because readers of left-to-right text take the right side as "go on";
+- a single button never stretches across a wide surface. On a phone
+  (480 px or narrower), a full-width main button is the platform's own
+  pattern and stays.
+
+In a centred column, the buttons are centred too.
+
+**Why.** The Windows-app runner's folder panel (2026-11-15) set its
+title, its text and its footnote at the left edge, and only the row of
+three buttons at the right. The owner: everything is aligned left, "and
+then buttons, and only the buttons, row is aligned to the right, like
+what?" The macOS step beside it, one Continue at the right under left
+text, read as right: that side means "continue". Always stretching is no
+answer either: one button across a whole panel looks odd.
+
+**Apply.**
+1. Look at the column's edge first: where do the title and the text
+   start? The row starts there.
+2. Several actions: start them at the leading edge, the main action
+   first and the escape (Cancel, Not now) last, or give them equal
+   columns across the full width.
+3. One action that moves on: the trailing edge is fine. One action of
+   another kind: the leading edge.
+4. The platform's own surfaces (a macOS alert, a system sheet) are drawn
+   as the platform draws them, and marked
+   `data-allow="align: drawn as macOS draws its alert"`.
+
+**Check.** `check-ui` (align) finds each row of buttons and the column it
+sits in. In a leading-aligned column, it flags a row of several buttons
+that doesn't start at the column's edge (unless it fills the column), a
+lone button that is neither at an edge nor at phone width, and a lone
+button stretched across a surface wider than 480 px. In a centred column,
+it flags a row off the centre.
+
+## Every button names its outcome
+
+**What.** Each button says what happens when it's pressed, in the words
+of the outcome, not of the operation. The way out of a question names
+what stays: "Keep the app" beside "Remove", "Keep editing" beside
+"Discard", "Keep copying" beside "Stop copying". Never a bare "Cancel",
+"OK", "Yes", "No", "Confirm" or "Submit": each could mean either answer.
+
+**Why.** The Windows-app runner asked whether to remove an app, with
+"Remove" and "Cancel" (2026-11-15). The owner: "Remove" says what
+will happen, but "Cancel" could just as well mean cancel the app you're
+removing. The operation is a cancel; what matters to the person is the
+outcome, and that the app stays.
+
+**Apply.**
+1. Read the question, then each button alone, as an answer to it. A
+   button that only makes sense once you know which side it's on is
+   wrong.
+2. The action: its verb and object ("Remove", "Save and remove",
+   "Empty Trash").
+3. The way out: what is kept or goes on ("Keep the app", "Keep
+   editing", "Not now" when the question comes back later).
+4. A surface the platform draws (a macOS alert, a system sheet) keeps
+   the platform's words, marked
+   `data-allow="outcome: drawn as macOS draws its alert"`.
+
+**Check.** `check-ui` (outcome) flags every button whose whole label is
+a word that names no outcome: Cancel, OK, Okay, Yes, No, Confirm,
+Submit, Accept, Decline, Proceed, Abort, Dismiss.
+
 ## Separate targets keep their distance
 
 **What.** Two separate tappable things are at least 8 px apart, edge to
@@ -293,9 +409,9 @@ worse: it turned flat chips into raised tiles, and raised tiles need air.
 3. After any global style change (depth, shadows), measure the spacing
    again.
 
-**Check.** A script measures the edge-to-edge gap between every pair of
-tappable elements. It flags anything under 8 px, except the three cases
-above. The reviewers get 1:1 crops of dense areas, not only scaled-down
+**Check.** `check-ui` (gap) measures the edge-to-edge gap between every
+pair of targets, across and down. It flags anything under 8 px, except
+the three cases above, marked `data-allow="gap: …"`. The reviewers get 1:1 crops of dense areas, not only scaled-down
 sheets.
 
 ## Spacing is measured from what you see
@@ -317,8 +433,10 @@ anywhere else. One change caused it, not 22 separate mistakes.
    once.
 2. Keep at least 16 px between a visible edge and the nearest text.
 
-**Check.** A script measures the gap from the top of each mascot's
-visible shape to the text above it.
+**Check.** `check-ui` (halo) measures every ring of 2 px or more and
+every glow to the nearest text that isn't its own. The painted extent of
+drawings (a disc behind a mascot) is still a project's own script
+([ENFORCEMENT.md](../ENFORCEMENT.md)).
 
 ## Centred means on the axis
 
@@ -336,8 +454,8 @@ but somehow isn't". Everything else on that screen was left-aligned.
 1. A centred block takes its column's full width, or is centred in it.
 2. In a left-aligned column, align every line to the left.
 
-**Check.** A script flags centred text blocks whose box is more than
-3 px off the column's axis. It skips labels inside buttons and rows,
+**Check.** `check-ui` (centre) flags centred text blocks whose box is
+more than 3 px off the column's axis. It skips labels inside targets,
 whose icon offsets them on purpose.
 
 ## Rank what the screen says
@@ -480,8 +598,9 @@ reviewers had passed it.
    size, mid-scroll and at rest, and judge the picture, not the idea.
 
 **Check.** Screenshot the scroll at several offsets. No frame shows a
-row partly covered by a drawing, and every label passes contrast
-against the exact pixels behind it.
+row partly covered by a drawing. `check-ui` (contrast) measures every
+label against the exact pixels behind it, drawings and gradients
+included, and skips text that something opaque covers.
 
 ## Nothing anyone reads under 11 px
 
@@ -497,8 +616,9 @@ labels carry real information.
 **Apply.** Set an 11 px floor in the type scale. Smaller sizes may only
 draw glyphs that sit inside a shape, like an avatar's initials.
 
-**Check.** Search the styles for font sizes under 11. Each hit is a glyph
-inside a shape.
+**Check.** `check-ui` (text-size) flags every text run under 11 px, SVG
+text at the size it is drawn. A glyph inside a shape is marked
+`data-allow="text-size: …"`.
 
 ## One anatomy per job
 
@@ -517,7 +637,8 @@ the ink pill for all toasts; the sending one counts down in words.
 3. Write the anatomy down: parts, order, sizes, the action's place.
 
 **Check.** The design doc lists each component's anatomy, and the canvas
-shows no second version.
+shows no second version. `check-ui` (same-look) flags like targets (the
+same tag and classes) of different height, type, radius or padding.
 
 ## A choice changes everything it owns
 
@@ -546,7 +667,8 @@ was no reason.
 
 **Check.** A test clicks each option. It checks the contrast of its
 icon, the value of each dependent field, and that its size and style
-match its siblings'.
+match its siblings'. On boards, `check-ui` (state) flags a focus, hover,
+active or pressed state that moves or resizes what's inside it.
 
 ## Show it in real context
 
@@ -618,7 +740,8 @@ home indicator.
 
 **What.** Screens speak in the product's own voice. Dialogs use little
 text and a button that names and does the action. Serious moments get
-calm words, not jokes.
+calm words, not jokes. Who speaks (the app, never "we") is in
+[common/voice.md](../common/voice.md).
 
 **Why.** Tern's first-run lines carry its idea ("Bring your mail home.",
 "Only you hold the key."). Its inbox zero carried a meme, which a review
@@ -642,9 +765,10 @@ Nothing waits on you."
 not inflection. On Scops (2026-11-14) the owner asked for the harder
 full forms on purpose: they read as care.
 
-**Check.** No "OK" or "Yes" buttons. No jokes on screens that can show
-sensitive content. Every screen that mentions a person is on the board
-in every gender.
+**Check.** No "OK" or "Yes" buttons (`check-ui` outcome, see
+[Every button names its outcome](#every-button-names-its-outcome)). No
+jokes on screens that can show sensitive content. Every screen that
+mentions a person is on the board in every gender.
 
 ## Answer the next question where it arises
 

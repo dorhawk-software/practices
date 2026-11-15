@@ -14,6 +14,21 @@ README.md is the map; read it first.
 - **Every practice has four parts**: What, Why (the incident, its cost,
   and a link to the commit that paid for it), Apply, Check. No essays:
   plain words, sentences under 25 words.
+- **Every rule a machine can check is a gate the agent can't skip** (the
+  owner, 2026-11-15, after a board was called ready with a button
+  sticking out of its panel: the rule was written, nothing measured it).
+  A rule's Check names the script that enforces it and where it runs:
+  claude-hook after edits and before the agent's turn ends, the git
+  hooks, CI. Its findings go back to the agent, each with its fix
+  ([common/gates.md](common/gates.md)). Only judgement (taste, wording,
+  whether an icon is ugly) is left to reviewers, and the Check says so.
+  - A new or changed rule gets its row in [ENFORCEMENT.md](ENFORCEMENT.md):
+    gate, partial, todo or review. `tests/enforcement` fails without it.
+  - A rule a script could check, but none does yet, is a todo there and
+    a task in ROADMAP.md, in the same commit.
+  - A new check comes with a planted fault in tests/run (it must catch
+    it, on its own rule) and a mutant in tests/mutate (breaking the
+    check must fail that case).
 - **Public repository.** No client or company names from private work,
   no real hosts or non-documentation addresses, no email addresses or
   account names, no people's names (roles only). Examples use ACME,
@@ -35,8 +50,10 @@ README.md is the map; read it first.
 ## Checks
 
 ```sh
-tests/check     # the gate: shellcheck, links, readme, versions, tests/run
+tests/check     # the gate: shellcheck, links, readme, versions, enforcement, tests/run
 tests/run       # the kit's checks on throwaway projects (seconds)
+tests/mutate    # each check broken in a copy: tests/run must fail on its case (minutes)
+tests/enforcement # ENFORCEMENT.md classifies every rule of every practice
 tests/links     # every relative link in the docs resolves
 tests/readme    # README names every top-level entry, practice, guide and script
 tests/versions  # the plugin's version is the newest release in CHANGELOG.md
@@ -48,7 +65,9 @@ The pre-commit hook runs `tests/check` (once per clone:
 only in CI, and a commit that failed shellcheck reached main.
 
 CI (.github/workflows/ci.yml) runs all of them, tests/run on Linux and
-macOS, plus actionlint and the commit-message check.
+macOS, tests/mutate on macOS, plus actionlint and the commit-message
+check. tests/run and tests/mutate need Node and Chrome (check-ui renders
+boards); without them they fail, as the gate does.
 
 ## Adding a practice or a project
 

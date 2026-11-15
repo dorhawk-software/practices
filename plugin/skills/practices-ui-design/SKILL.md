@@ -84,10 +84,28 @@ sometimes edits it.
   every screen as the user in their worst moment (identity-pass.md).
 - Claims about health, safety or results cite a source, say what was
   measured, and promise no outcome (identity-pass.md, step 12).
+- `check-ui` is the floor, not the bar. The kit runs it on every board
+  after each edit, at the end of every turn and before each commit, and
+  hands its findings back to you to fix: nothing past its surface,
+  buttons that follow their column and name their outcome ("Keep the
+  app", never "Cancel"), 8 px between targets, the 11 px floor,
+  contrast, and the rest of visual-craft.md's measurable rules. Run
+  `.practices/bin/check-ui` yourself while you work. A deliberate
+  exception is marked where it applies, `data-allow="rule: reason"`, with
+  a reason a reviewer can judge; never to quiet a finding you could fix.
+- A wordmark or logo may be drawn any way the idea asks (letters cut and
+  sampled, typefaces mixed, the brand's object in a letter or beside the
+  word). Declare it, `data-mark` on its `<svg>` and `data-mark-brand` on
+  the brand's element, and show it on its board where it ships smallest:
+  `check-ui` measures it there (identity-pass.md, "A mark holds at its
+  smallest size").
+  Clean output says nothing about taste: the review steps still run.
 - Geometry is measured, not eyeballed: 8 px between separate targets,
   nothing tappable within 34 px of the bottom edge, 16 px from a visible
   halo to text, centred text on its column's axis. Re-run all of it
   after any global style change (visual-craft.md).
+- The product speaks as itself or names who acts, never "we" (and in
+  Czech, never the -me verb): common/voice.md, checked by `check-voice`.
 - One reading only: every number and limit names its subject and what
   happens when it runs out (visual-craft.md).
 - Dates, times and counts are picked, never typed; derived text

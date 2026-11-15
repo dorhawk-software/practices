@@ -5,6 +5,94 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+### New
+
+- **Rules a machine can check are gates the agent can't skip.** On
+  2026-11-15 an agent called a design board ready, and the owner saw a
+  button 3 px out of its panel within seconds. The rule was written;
+  nothing ran it. The new rule: every rule a script can decide runs
+  after each edit, before the agent's turn ends, before each commit and
+  in CI, and its findings go back to the agent as an error to fix. Only
+  judgement stays with reviewers (`common/gates.md`, and this
+  repository's CLAUDE.md for contributors).
+
+- **`check-ui` measures design boards.** It renders every board under
+  `design/` in headless Chrome, at each width, light and dark, and
+  checks nothing runs past its surface or gets cut off. It also checks
+  the rest of `ui/visual-craft.md`'s measurable rules: buttons that
+  follow their column, 8 px between targets, the 11 px floor, rings and
+  shadows, halos near text, centring, states that don't move content,
+  icons on buttons, like controls alike, and contrast, measured against
+  the pixels behind text on gradients and pictures. A deliberate
+  exception is marked in place, `data-allow="rule: reason"`; a mark
+  without a reason is a finding. Node 18 and Chrome; no packages.
+  Settings: `UI_*` in `templates/config`.
+
+- **`claude-hook` runs after edits and on Stop.** After Bash, Edit and
+  Write it runs `check-ui` on boards that changed; on Stop and
+  SubagentStop the agent can't end its turn while a board fails.
+  `bin/install` updates settings that still match the old template, and
+  the new `check-hooks` fails a commit whose `.claude/settings.json`
+  stops running the hook. pre-commit runs both.
+
+- **Buttons follow the column.** A row of buttons starts where the text
+  above it starts, fills the column, or is centred in a centred column.
+  One forward action may sit at the trailing edge; one button never
+  stretches across a wide surface (`ui/visual-craft.md`, checked by
+  `check-ui`).
+
+- **The product speaks as itself, never as "we".** A data-box app told
+  people "we sent you the code by SMS" when the state's system had sent
+  it, and promised "nobody opens it, not even us" without saying who
+  "us" was. Copy now names who acts (the app, the developers, the
+  service) or says it impersonally. The new `check-voice` reads every
+  string people see, in English and Czech (where the verb alone says
+  "we": "upozorníme"), and runs after edits, on Stop, in pre-commit and
+  in lint (new `common/voice.md`). On that app it found 37 strings; a
+  careful review had found eight.
+
+- **A mark holds at its smallest size.** A wordmark may be cut, sampled
+  or mixed from several typefaces; only what fails where it ships is
+  ruled out. A drawing of a Mac app's wordmark set its egg as a speck the
+  owner couldn't make out, and a later cut left strokes of 0.9 px, grey
+  fuzz at the smallest size; the designer saw neither at the board's
+  sizes. `check-ui` now finds each `svg[data-mark]`, draws it alone and
+  large, and measures it at the smallest size the board shows: strokes
+  1 px or more, no leftover piece of a cut, the brand element
+  (`data-mark-brand`) 10 px or taller and touching the letters or a
+  quarter of a stroke clear (`ui/identity-pass.md`).
+
+- **Every practice reaches `rules.md`.** The digest each session loads
+  missed `it-just-works`, `consent`, `drag-and-drop` and `pickers`, so
+  no session saw their rules. `tests/enforcement` now fails on a practice
+  that `bin/install` doesn't digest.
+
+- **Every button names its outcome.** "Remove" beside "Cancel" left
+  the owner unsure: cancel the removal, or cancel the app? The way out
+  now names what stays ("Keep the app", "Keep editing"), and `check-ui`
+  flags any button labelled only Cancel, OK, Yes, No, Confirm, Submit
+  or another word that fits either answer (`ui/visual-craft.md`).
+
+- **Nothing runs past its surface.** A button, label or badge stays
+  inside the panel, card or sheet that holds it, at every width
+  (`ui/visual-craft.md`, checked by `check-ui`).
+
+- **ENFORCEMENT.md lists every rule and how it's enforced**: gate,
+  partial, todo or review, audited rule by rule against the scripts.
+  The todo rows are the work list. `tests/enforcement` fails when a rule
+  isn't listed.
+
+- **A test of a check is proven by breaking the check.** `tests/mutate`
+  breaks each check in a copy of the kit, and `tests/run` must fail on
+  that check's own case. It guards itself: an unmutated baseline first,
+  no-op and unparseable mutants refused, and a failure for another
+  reason isn't counted (`common/gates.md`). CI runs it on macOS.
+
+### Fixed
+
+- `rust/conventions.md` and `rust/lints.md` named the unsafe-code
+  setting `UNSAFE_PATHS`; the scripts read `UNSAFE_ALLOWED`.
+
 ## 1.5.0 (2026-11-15)
 
 ### New

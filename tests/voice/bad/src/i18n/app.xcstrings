@@ -1,0 +1,12 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Sent" : {
+      "comment" : "We write comments for translators.",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Pošleme to znovu." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Welcome back." } }
+      }
+    }
+  }
+}

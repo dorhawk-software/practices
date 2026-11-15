@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# ENFORCEMENT.md lists every rule of every practice, with how it is
+# enforced: gate, partial, todo or review. A new rule can't land without
+# saying which (CLAUDE.md: every rule a machine can check is a gate), and
+# a rule that's gone can't linger in the list.
+#
+#   tests/enforcement
+set -uo pipefail
+cd "$(dirname "$0")/.." || exit 2
+
+fail=0
+rules=$(mktemp)
+listed=$(mktemp)
+trap 'rm -f "$rules" "$listed"' EXIT
+
+# The rules: each "## " heading outside fenced code, as bin/install's rules.md reads them.
+for f in common/*.md ui/*.md rust/*.md typescript/*.md mobile/*.md; do
+    awk -v f="$f" '/^```/ { fenced = !fenced; next } !fenced && /^## / { sub(/^## /, ""); if ($0 != "Check" && $0 != "Apply") print f "\t" $0 }' "$f"
+done | sort >"$rules"
+
+# The list: each table row under a "### [file](file)" heading.
+awk '
+    /^### \[/ { match($0, /\[[^]]+\]/); file = substr($0, RSTART + 1, RLENGTH - 2); next }
+    /^## / { file = "" }
+    file != "" && /^\| / && !/^\| Rule \| Status \|/ && !/^\| --- / {
+        line = $0
+        gsub(/\\\|/, "\001", line)
+        n = split(line, cell, "|")
+        rule = cell[2]; status = cell[3]
+        gsub(/^ +| +$/, "", rule); gsub(/^ +| +$/, "", status)
+        gsub(/\001/, "|", rule)
+        print file "\t" rule "\t" status
+    }
+' ENFORCEMENT.md >"$listed"
+
+while IFS=$'\t' read -r file rule status; do
+    case $status in
+    gate | partial | todo | review) ;;
+    *) echo "ENFORCEMENT.md: \"$rule\" ($file) has status \"$status\"; use gate, partial, todo or review."; fail=1 ;;
+    esac
+done <"$listed"
+
+missing=$(cut -f1,2 "$listed" | sort | comm -23 "$rules" -)
+stale=$(cut -f1,2 "$listed" | sort | comm -13 "$rules" -)
+if [ -n "$missing" ]; then
+    echo "ENFORCEMENT.md doesn't list these rules. Add a row each: is it a gate (which script, where it runs), partial, todo or review?"
+    printf '%s\n' "$missing" | sed 's/\t/: /; s/^/  - /'
+    fail=1
+fi
+if [ -n "$stale" ]; then
+    echo "ENFORCEMENT.md lists rules no practice has (renamed or removed): fix or drop the rows."
+    printf '%s\n' "$stale" | sed 's/\t/: /; s/^/  - /'
+    fail=1
+fi
+# Every practice reaches rules.md, the digest each session loads: bin/install names it.
+for f in common/*.md ui/*.md rust/*.md typescript/*.md mobile/*.md; do
+    case $f in */README.md) continue ;; esac
+    if ! grep -qF "$f" bin/install; then
+        echo "bin/install doesn't digest $f into rules.md, so no session loads its rules. Fix: add it to a digest line in bin/install."
+        fail=1
+    fi
+done
+# The counts line says what the rows say.
+want=$(cut -f3 "$listed" | awk '{ n[$0]++ } END { printf "Today: %d gate, %d partial, %d todo, %d review", n["gate"], n["partial"], n["todo"], n["review"] }')
+if ! grep -qxF "$want" ENFORCEMENT.md; then
+    echo "ENFORCEMENT.md's counts are stale. Fix: change its \"Today:\" line to: $want"
+    fail=1
+fi
+[ $fail = 0 ] && echo "tests/enforcement: $(wc -l <"$listed" | tr -d ' ') rules, each with its enforcement"
+exit $fail

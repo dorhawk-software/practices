@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+# Mutation tests: proof that tests/run would notice a check that stopped
+# checking. Each mutant breaks one line of one check, in a copy of the
+# kit, and tests/run must then fail on that check's own case.
+#
+#   tests/mutate            # every mutant, JOBS at a time (default 4)
+#   tests/mutate NAME...    # just these
+#
+# Why: on 2026-11-15 an agent's ad-hoc mutation run reported every check
+# "caught" while it measured nothing. Its copies sat outside a git
+# repository, so every run failed before checking, and that failure was
+# counted as a kill. Its baseline then read `$?` from the wrong command.
+# So this runner guards itself:
+# - mutants run in full copies of one snapshot of the kit, .git
+#   included; the repository's own files are never changed;
+# - the unmutated copy must pass tests/run first, or nothing counts;
+# - a mutation that matches nothing fails the run (a no-op isn't a kill),
+#   and so does one that leaves the script unable to parse;
+# - a mutant counts as killed only when tests/run fails on the case named
+#   for it. Failing for another reason (a crash, a refused start) is
+#   reported, not counted.
+set -uo pipefail
+here=$(cd "$(dirname "$0")/.." && pwd)
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+jobs=${JOBS:-4}
+
+# name ¦ file ¦ text to replace (literal) ¦ replacement ¦ the FAIL line tests/run must print.
+# Fields are split at " ¦ ", which no script contains: an earlier "|" split
+# cut rows whose code holds "||" and broke the mutated script instead.
+# A quoted heredoc: no character in a row (an apostrophe, a $) can end it
+# or expand. A single-quoted string ended at the first "product's".
+mutants=$(cat <<'ROWS'
+contain ¦ scripts/ui-audit.mjs ¦ add("contain", e, ¦ void ("contain", e, ¦ check-ui catches tests/ui/contain.html
+align ¦ scripts/ui-audit.mjs ¦ add("align", row, ¦ void ("align", row, ¦ check-ui catches tests/ui/align.html
+clip ¦ scripts/ui-audit.mjs ¦ add("clip", e, ¦ void ("clip", e, ¦ check-ui catches tests/ui/clip.html
+gap ¦ scripts/ui-audit.mjs ¦ add("gap", a, ¦ void ("gap", a, ¦ check-ui catches tests/ui/gap.html
+text-size ¦ scripts/ui-audit.mjs ¦ add("text-size", e, ¦ void ("text-size", e, ¦ check-ui catches tests/ui/text-size.html
+ring ¦ scripts/ui-audit.mjs ¦ add("ring", e, ¦ void ("ring", e, ¦ check-ui catches tests/ui/ring.html
+shadow ¦ scripts/ui-audit.mjs ¦ add("shadow", e, ¦ void ("shadow", e, ¦ check-ui catches tests/ui/shadow.html
+halo ¦ scripts/ui-audit.mjs ¦ add("halo", e, ¦ void ("halo", e, ¦ check-ui catches tests/ui/halo.html
+centre ¦ scripts/ui-audit.mjs ¦ add("centre", e, ¦ void ("centre", e, ¦ check-ui catches tests/ui/centre.html
+state ¦ scripts/ui-audit.mjs ¦ add("state", e, ¦ void ("state", e, ¦ check-ui catches tests/ui/state.html
+icon ¦ scripts/ui-audit.mjs ¦ add("icon", e, ¦ void ("icon", e, ¦ check-ui catches tests/ui/icon.html
+outcome ¦ scripts/ui-audit.mjs ¦ add("outcome", e, ¦ void ("outcome", e, ¦ check-ui catches tests/ui/outcome.html
+same-look ¦ scripts/ui-audit.mjs ¦ add("same-look", looks[1][1], ¦ void ("same-look", looks[1][1], ¦ check-ui catches tests/ui/same-look.html
+contrast ¦ scripts/ui-audit.mjs ¦ add("contrast", e, ¦ void ("contrast", e, ¦ check-ui catches tests/ui/contrast.html
+contrast-pixels ¦ scripts/ui-audit.mjs ¦ result.findings.push({ rule: "contrast", ¦ void ({ rule: "contrast", ¦ check-ui catches tests/ui/contrast-gradient.html
+mark-thin ¦ scripts/ui-mark.mjs ¦ if ((2 * v - 1) * scale < minStroke) thin[j] = 1; ¦ if (false) thin[j] = 1; ¦ check-ui catches tests/ui/mark-thin.html
+mark-fragment ¦ scripts/ui-mark.mjs ¦ if (c.area < 1.5 * stroke * stroke && !dotLike) ¦ if (false) ¦ check-ui catches tests/ui/mark-fragment.html
+mark-dot ¦ scripts/ui-mark.mjs ¦ const dotLike = c.area ¦ const dotLike = false && c.area ¦ check-ui passes tests/ui/mark-ok.html
+mark-brand ¦ scripts/ui-mark.mjs ¦ if (bh < minBrand) add( ¦ if (false) add( ¦ check-ui catches tests/ui/mark-brand.html
+mark-touch ¦ scripts/ui-mark.mjs ¦ if (stroke && gap > 1.5 && gap < 0.25 * stroke) ¦ if (false) ¦ check-ui catches tests/ui/mark-touch.html
+mark-small ¦ scripts/ui-mark.mjs ¦ if (least.h > small) add( ¦ if (false) add( ¦ check-ui catches tests/ui/mark-small.html
+allow ¦ scripts/ui-audit.mjs ¦ add("allow", e, ¦ void ("allow", e, ¦ check-ui catches tests/ui/allow-unreasoned.html
+covered ¦ scripts/ui-audit.mjs ¦ t.covered = t.lines.length > 0 && coveredAt(t.e, t.lines[0]); ¦ t.covered = false; ¦ check-ui passes tests/ui/covered.html
+no-chrome ¦ scripts/ui-audit.mjs ¦ process.exit(2); }; ¦ process.exit(0); }; ¦ check-ui without Chrome fails
+hook-edit ¦ scripts/claude-hook ¦ gates || exit 2 ¦ true ¦ claude-hook hands a board
+hook-stop ¦ scripts/claude-hook ¦ if [ "$event" = Stop ] || [ "$event" = SubagentStop ]; then ¦ if false; then ¦ the Stop hook blocks
+precommit-ui ¦ hooks/pre-commit ¦ xargs -0 nice -n 10 "$bin/check-ui" || exit 1 ¦ true ¦ pre-commit refuses a board that fails check-ui
+precommit-hooks ¦ hooks/pre-commit ¦ "$bin/check-hooks" || exit 1 ¦ true ¦ pre-commit refuses settings that drop the hooks
+check-hooks ¦ scripts/check-hooks ¦ for event in ("Stop", "SubagentStop"): ¦ for event in (): ¦ check-hooks finds edits and Stop unwired
+voice-everywhere ¦ scripts/voice-audit.py ¦ everywhere = word_re(EVERYWHERE + ([extra] if extra else [])) ¦ everywhere = word_re(["(?!)"]) ¦ check-voice finds "us"
+voice-czech ¦ scripts/voice-audit.py ¦ if lang == "cs": ¦ if False: ¦ check-voice finds "Upozorníme"
+voice-path-lang ¦ scripts/voice-audit.py ¦ fixed = path_lang(path) ¦ fixed = None ¦ check-voice finds Localizable.strings:1 [cs]
+voice-block-lang ¦ scripts/voice-audit.py ¦ stack.append((depth, m.group(1))) ¦ pass ¦ check-voice finds strings.ts:2 [cs]
+voice-keys ¦ scripts/voice-audit.py ¦ continue  # a key ¦ pass  # a key ¦ check-voice passes copy that speaks as the app
+voice-comments ¦ scripts/voice-audit.py ¦ if text.startswith("//", i) or (hash_comments and c == "#"): ¦ if False: ¦ check-voice passes copy that speaks as the app
+voice-json-keys ¦ scripts/voice-audit.py ¦ if k in ("comment", "@@locale") or k.startswith("@"): ¦ if False: ¦ check-voice reads only strings people see
+voice-allow ¦ scripts/voice-audit.py ¦ if len(reason.split()) < 3: ¦ if False: ¦ check-voice finds without its reason
+hook-voice ¦ scripts/claude-hook ¦ gate voice voice_files check-voice || failed=1 ¦ true ¦ claude-hook hands we in the copy back to the agent
+precommit-voice ¦ hooks/pre-commit ¦ xargs -0 "$bin/check-voice" || exit 1 ¦ true ¦ pre-commit refuses copy that says we
+lint-voice ¦ scripts/lint ¦ step "the product's voice" "$PRACTICES_BIN/check-voice" ¦ true ¦ lint fails while the copy says we
+check-size ¦ scripts/check-size ¦ elif [ "$code" -gt "$limit" ]; then ¦ elif false; then ¦ 701 lines fail
+check-unsafe ¦ scripts/check-unsafe ¦ if (line ~ /(^|[^A-Za-z0-9_])unsafe([^A-Za-z0-9_]|$)/) print ¦ if (0) print ¦ unsafe code fails
+check-private ¦ scripts/check-private ¦ 0) found=1 ;; ¦ 0) ;; ¦ a new file naming a client fails
+check-commit-msg ¦ scripts/check-commit-msg ¦ ^[A-Za-z-]+-session(-id)?:|claude\.ai/code/session_|session_[0-9A-Za-z]{16,} ¦ ^never matches$ ¦ a session trailer fails
+ROWS
+)
+
+row() { # row LINE: the five fields, tab-separated
+    local line=$1 sep=' ¦ ' name file from to want
+    name=${line%%"$sep"*}; line=${line#*"$sep"}
+    file=${line%%"$sep"*}; line=${line#*"$sep"}
+    from=${line%%"$sep"*}; line=${line#*"$sep"}
+    to=${line%%"$sep"*}; want=${line#*"$sep"}
+    printf '%s\t%s\t%s\t%s\t%s\n' "$name" "$file" "$from" "$to" "$want"
+}
+
+# The kit as it is when the run starts, uncommitted changes and .git
+# included. Every copy comes from this snapshot: an edit made to the
+# repository while the mutants run must not leak into some of them.
+mkdir -p "$work/snap" && (cd "$here" && tar cf - .) | (cd "$work/snap" && tar xf -)
+copy() { # copy DIR: a fresh copy of the snapshot
+    mkdir -p "$1" && (cd "$work/snap" && tar cf - .) | (cd "$1" && tar xf -)
+}
+
+# 1. The baseline: an unmutated copy passes. Otherwise every "kill" below means nothing.
+copy "$work/base"
+if ! out=$("$work/base/tests/run" 2>&1); then
+    printf 'tests/mutate: the unmutated copy fails tests/run, so no mutant can be judged:\n%s\n' "$out"
+    exit 1
+fi
+echo "baseline: the unmutated copy passes tests/run"
+
+run_one() { # run_one NAME FILE FROM TO WANT: writes $work/NAME.result
+    local name=$1 file=$2 from=$3 to=$4 want=$5 dir=$work/m-$1 out status
+    copy "$dir"
+    if ! FROM=$from TO=$to perl -0pi -e '$n = s/\Q$ENV{FROM}\E/$ENV{TO}/g; END { exit($n ? 0 : 3) }' "$dir/$file"; then
+        echo "no-op: \"$from\" isn't in $file (the mutant would change nothing)" >"$work/$name.result"
+        return
+    fi
+    # A mutant that doesn't parse fails every case near it: that proves nothing.
+    case $file in
+    *.mjs) node --check "$dir/$file" >/dev/null 2>&1 ;;
+    *.py) python3 -c 'import ast, sys; ast.parse(open(sys.argv[1]).read())' "$dir/$file" >/dev/null 2>&1 ;;
+    *) bash -n "$dir/$file" >/dev/null 2>&1 ;;
+    esac || {
+        echo "invalid: the mutated $file doesn't parse, so a failure would prove nothing" >"$work/$name.result"
+        return
+    }
+    out=$("$dir/tests/run" 2>&1)
+    status=$?
+    if [ $status = 0 ]; then
+        echo "SURVIVED: tests/run passes with $file broken" >"$work/$name.result"
+    elif printf '%s\n' "$out" | grep -F 'FAIL: ' | grep -qF -- "$want"; then
+        echo "killed" >"$work/$name.result"
+    else
+        printf 'killed for another reason (no FAIL line with "%s"):\n%s\n' "$want" "$(printf '%s\n' "$out" | grep -m 5 'FAIL\|error' || printf '%s\n' "$out" | tail -n 5)" >"$work/$name.result"
+    fi
+    rm -rf "$dir"
+}
+
+# 2. Every mutant (or the ones named), JOBS at a time.
+picked=0 n=0
+while IFS= read -r line; do
+    [ -n "$line" ] || continue
+    IFS=$'\t' read -r name file from to want <<<"$(row "$line")"
+    if [ -z "$name" ] || [ -z "$file" ] || [ -z "$from" ] || [ -z "$to" ] || [ -z "$want" ] || [ ! -f "$here/$file" ]; then
+        echo "tests/mutate: a malformed row (five fields, split at \" ¦ \", on a file that exists): $line"
+        exit 1
+    fi
+    if [ $# -gt 0 ]; then
+        case " $* " in *" $name "*) ;; *) continue ;; esac
+    fi
+    picked=$((picked + 1))
+    run_one "$name" "$file" "$from" "$to" "$want" &
+    n=$((n + 1))
+    if [ $n -ge "$jobs" ]; then
+        wait
+        n=0
+    fi
+done <<EOF
+$mutants
+EOF
+wait
+[ $picked -gt 0 ] || { echo "tests/mutate: no mutant named $*"; exit 1; }
+
+failed=0
+for r in "$work"/*.result; do
+    name=$(basename "$r" .result)
+    verdict=$(cat "$r")
+    case $verdict in
+    killed) printf '  killed    %s\n' "$name" ;;
+    *) failed=$((failed + 1)); printf '  NOT KILLED %s: %s\n' "$name" "$verdict" ;;
+    esac
+done
+echo "$picked mutants, $((picked - failed)) killed, $failed not"
+[ $failed = 0 ]

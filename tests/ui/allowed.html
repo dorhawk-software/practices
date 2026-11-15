@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>allowed</title>
+<style>
+body{font:14px/1.4 Helvetica,Arial,sans-serif;background:#fff;color:#222;margin:24px}
+.card{background:#f2f2f2;padding:16px;width:320px;border-radius:8px}
+.row{display:flex;gap:8px;margin-top:16px}
+button{white-space:nowrap;font:inherit;color:#222;background:#e2e2e2;border:0;border-radius:6px;padding:6px 12px;display:inline-flex;gap:6px;align-items:center}
+button svg{width:12px;height:12px}
+.cut{overflow:hidden;height:20px}
+</style></head>
+<body>
+<div class="card"><div class="cut" data-allow="clip: a list that scrolls, drawn mid-scroll">The first line shows. The rest of this sentence is hidden by a box that is too short for it.</div></div>
+<div class="card" data-allow="outcome: drawn as macOS draws its alert"><p>“Example” would like to access files in your Documents folder.</p><div class="row"><button><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#222"/></svg>Don't Allow</button><button><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#222"/></svg>OK</button></div></div>
+<!-- a mark only ever shown large: allowed, with its reason -->
+<svg data-mark="poster" data-allow="mark: only ever shown on the launch poster" width="200" height="60" viewBox="0 0 200 60"><g fill="none" stroke="#222" stroke-width="9" stroke-linecap="round"><path d="M14 20V52M40 20V52"/></g><ellipse data-mark-brand cx="172" cy="34" rx="13" ry="18" fill="#4A90C8"/></svg>
+</body></html>

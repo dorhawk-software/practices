@@ -21,3 +21,23 @@
 
 # Files left out of the coverage share (regex on paths from the root).
 #COVERAGE_EXCLUDE='^crates/app/src/(scenarios/|journey_)'
+
+# The design boards check-ui renders (git pathspecs); empty: none.
+#UI_BOARDS=':(glob)design/**/*.html'
+# Window widths in px, and the colour schemes, each board is checked at.
+#UI_WIDTHS='1100 1440'
+#UI_THEMES='light dark'
+# What counts as a click target (CSS selector), and the state classes
+# whose removal must not move content.
+#UI_TARGETS='button, a[href], [role=button], input, select, textarea, summary'
+#UI_STATES='focus hover active pressed'
+# Chrome or Chromium to render with; empty: found on its own.
+#UI_CHROME=''
+
+# The files that hold the copy people see, for check-voice (git pathspecs);
+# the defaults cover common strings files. Add the code files that hold
+# copy too, and leave out quoted third-party text (licences):
+#VOICE_FILES=':(glob)src/i18n/** :(glob)src/content/faq.ts'
+# More "we" words to flag, as a regex alternation, for a language the
+# check doesn't know (it knows English and Czech):
+#VOICE_WORDS='wir|uns|unser(?:e|er|en|em)?'

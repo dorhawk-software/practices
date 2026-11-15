@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # This repository's own gate: CI's static checks (shellcheck on every
-# script, every relative link, README's map, the plugin's version), then
+# script, every relative link, README's map, the plugin's version, every
+# rule classified in ENFORCEMENT.md), then
 # the kit's tests. Quiet when it passes.
 # The pre-commit hook in .githooks runs it (once per clone:
 # `git config core.hooksPath .githooks`); CI's static job calls
@@ -22,12 +23,13 @@ run() {
     fi
 }
 run shellcheck -x -P SCRIPTDIR scripts/lib.sh scripts/lint scripts/check-* scripts/claude-hook \
-    scripts/disk-guard scripts/install-hooks hooks/* bin/install tests/run tests/example tests/links tests/check tests/readme tests/versions \
+    scripts/disk-guard scripts/install-hooks hooks/* bin/install tests/run tests/example tests/links tests/check tests/readme tests/versions tests/enforcement tests/mutate \
     .githooks/pre-commit
 run shellcheck -s sh scripts/prune-caches scripts/sweep-target
 run tests/links
 run tests/readme
 run tests/versions
+run tests/enforcement
 if [ "${1:-}" != static ]; then
     run tests/run
 fi

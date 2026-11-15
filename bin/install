@@ -17,8 +17,10 @@
 #   .practices/coverage-floors, and with --templates clippy.toml,
 #   deny.toml, rust-toolchain.toml, .github/dependabot.yml; in any
 #   project with --templates, .claude/settings.json (the Claude Code
-#   hook). CLAUDE.md is the project's too: install only adds the line
-#   that loads .practices/rules.md, once.
+#   hooks). On every run, settings an older kit made and nobody changed
+#   are updated; changed ones are left alone, with what to add.
+#   CLAUDE.md is the project's too: install only adds the line that
+#   loads .practices/rules.md, once.
 # Cargo.toml's lints it can't merge safely: it prints what to paste.
 #
 # Any project gets the language-neutral part: the privacy check, the
@@ -88,9 +90,11 @@ EOF
     digest common/agent-working-rules.md common/commits.md common/changelog.md \
         common/not-now.md common/testing.md common/claude-md.md \
         common/privacy-public-repos.md common/releases.md common/ci-caching.md \
-        common/gates.md common/crash-reports.md
+        common/gates.md common/crash-reports.md common/it-just-works.md \
+        common/voice.md
     digest ui/design-before-build.md ui/identity-pass.md ui/visual-craft.md \
-        ui/keyboard-shortcuts.md ui/window-buttons.md
+        ui/keyboard-shortcuts.md ui/window-buttons.md ui/drag-and-drop.md \
+        ui/pickers.md ui/consent.md
     if [ -f "$project/Cargo.toml" ]; then
         digest rust/conventions.md rust/lints.md rust/coverage.md
         if grep -rqs 'gpui' "$project/Cargo.toml"; then digest rust/gpui.md; fi
@@ -154,6 +158,21 @@ fi
 
 if [ -n "$templates" ]; then
     own templates/claude-settings.json .claude/settings.json
+fi
+# The Claude Code hooks. Settings still exactly as an older kit made them
+# get the current template (1.6.0 added edits, Stop and SubagentStop);
+# settings the project changed are its own: install says what to add,
+# and the pre-commit hook (check-hooks) refuses commits until it's there.
+settings=$project/.claude/settings.json
+if [ -f "$settings" ] && [ "$(git hash-object "$settings")" = d8ed312ba7d86cd9d6a1ccecddac1451075433bf ]; then
+    cp "$here/templates/claude-settings.json" "$settings"
+    echo "updated: .claude/settings.json (claude-hook now also runs after edits and when a turn ends)"
+elif [ -f "$settings" ] && ! (cd "$project" && "$kit/bin/check-hooks" >/dev/null 2>&1); then
+    echo
+    echo "Your .claude/settings.json doesn't run claude-hook everywhere it must:"
+    (cd "$project" && "$kit/bin/check-hooks" | grep '^  - ') || true
+    echo "Add the entries from this template (commits are refused until they're there):"
+    cat "$here/templates/claude-settings.json"
 fi
 if [ -n "$templates" ] && [ -z "$rust" ]; then
     echo "no Cargo.toml: no Rust templates copied"
