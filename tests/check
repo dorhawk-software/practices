@@ -26,6 +26,16 @@ run shellcheck -x -P SCRIPTDIR scripts/lib.sh scripts/lint scripts/check-* scrip
     scripts/disk-guard scripts/install-hooks hooks/* bin/install tests/run tests/example tests/links tests/check tests/readme tests/versions tests/enforcement tests/mutate \
     .githooks/pre-commit
 run shellcheck -s sh scripts/prune-caches scripts/sweep-target
+# macOS runs the kit's scripts with its own /bin/bash 3.2, which parses less
+# than the bash 5 a developer has (2026-11-15: a heredoc inside $( ) that
+# bash 5 read broke tests/mutate in CI). Parse each script with it too.
+if [ -x /bin/bash ] && /bin/bash -c '[ "${BASH_VERSINFO[0]}" -lt 4 ]'; then
+    for f in scripts/lib.sh scripts/lint scripts/check-* scripts/claude-hook scripts/disk-guard scripts/install-hooks \
+        hooks/* bin/install tests/run tests/example tests/links tests/check tests/readme tests/versions tests/enforcement \
+        tests/mutate .githooks/pre-commit; do
+        head -1 "$f" | grep -q bash && run /bin/bash -n "$f"
+    done
+fi
 run tests/links
 run tests/readme
 run tests/versions

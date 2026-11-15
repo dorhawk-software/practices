@@ -29,8 +29,10 @@ jobs=${JOBS:-4}
 # Fields are split at " ¦ ", which no script contains: an earlier "|" split
 # cut rows whose code holds "||" and broke the mutated script instead.
 # A quoted heredoc: no character in a row (an apostrophe, a $) can end it
-# or expand. A single-quoted string ended at the first "product's".
-mutants=$(cat <<'ROWS'
+# or expand. A single-quoted string ended at the first "product's". Read
+# with `read`, not `$(cat <<…)`: macOS's bash 3.2 matches the parentheses
+# inside a command substitution's heredoc, and a row's "add(" broke it.
+IFS= read -r -d '' mutants <<'ROWS' || true
 contain ¦ scripts/ui-audit.mjs ¦ add("contain", e, ¦ void ("contain", e, ¦ check-ui catches tests/ui/contain.html
 align ¦ scripts/ui-audit.mjs ¦ add("align", row, ¦ void ("align", row, ¦ check-ui catches tests/ui/align.html
 clip ¦ scripts/ui-audit.mjs ¦ add("clip", e, ¦ void ("clip", e, ¦ check-ui catches tests/ui/clip.html
@@ -76,7 +78,6 @@ check-unsafe ¦ scripts/check-unsafe ¦ if (line ~ /(^|[^A-Za-z0-9_])unsafe([^A-
 check-private ¦ scripts/check-private ¦ 0) found=1 ;; ¦ 0) ;; ¦ a new file naming a client fails
 check-commit-msg ¦ scripts/check-commit-msg ¦ ^[A-Za-z-]+-session(-id)?:|claude\.ai/code/session_|session_[0-9A-Za-z]{16,} ¦ ^never matches$ ¦ a session trailer fails
 ROWS
-)
 
 row() { # row LINE: the five fields, tab-separated
     local line=$1 sep=' ¦ ' name file from to want
