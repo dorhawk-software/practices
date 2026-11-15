@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>text-size-scaled</title>
+<!-- 14 px type in a preview scaled to a half: 7 px on the screen. Until 1.6.1 the check read the
+     computed 14 px and passed it. -->
+<style>
+body{font:14px/1.4 Helvetica,Arial,sans-serif;background:#fff;color:#222;margin:24px}
+.thumb{transform:scale(.5);transform-origin:0 0;width:320px;background:#f2f2f2;padding:16px}
+</style></head>
+<body>
+<div class="thumb"><p>The whole letter, shown as a thumbnail someone still reads.</p></div>
+</body></html>

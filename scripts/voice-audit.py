@@ -28,13 +28,36 @@ EVERYWHERE = [
 # Czech only: "my" (in English, the person's own word) and the first
 # person plural verb, a word ending in -me ("odešleme", "upozorníme").
 CZECH = [r"[Mm]y", r"[^\W\d_]{2,}me"]
+# Words ending in -me that are no Czech verb: a Czech "we" ends in -eme,
+# -íme, -áme, -jme, -ďme, -ěme..., never in -ome, -ame, -ime, -ume or -yme,
+# which are English ("Chrome", "Home", "Same", "Time"); and these -eme ones.
+NOT_CZECH_VERB = re.compile(r"(?:ome|ame|ime|ume|yme)$|^(?:theme|scheme|extreme|supreme|meme|acme)$", re.I)
+QUOTES_OPEN = "\"“„'‘‚«‹"
+QUOTES_CLOSE = "\"”“'’‘»›"
 
 CODE = (".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".swift", ".kt", ".kts", ".java", ".rs", ".dart", ".py", ".go", ".cs")
 JSONISH = (".json", ".arb", ".xcstrings")
 
 
 def word_re(words):
-    return re.compile(r"(?<![\w'’-])(" + "|".join(words) + r")(?![\w'’-])")
+    # Any case: "WE NEVER SELL IT" says we too (1.6.1; it read only "We" and "we").
+    return re.compile(r"(?<![\w'’-])(" + "|".join(words) + r")(?![\w'’-])", re.IGNORECASE)
+
+
+def mention(said, m):
+    """The word in quotes, as a word ("never write \u201cwe\u201d"): a mention, not the product speaking."""
+    a, b = m.start(1), m.end(1)
+    return a > 0 and b < len(said) and said[a - 1] in QUOTES_OPEN and said[b] in QUOTES_CLOSE
+
+
+def square(said, m):
+    """Czech "nám." for náměstí in an address ("Mariánské nám. 2", "nám. Míru 5"), not "to us"."""
+    a, b = m.start(1), m.end(1)
+    if m.group(1).lower() != "nám" or said[b:b + 1] != ".":
+        return False
+    after = said[b + 1:]
+    return bool(re.match(r"\s*\d", after) or re.match(r"\s+[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]\w*\s+\d", after)
+                or re.search(r"\w(?:é|ého)\s+$", said[:a]))
 
 
 def path_lang(path):
@@ -98,7 +121,8 @@ def from_code(text, path):
                 j += 1
             i = j + 1
             rest = text[i:i + 40].lstrip()
-            if rest.startswith(":") and not rest.startswith("::"):
+            ternary = text[:start].rstrip().endswith("?")  # `k ? 'We…' : …` is copy, not a key
+            if rest.startswith(":") and not rest.startswith("::") and not ternary:
                 continue  # a key
             before = text[text.rfind("\n", 0, start) + 1:start]
             m = re.search(r"(?:^|[^\w])[\"']?(" + LANGS + r")[\"']?\s*:\s*$", before)
@@ -106,6 +130,26 @@ def from_code(text, path):
             out.append((line_at(text, start), "".join(buf), lang))
             continue
         i += 1
+    return out
+
+
+# Code between two tags, not text: operators, a comment, the end of a ternary's branch (`) : (`).
+JSX_CODE = re.compile(r"&&|\|\||;|=>|[=!<>]=|\breturn\b|//|/\*|\)\s*[:?]\s*\(")
+
+
+def from_jsx(text, path):
+    """Text between JSX tags (`<Text>We sent it.</Text>`): copy that is no string literal."""
+    out = []
+    for m in re.finditer(r"(?<=[\w\"'}/])>([^<>{}]*)<(?=[A-Za-z/>])", text):
+        body = m.group(1)
+        line_start = text.rfind("\n", 0, m.start()) + 1
+        lead = text[line_start:m.start()].lstrip()
+        if not re.search(r"[^\W\d_]{2,}", body) or JSX_CODE.search(body) or lead.startswith(("//", "*", "/*")):
+            continue
+        opened = text.rfind("<", 0, m.start())  # the tag this > closes: `Array<number>` is a type, not a tag
+        if opened > 0 and (text[opened - 1].isalnum() or text[opened - 1] == "_") and text[opened + 1:opened + 2] != "/":
+            continue
+        out.append((line_at(text, m.start(1) + len(body) - len(body.lstrip())), " ".join(body.split()), None))
     return out
 
 
@@ -157,6 +201,7 @@ def from_lines(text, path):
                 continue
             if fenced:
                 continue
+            s = re.sub(r"`[^`]*`|<!--.*?-->", " ", s)  # inline code and comments aren't read
         out.append((ln, s, None))
     return out
 
@@ -178,6 +223,8 @@ def main(argv):
                 strings = from_json(text, path)
             elif path.endswith(CODE):
                 strings = from_code(text, path)
+                if path.endswith((".tsx", ".jsx")):
+                    strings += from_jsx(text, path)
             else:
                 strings = from_lines(text, path)
         except (OSError, UnicodeDecodeError, ValueError) as e:
@@ -188,9 +235,12 @@ def main(argv):
         for ln, s, lang in strings:
             lang = fixed or lang
             said = re.sub(r"\{[^{}]*\}|%\d*\$?[@sdif]|\$\w+", " ", s)  # placeholders aren't words
-            hits = [m.group(1) for m in everywhere.finditer(said) if m.group(1) != "US"]
+            said = re.sub(r"\b[a-z][a-z0-9+.-]*://\S+|\bwww\.\S+", " ", said)  # nor web addresses (/us/)
+            hits = [m.group(1) for m in everywhere.finditer(said)
+                    if m.group(1) != "US" and not mention(said, m) and not square(said, m)]
             if lang == "cs":
-                hits += [m.group(1) for m in czech.finditer(said)]
+                hits += [m.group(1) for m in czech.finditer(said)
+                         if not mention(said, m) and not NOT_CZECH_VERB.search(m.group(1))]
             if not hits:
                 continue
             marks = [m for m in (ALLOW.search(x) for x in lines[max(0, ln - 2):ln]) if m]

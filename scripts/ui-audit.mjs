@@ -125,6 +125,9 @@ function audit(cfg) {
   };
   const surfaceOf = (e) => { for (let a = e.parentElement; a && a !== document.body && a !== document.documentElement; a = a.parentElement) if (draws(a)) return a; return null; };
   const scrolls = (a) => /auto|scroll/.test(cs(a).overflowX + cs(a).overflowY);
+  // A surface that clips hides what runs past it: clip reports that, once, and one mark allows it (1.6.1;
+  // a phone drawn mid-scroll and marked for clip was still reported by contain).
+  const clips = (a) => /hidden|clip/.test(cs(a).overflowX + cs(a).overflowY);
   const outside = (r, p) => ({ left: p.left - r.left, right: r.right - p.right, top: p.top - r.top, bottom: r.bottom - p.bottom });
 
   const all = [...document.body.querySelectorAll("*")].filter((e) => !isSvgInner(e) && visible(e));
@@ -133,7 +136,7 @@ function audit(cfg) {
   const spills = new Set();
   for (const e of all) {
     const s = surfaceOf(e);
-    if (!s || scrolls(s)) continue;
+    if (!s || scrolls(s) || clips(s)) continue;
     const d = outside(e.getBoundingClientRect(), s.getBoundingClientRect());
     const sides = Object.entries(d).filter(([, v]) => v > 0.5);
     if (!sides.length) continue;
@@ -178,10 +181,16 @@ function audit(cfg) {
   for (const t of texts) t.covered = t.lines.length > 0 && coveredAt(t.e, t.lines[0]);
   window.scrollTo(0, 0);
 
+  // How much a transform (scale) shrinks an element on the screen: its drawn box over its laid-out one.
+  const drawnScale = (e) => {
+    const r = e.getBoundingClientRect(), w = e.offsetWidth, h = e.offsetHeight;
+    return w > 0 && h > 0 ? Math.min(r.width / w, r.height / h, 1) : 1;
+  };
   // text-size: nothing anyone reads under the floor (11 px).
   for (const { e } of texts) {
     let size = parseFloat(cs(e).fontSize);
     if (e instanceof SVGElement) { const m = e.getScreenCTM && e.getScreenCTM(); if (m) size *= Math.hypot(m.a, m.b); }
+    else size *= drawnScale(e); // a scaled preview draws its type smaller than its font-size says (1.6.1)
     if (size < cfg.minText - 0.05 && !allowNode(e, "text-size")) add("text-size", e, `"${words(e)}" is ${px(size)} px, under ${cfg.minText}.`, label(e) + "|" + px(size));
   }
 
@@ -215,6 +224,9 @@ function audit(cfg) {
   // Targets: separate things a person clicks.
   const targets = [...document.querySelectorAll(cfg.targets)].filter((e) => visible(e) && !e.closest("[aria-hidden=true]"));
   const outer = targets.filter((e) => !targets.some((o) => o !== e && o.contains(e)));
+  // A segmented control says so by its role: its options are one control (1.6.1).
+  const SEGMENTED = "[role=tablist], [role=radiogroup]";
+  const segment = (e) => e.closest(SEGMENTED);
 
   // align: a row of buttons follows its column (ui/visual-craft.md, "Buttons follow the column").
   const rowsSeen = new Set();
@@ -224,19 +236,26 @@ function audit(cfg) {
     rowsSeen.add(row);
     const kids = [...row.children].filter(visible);
     if (!kids.every((k) => outer.includes(k)) || [...row.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue; // a row of buttons, nothing else
-    const ccs = cs(col);
-    if (/flex|grid/.test(ccs.display) && !/column/.test(ccs.flexDirection)) continue; // beside the text, not under it
-    const text = [...col.children].filter((c) => c !== row && visible(c) && words(c) && !outer.includes(c) && !c.querySelector(cfg.targets));
-    if (!text.length || allowNode(row, "align")) continue; // no text to line up with
+    // A bar of its own (it draws a fill or an edge) or a row placed by hand (absolute) is its buttons'
+    // column: they follow its padding (1.6.1: every phone board's bottom bar, padded like the screen's
+    // text, read as "16 px in" from the phone's frame).
+    const own = draws(row) || /absolute|fixed/.test(cs(row).position);
+    const ccs = cs(own ? row : col);
+    if (!own && /flex|grid/.test(ccs.display) && !/column/.test(ccs.flexDirection)) continue; // beside the text, not under it
+    const text = own ? [] : [...col.children].filter((c) => c !== row && visible(c) && words(c) && !outer.includes(c) && !c.querySelector(cfg.targets));
+    if ((!own && !text.length) || allowNode(row, "align")) continue; // no text to line up with
     const rs = kids.map((k) => k.getBoundingClientRect());
     const left = Math.min(...rs.map((r) => r.left)), right = Math.max(...rs.map((r) => r.right));
-    const cr = col.getBoundingClientRect();
+    const cr = (own ? row : col).getBoundingClientRect();
     const cl = cr.left + parseFloat(ccs.paddingLeft) + parseFloat(ccs.borderLeftWidth), cr2 = cr.right - parseFloat(ccs.paddingRight) - parseFloat(ccs.borderRightWidth);
     const rtl = ccs.direction === "rtl";
     const fromLead = rtl ? cr2 - right : left - cl, fromTrail = rtl ? left - cl : cr2 - right;
     const atLead = Math.abs(fromLead) <= 2, atTrail = Math.abs(fromTrail) <= 2, n = kids.length;
     const names = kids.map((k) => `"${words(k)}"`).join(", ");
-    if (text.every((c) => cs(c).textAlign === "center")) {
+    // Centred by text-align, or by a flex column that centres its items (1.6.1: a lock screen's
+    // centred heading and its button 24 px in from each side read as off the leading edge).
+    const centred = (c) => { const t = cs(c); return t.textAlign === "center" || (/flex/.test(t.display) && /column/.test(t.flexDirection) && t.alignItems === "center"); };
+    if (text.length && text.every(centred)) {
       const off = (left + right) / 2 - (cl + cr2) / 2;
       if (!(atLead && atTrail) && Math.abs(off) > 3) add("align", row, `the buttons ${names} sit ${px(Math.abs(off))} px off the centre of a centred column.`);
     } else if (n === 1 && atLead && atTrail && cr2 - cl > 480) {
@@ -256,6 +275,7 @@ function audit(cfg) {
     const dx = Math.max(q.left - p.right, p.left - q.right), dy = Math.max(q.top - p.bottom, p.top - q.bottom);
     const d = Math.max(dx, dy);
     if (d >= cfg.gap - 0.05) continue;
+    if (segment(a) && segment(a) === segment(b)) continue; // options of one segmented control
     const na = allowNode(a, "gap"), nb = allowNode(b, "gap");
     if ((na && na.contains(b)) || (nb && nb.contains(a))) continue;
     add("gap", a, `${label(a)} "${words(a)}" and ${label(b)} "${words(b)}" are ${px(d)} px apart${d < 0 ? " (they overlap)" : ""}; separate targets need ${cfg.gap}.`, label(a) + "|" + words(a) + "|" + words(b));
@@ -303,12 +323,14 @@ function audit(cfg) {
   // icon: every main button carries one from the family.
   for (const e of outer) {
     if (!/^(BUTTON)$/.test(e.tagName) && !e.matches("[role=button]")) continue;
-    if (!words(e) || e.querySelector("svg, img, [class*=icon]") || allowNode(e, "icon")) continue;
+    if (!words(e) || e.querySelector("svg, img, [class*=icon]") || segment(e) || allowNode(e, "icon")) continue; // a tab is no main button
     add("icon", e, `the button "${words(e)}" has no icon.`);
   }
 
   // outcome: a button's label says what happens, never a word that fits either answer.
-  const vague = /^(cancel|ok|okay|yes|no|confirm|submit|accept|decline|proceed|abort|dismiss)$/i;
+  // English, and Czech (1.6.1: a Czech board's "Zrušit" and "Ano" passed): zrušit and storno (cancel), ano, ne,
+  // potvrdit (confirm), přijmout (accept), odmítnout (decline), přerušit (abort).
+  const vague = /^(cancel|ok|okay|yes|no|confirm|submit|accept|decline|proceed|abort|dismiss|zrušit|storno|ano|ne|potvrdit|přijmout|odmítnout|přerušit)$/iu;
   for (const e of outer) {
     if (!/^(BUTTON)$/.test(e.tagName) && !e.matches("[role=button], input[type=button], input[type=submit]")) continue;
     const said = (e.tagName === "INPUT" ? e.value : words(e)).replace(/[.!…]+$/, "").trim();
@@ -321,9 +343,12 @@ function audit(cfg) {
   const stateRe = new RegExp(`^(${cfg.states.split(/\s+/).join("|")})$`);
   for (const e of outer) {
     if (allowNode(e, "same-look") || (e.tagName === "A" && !(typeof e.className === "string" && e.className.trim()))) continue; // a plain link takes its sentence's size
-    const key = e.tagName + "." + (typeof e.className === "string" ? e.className.trim().split(/\s+/).filter((c) => c && !stateRe.test(c)).sort().join(".") : "");
+    // A button with no words (an icon button) is its own kind, and its type is nobody's to read (1.6.1:
+    // a header's back arrow was "another look" of the labelled button beside it).
+    const wordless = !words(e);
+    const key = e.tagName + "." + (typeof e.className === "string" ? e.className.trim().split(/\s+/).filter((c) => c && !stateRe.test(c)).sort().join(".") : "") + (wordless ? " (icon only)" : "") + (e.getAttribute("role") ? `[role=${e.getAttribute("role")}]` : ""); // a tab is a kind of its own
     const s = cs(e);
-    const look = [Math.round(e.getBoundingClientRect().height), s.fontSize, s.fontWeight, s.borderTopLeftRadius, s.paddingTop].join(" / ");
+    const look = [Math.round(e.getBoundingClientRect().height), wordless ? "-" : s.fontSize, wordless ? "-" : s.fontWeight, s.borderTopLeftRadius, s.paddingTop].join(" / ");
     if (!groups.has(key)) groups.set(key, new Map());
     const g = groups.get(key);
     if (!g.has(look)) g.set(look, e);

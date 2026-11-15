@@ -35,8 +35,9 @@
 #UI_CHROME=''
 
 # The files that hold the copy people see, for check-voice (git pathspecs);
-# the defaults cover common strings files. Add the code files that hold
-# copy too, and leave out quoted third-party text (licences):
+# the defaults cover common strings files, the changelog and a content/
+# folder. Add the code files that hold copy too, and leave out quoted
+# third-party text (licences):
 #VOICE_FILES=':(glob)src/i18n/** :(glob)src/content/faq.ts'
 # More "we" words to flag, as a regex alternation, for a language the
 # check doesn't know (it knows English and Czech):

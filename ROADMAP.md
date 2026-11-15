@@ -221,8 +221,9 @@ rows are this list's source; the most valuable first.
     wiping a simulator or emulator that isn't on the demo list.
   - [ ] Releases (common/releases.md, mobile/releases.md) and mobile CI
     have no script in the kit yet: phase 2's release script carries them.
-  - [ ] check-voice reads JSX text between tags and the copy on design
-    boards, and knows more languages' we-words than English and Czech.
+  - [x] check-voice reads JSX text between tags (1.6.1).
+  - [ ] check-voice reads the copy on design boards, and knows more
+    languages' we-words than English and Czech.
   - [ ] tests/mutate lists the kit's checks and fails when one has no
     mutant ("A test of a check is proven by breaking the check").
 - **Rust:**

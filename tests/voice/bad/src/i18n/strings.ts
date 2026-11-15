@@ -10,3 +10,5 @@ const en: Record<string, string> = {
 const faq = { privacy: { cs: 'Data neprodáváme.', en: 'Our servers keep nothing.' } };
 // practices-allow voice: quote
 const quoted = 'We said so';
+const banner = { en: 'WE NEVER SELL IT' };
+const pick = (keep: boolean) => (keep ? 'We keep it for you.' : 'Kept.');

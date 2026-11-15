@@ -173,7 +173,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 
 | Rule | Status | Enforced by | Still to check |
 | --- | --- | --- | --- |
-| The product speaks as itself, never as "we" | partial | check-voice: "we" in English and Czech (pronouns, jsme/budeme, the -me verb), in string literals, JSON, .strings, .xcstrings, .ftl, .po, strings.xml and store text (claude-hook after edits and on Stop, pre-commit, lint) | "I" is review (the person's own words use it); JSX text outside string literals and the copy on design boards aren't read; other languages only through VOICE_WORDS. |
+| The product speaks as itself, never as "we" | partial | check-voice: "we" in English and Czech, in any case (pronouns, jsme/budeme, the -me verb), in string literals, ternary branches, JSX text, JSON, .strings, .xcstrings, .ftl, .po, strings.xml, store text, the changelog and content/ (claude-hook after edits and on Stop, pre-commit, lint) | "I" is review (the person's own words use it); the copy on design boards isn't read; other languages only through VOICE_WORDS. |
 
 ## UI design (ui/)
 
@@ -263,7 +263,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | A counting mark keeps one scale | todo | - | check-ui: every element with data-count-unit has the same size and centre-to-centre pitch per unit across all boards. |
 | Decoration never half-hides what you read or click | partial | check-ui contrast against the pixels behind text, drawings included; covered text skipped (claude-hook, Stop, pre-commit) | A row or control partly covered by a drawing in front of it (elementsFromPoint across its box). |
 | Nothing anyone reads under 11 px | gate | check-ui text-size, SVG text at its drawn size; glyphs in shapes marked data-allow (claude-hook, Stop, pre-commit) | - |
-| One anatomy per job | partial | check-ui same-look: like targets (same tag and classes) share height, type, radius and padding (claude-hook, Stop, pre-commit) | Non-target components (toasts, cards) by a declared component name. |
+| One anatomy per job | partial | check-ui same-look: like targets (same tag, classes and role; icon buttons apart) share height, type, radius and padding (claude-hook, Stop, pre-commit) | Non-target components (toasts, cards) by a declared component name. |
 | A choice changes everything it owns | partial | check-ui state: a focus, hover, active or pressed state never moves or resizes content; same-look (claude-hook, Stop, pre-commit) | Icon colour and dependent fields after a click: a test that clicks each option in a prototype. |
 | Show it in real context | todo | - | check-ui: every phone/desktop board contains the shared frame component with a data-source naming its kit, has a distinct dark render, a pseudo-locale variant, and no lorem/placeholder copy. |
 | Both safe areas belong to the frame | todo | - | check-ui: every phone board draws the home indicator, every target ends >=34+8 px above the frame bottom and below the status bar, and bottom sheets include the safe area in their padding. |
@@ -272,7 +272,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Motion with a reason | todo | - | check-ui: render with emulated prefers-reduced-motion and assert no running animations/transitions and that all checks still pass; infinite animations need data-allow; generic spinners (known spinner classes, rotating circle) are flagged. |
 | Nothing runs past its surface | gate | check-ui contain and clip, at every width and theme (claude-hook, Stop, pre-commit) | - |
 | Buttons follow the column | partial | check-ui align: a row of buttons starts at its column's leading edge, fills it, or is centred in a centred column; a lone button may sit at the trailing edge; a lone button never stretches across a surface wider than 480 px (claude-hook, Stop, pre-commit) | Whether a lone trailing button moves on (its wording) is review; equal widths in a full-width row aren't checked. |
-| Every button names its outcome | partial | check-ui outcome: no button labelled only Cancel, OK, Okay, Yes, No, Confirm, Submit, Accept, Decline, Proceed, Abort or Dismiss (claude-hook, Stop, pre-commit) | Whether a specific label says the outcome ("Keep the app" beside "Remove") is review. |
+| Every button names its outcome | partial | check-ui outcome: no button labelled only Cancel, OK, Okay, Yes, No, Confirm, Submit, Accept, Decline, Proceed, Abort or Dismiss, and their Czech words (claude-hook, Stop, pre-commit) | Whether a specific label says the outcome ("Keep the app" beside "Remove") is review. |
 
 ### [ui/window-buttons.md](ui/window-buttons.md)
 

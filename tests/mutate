@@ -65,6 +65,15 @@ mark-small ¦ scripts/ui-mark.mjs ¦ if (least.h > small) add( ¦ if (false) add
 allow ¦ scripts/ui-audit.mjs ¦ add("allow", e, ¦ void ("allow", e, ¦ check-ui catches tests/ui/allow-unreasoned.html
 covered ¦ scripts/ui-audit.mjs ¦ t.covered = t.lines.length > 0 && coveredAt(t.e, t.lines[0]); ¦ t.covered = false; ¦ check-ui passes tests/ui/covered.html
 no-chrome ¦ scripts/ui-audit.mjs ¦ process.exit(2); }; ¦ process.exit(0); }; ¦ check-ui without Chrome fails
+contain-clips ¦ scripts/ui-audit.mjs ¦ if (!s || scrolls(s) || clips(s)) continue; ¦ if (!s || scrolls(s)) continue; ¦ check-ui passes tests/ui/skips.html
+gap-segment ¦ scripts/ui-audit.mjs ¦ if (segment(a) && segment(a) === segment(b)) continue; ¦ if (false) continue; ¦ check-ui passes tests/ui/skips.html
+icon-segment ¦ scripts/ui-audit.mjs ¦ || segment(e) || allowNode(e, "icon") ¦ || allowNode(e, "icon") ¦ check-ui passes tests/ui/skips.html
+align-flex-centre ¦ scripts/ui-audit.mjs ¦ if (text.length && text.every(centred)) { ¦ if (text.length && text.every((c) => cs(c).textAlign === "center")) { ¦ check-ui passes tests/ui/skips.html
+align-own-bar ¦ scripts/ui-audit.mjs ¦ const own = draws(row) || /absolute|fixed/.test(cs(row).position); ¦ const own = false; ¦ check-ui passes tests/ui/skips.html
+text-size-scaled ¦ scripts/ui-audit.mjs ¦ else size *= drawnScale(e); ¦ else size *= 1; ¦ check-ui catches tests/ui/text-size-scaled.html
+same-look-role ¦ scripts/ui-audit.mjs ¦ + (e.getAttribute("role") ? `[role=${e.getAttribute("role")}]` : ""); ¦ + ""; ¦ check-ui passes tests/ui/skips.html
+outcome-cs ¦ scripts/ui-audit.mjs ¦ |dismiss|zrušit|storno|ano|ne|potvrdit|přijmout|odmítnout|přerušit)$/iu; ¦ |dismiss)$/iu; ¦ check-ui catches tests/ui/outcome-cs.html
+same-look-wordless ¦ scripts/ui-audit.mjs ¦ + (wordless ? " (icon only)" : "") ¦ + "" ¦ check-ui passes tests/ui/skips.html
 hook-edit ¦ scripts/claude-hook ¦ gates || exit 2 ¦ true ¦ claude-hook hands a board
 hook-stop ¦ scripts/claude-hook ¦ if [ "$event" = Stop ] || [ "$event" = SubagentStop ]; then ¦ if false; then ¦ the Stop hook blocks
 precommit-ui ¦ hooks/pre-commit ¦ xargs -0 nice -n 10 "$bin/check-ui" || exit 1 ¦ true ¦ pre-commit refuses a board that fails check-ui
@@ -78,6 +87,17 @@ voice-keys ¦ scripts/voice-audit.py ¦ continue  # a key ¦ pass  # a key ¦ ch
 voice-comments ¦ scripts/voice-audit.py ¦ if text.startswith("//", i) or (hash_comments and c == "#"): ¦ if False: ¦ check-voice passes copy that speaks as the app
 voice-json-keys ¦ scripts/voice-audit.py ¦ if k in ("comment", "@@locale") or k.startswith("@"): ¦ if False: ¦ check-voice reads only strings people see
 voice-allow ¦ scripts/voice-audit.py ¦ if len(reason.split()) < 3: ¦ if False: ¦ check-voice finds without its reason
+voice-case ¦ scripts/voice-audit.py ¦ + r")(?![\w'’-])", re.IGNORECASE) ¦ + r")(?![\w'’-])") ¦ check-voice finds "WE"
+voice-ternary ¦ scripts/voice-audit.py ¦ and not rest.startswith("::") and not ternary: ¦ and not rest.startswith("::"): ¦ check-voice finds "We keep it for you." says
+voice-jsx ¦ scripts/voice-audit.py ¦ strings += from_jsx(text, path) ¦ strings += [] ¦ check-voice finds Notice.tsx:3
+voice-jsx-code ¦ scripts/voice-audit.py ¦ or JSX_CODE.search(body) or ¦ or ¦ check-voice passes copy that speaks as the app
+voice-jsx-generic ¦ scripts/voice-audit.py ¦ if opened > 0 and (text[opened - 1].isalnum() ¦ if False and (text[opened - 1].isalnum() ¦ check-voice passes copy that speaks as the app
+voice-mention ¦ scripts/voice-audit.py ¦ if m.group(1) != "US" and not mention(said, m) and ¦ if m.group(1) != "US" and ¦ check-voice passes copy that speaks as the app
+voice-square ¦ scripts/voice-audit.py ¦ and not square(said, m)] ¦ ] ¦ check-voice passes copy that speaks as the app
+voice-url ¦ scripts/voice-audit.py ¦ said = re.sub(r"\b[a-z][a-z0-9+.-]*://\S+|\bwww\.\S+", " ", said) ¦ said = said ¦ check-voice passes copy that speaks as the app
+voice-not-verb ¦ scripts/voice-audit.py ¦ and not NOT_CZECH_VERB.search(m.group(1))] ¦ ] ¦ check-voice passes copy that speaks as the app
+voice-changelog ¦ scripts/lib.sh ¦ VOICE_FILES=':(glob)CHANGELOG*.md ¦ VOICE_FILES=' ¦ check-voice finds CHANGELOG.md:7
+voice-content ¦ scripts/lib.sh ¦ :(glob)**/content/**/*.ts :(glob)**/content/**/*.tsx ¦ :(glob)**/content/**/*.tsx ¦ check-voice finds content/faq.ts:2
 hook-voice ¦ scripts/claude-hook ¦ gate voice voice_files check-voice || failed=1 ¦ true ¦ claude-hook hands we in the copy back to the agent
 precommit-voice ¦ hooks/pre-commit ¦ xargs -0 "$bin/check-voice" || exit 1 ¦ true ¦ pre-commit refuses copy that says we
 lint-voice ¦ scripts/lint ¦ step "the product's voice" "$PRACTICES_BIN/check-voice" ¦ true ¦ lint fails while the copy says we

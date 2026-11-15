@@ -316,11 +316,11 @@ for f in "$here"/tests/ui/*.html; do
     out=$("$p/.practices/bin/check-ui" "design/$name.html" 2>&1)
     status=$?
     case $name in
-    clean | allowed | covered | align-forward | mark-ok)
+    clean | allowed | covered | align-forward | mark-ok | skips)
         [ $status = 0 ] && ok || bad "check-ui passes tests/ui/$name.html" "$out" ;;
     *)
         rule=$name
-        case $name in contrast-gradient) rule=contrast ;; allow-unreasoned) rule=allow ;; align-stretched) rule=align ;; mark-*) rule=mark ;; esac
+        case $name in contrast-gradient) rule=contrast ;; text-size-*) rule=text-size ;; outcome-*) rule=outcome ;; allow-unreasoned) rule=allow ;; align-stretched) rule=align ;; mark-*) rule=mark ;; esac
         [ $status = 1 ] && printf '%s\n' "$out" | grep -q "^\[$rule\]" && ok ||
             bad "check-ui catches tests/ui/$name.html as [$rule] (exit $status)" "$out" ;;
     esac
@@ -346,7 +346,8 @@ out=$("$p/.practices/bin/check-voice" 2>&1)
 st=$?
 [ $st = 1 ] && ok || bad "check-voice fails on we in the copy (exit $st)" "$out"
 for want in 'strings.ts:2 [cs]' '"jsme"' '"Upozorníme"' '"my"' "\"we'll\"" '"us"' '"neprodáváme"' '"Our"' \
-    'Localizable.strings:1 [cs]' '"Odešleme"' 'strings.xml:3 [cs]' '"uložíme"' 'app.xcstrings:7 [cs]' '"Pošleme"' 'without its reason'; do
+    'Localizable.strings:1 [cs]' '"Odešleme"' 'strings.xml:3 [cs]' '"uložíme"' 'app.xcstrings:7 [cs]' '"Pošleme"' 'without its reason' \
+    '"WE"' '"We keep it for you." says' 'Notice.tsx:3' 'CHANGELOG.md:7' 'content/faq.ts:2'; do
     case $out in *"$want"*) ok ;; *) bad "check-voice finds $want" "$out" ;; esac
 done
 case $out in *'Welcome'* | *'comments for translators'* | *'never read'*) bad "check-voice reads only strings people see" "$out" ;; *) ok ;; esac

@@ -5,6 +5,45 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+### Fixed
+
+- **`check-voice` missed "we" it should have read.** Obálka's update to
+  1.6.0 passed its 13 default copy files, while its FAQ said "not even
+  us" and its changelog "we fixed". Widened to its real copy, the check
+  found 19 lines. It now reads the changelog and a `content/` folder by
+  default, any case ("WE NEVER SELL IT"), a ternary's branches (`ok ?
+  'We keep it' : …` read as a key), and the text between JSX tags.
+
+- **`check-voice` flagged words that aren't "we".** "Chrome", "Home"
+  and "Time" read as Czech verbs; "nám." (náměstí, a square) in an
+  address read as "to us"; "/us/" in a store link, and a word quoted as a
+  word ("the word “we”"), were findings. All are skipped now, as are
+  TypeScript generics and comments between JSX tags.
+
+- **`check-ui` flagged boards that follow the rules.** Obálka's 24
+  boards gave 248 findings, and these were the check's own:
+  - Every phone's bottom bar is a surface padded like the screen's text.
+    Its buttons read as "16 px in" from the phone's frame (15 findings).
+    A row that draws its own surface, or is placed by hand, is now its
+    buttons' column.
+  - A column centred by a flex column (`align-items: center`) counted as
+    leading-aligned.
+  - A screen drawn mid-scroll inside a clipping frame was reported twice,
+    by clip and by contain, so one `data-allow` mark couldn't cover it.
+  - A segmented control's options, marked `role="tablist"` or
+    `role="radiogroup"`, needed a mark for gap and an icon each.
+  - same-look compared an icon button's unset type with a labelled
+    button's, and a tab with every other unclassed button. Icon buttons
+    and roles are kinds of their own now.
+
+- **`check-ui` passed a Czech "Zrušit".** The outcome check knew only
+  English, so a Czech board's bare "Zrušit" (Cancel), "Ano" and "Ne"
+  passed. It now knows their Czech words too.
+
+- **`check-ui` passed type a transform shrinks.** 14 px text in a preview
+  scaled to a half is 7 px on the screen. It now measures HTML type at
+  its drawn size, as it did for SVG.
+
 ## 1.6.0 (2026-11-15)
 
 ### New

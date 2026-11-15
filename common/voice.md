@@ -46,10 +46,15 @@ guess who is acting.
 
 **Check.** `check-voice` reads every string people see (`VOICE_FILES`:
 the project's strings files, and the code files that hold its copy) and
-flags "we" in each language it knows: English we, us, our and their
-contractions; Czech my, nás, náš and their forms, jsme, budeme, and the
-first person plural verb (a word ending in -me). Comments and keys are
-skipped. claude-hook runs it after each edit on the files that changed and
+flags "we" in each language it knows, in any case ("WE"): English we,
+us, our and their contractions; Czech my, nás, náš and their forms, jsme,
+budeme, and the first person plural verb (a word ending in -me, but not
+-ome, -ame or -ime, which are English: "Chrome", "Home"). It reads string
+literals, a ternary's branches, and the text between JSX tags. Comments,
+keys, web addresses, a word quoted as a word ("the word “we”") and the
+abbreviation "nám." in an address are skipped. By default it reads the
+strings files, the changelog and a `content/` folder (a FAQ, help
+pages). claude-hook runs it after each edit on the files that changed and
 holds the agent's turn while it fails; pre-commit runs it on what is
 staged, and lint on everything. "I" stays with the reviewer, because the
 person's own words use it too.

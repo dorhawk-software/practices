@@ -18,3 +18,7 @@ const en: Record<string, string> = {
   'quote': '"We, the citizens", says the act.',
 };
 const faq = { reach: { cs: 'Aplikace pošle popis chyby.', en: 'The app sends a description.' } };
+const words = {
+  cs: { tip: 'Slovo „my“ aplikace nepoužívá.', address: 'Mariánské nám. 2, Praha', square: 'nám. Míru 5', browser: 'Otevřete v Chrome; tlačítko Home.' },
+  en: { tip: 'The word "we" is never used.', store: 'https://apps.apple.com/us/app/example/id1' },
+};

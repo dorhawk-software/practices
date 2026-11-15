@@ -60,8 +60,10 @@ UI_STATES='focus hover active pressed'
 UI_CHROME=''
 # The voice gate (check-voice): the files that hold the copy people see
 # (git pathspecs; tests and generated files left out), and more first-person plural words to flag, as a regex
-# alternation (a language the check doesn't know).
-VOICE_FILES=':(glob)**/i18n/** :(glob)**/locales/** :(glob)**/l10n/** :(glob)**/*.lproj/*.strings :(glob)**/*.xcstrings :(glob)**/*.ftl :(glob)**/*.po :(glob)**/*.arb :(glob)**/res/values*/strings.xml :(glob)fastlane/metadata/**/*.txt :(exclude,glob)**/__tests__/** :(exclude,glob)**/*.test.* :(exclude,glob)**/*.spec.* :(exclude,glob)**/tests/** :(exclude,glob)**/*.generated.*'
+# alternation (a language the check doesn't know). The changelog is What's new
+# and the release notes, and a content/ folder holds a FAQ or help pages: until
+# 1.6.1 neither was read, and a FAQ's "not even us" passed.
+VOICE_FILES=':(glob)CHANGELOG*.md :(glob)**/content/**/*.ts :(glob)**/content/**/*.tsx :(glob)**/content/**/*.js :(glob)**/content/**/*.json :(glob)**/content/**/*.md :(glob)**/i18n/** :(glob)**/locales/** :(glob)**/l10n/** :(glob)**/*.lproj/*.strings :(glob)**/*.xcstrings :(glob)**/*.ftl :(glob)**/*.po :(glob)**/*.arb :(glob)**/res/values*/strings.xml :(glob)fastlane/metadata/**/*.txt :(exclude,glob)**/__tests__/** :(exclude,glob)**/*.test.* :(exclude,glob)**/*.spec.* :(exclude,glob)**/tests/** :(exclude,glob)**/*.generated.*'
 VOICE_WORDS=''
 
 if [ -f .practices/config ]; then

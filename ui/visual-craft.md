@@ -189,7 +189,9 @@ design doc says why. Each icon of the family, side by side at 24 and at
 48, reads as one hand. The weight is in the families list above. A
 list row or button without an icon has a written reason. `check-ui` (icon)
 flags every button with words and no icon, unless it is marked
-`data-allow="icon: …"`.
+`data-allow="icon: …"`. The options of a segmented control
+(`role="tablist"` or `role="radiogroup"`) are no main buttons and aren't
+flagged.
 
 ## Depth and texture from a concept
 
@@ -309,7 +311,8 @@ but no script measured it.
 
 **Check.** `.practices/bin/check-ui` measures every element against the
 surface it is drawn on, and every clipping box against its content, at
-each width and theme. It runs after every edit to a board, before the
+each width and theme. A surface that clips is measured once, by clip, so
+one `data-allow="clip: …"` covers a screen drawn mid-scroll. It runs after every edit to a board, before the
 agent's turn ends, and before each commit.
 
 ## Buttons follow the column
@@ -350,8 +353,11 @@ answer either: one button across a whole panel looks odd.
 sits in. In a leading-aligned column, it flags a row of several buttons
 that doesn't start at the column's edge (unless it fills the column), a
 lone button that is neither at an edge nor at phone width, and a lone
-button stretched across a surface wider than 480 px. In a centred column,
-it flags a row off the centre.
+button stretched across a surface wider than 480 px. In a centred column
+(`text-align: center`, or a flex column that centres its items), it flags
+a row off the centre. A row that is a surface of its own (a bottom bar
+with a fill) or is placed by hand (`position: absolute`) is its buttons'
+column: they follow its padding.
 
 ## Every button names its outcome
 
@@ -381,7 +387,8 @@ outcome, and that the app stays.
 
 **Check.** `check-ui` (outcome) flags every button whose whole label is
 a word that names no outcome: Cancel, OK, Okay, Yes, No, Confirm,
-Submit, Accept, Decline, Proceed, Abort, Dismiss.
+Submit, Accept, Decline, Proceed, Abort, Dismiss, and in Czech Zrušit,
+Storno, Ano, Ne, Potvrdit, Přijmout, Odmítnout, Přerušit.
 
 ## Separate targets keep their distance
 
@@ -411,7 +418,9 @@ worse: it turned flat chips into raised tiles, and raised tiles need air.
 
 **Check.** `check-ui` (gap) measures the edge-to-edge gap between every
 pair of targets, across and down. It flags anything under 8 px, except
-the three cases above, marked `data-allow="gap: …"`. The reviewers get 1:1 crops of dense areas, not only scaled-down
+the three cases above, marked `data-allow="gap: …"`. A segmented
+control that says so by its role (`role="tablist"` or
+`role="radiogroup"`) needs no mark. The reviewers get 1:1 crops of dense areas, not only scaled-down
 sheets.
 
 ## Spacing is measured from what you see
@@ -616,8 +625,9 @@ labels carry real information.
 **Apply.** Set an 11 px floor in the type scale. Smaller sizes may only
 draw glyphs that sit inside a shape, like an avatar's initials.
 
-**Check.** `check-ui` (text-size) flags every text run under 11 px, SVG
-text at the size it is drawn. A glyph inside a shape is marked
+**Check.** `check-ui` (text-size) flags every text run under 11 px at the
+size it is drawn: SVG text through its transform, and HTML type through
+any `transform: scale()` around it (a scaled preview). A glyph inside a shape is marked
 `data-allow="text-size: …"`.
 
 ## One anatomy per job
@@ -638,7 +648,9 @@ the ink pill for all toasts; the sending one counts down in words.
 
 **Check.** The design doc lists each component's anatomy, and the canvas
 shows no second version. `check-ui` (same-look) flags like targets (the
-same tag and classes) of different height, type, radius or padding.
+same tag, classes and role) of different height, type, radius or padding.
+A button with no words (an icon button) is a kind of its own, compared
+by height, radius and padding only.
 
 ## A choice changes everything it owns
 
