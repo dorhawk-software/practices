@@ -5,6 +5,7 @@
 #
 #   tests/mutate            # every mutant, JOBS at a time (default 4)
 #   tests/mutate NAME...    # just these
+#   SHARD=2/4 tests/mutate  # every 4th mutant, from the 2nd (CI runs 4 shards)
 #
 # Why: on 2026-11-15 an agent's ad-hoc mutation run reported every check
 # "caught" while it measured nothing. Its copies sat outside a git
@@ -24,6 +25,13 @@ here=$(cd "$(dirname "$0")/.." && pwd)
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 jobs=${JOBS:-4}
+shard=${SHARD:-1/1}
+case $shard in
+[1-9]/[1-9] | [1-9]/[1-9][0-9] | [1-9][0-9]/[1-9][0-9]) ;;
+*) echo "tests/mutate: SHARD is K/N, as 2/4 (got \"$shard\")"; exit 2 ;;
+esac
+shard_k=${shard%/*} shard_n=${shard#*/}
+[ "$shard_k" -le "$shard_n" ] || { echo "tests/mutate: SHARD $shard: K is more than N"; exit 2; }
 
 # name ¦ file ¦ text to replace (literal) ¦ replacement ¦ the FAIL line tests/run must print.
 # Fields are split at " ¦ ", which no script contains: an earlier "|" split
@@ -133,9 +141,10 @@ run_one() { # run_one NAME FILE FROM TO WANT: writes $work/NAME.result
 }
 
 # 2. Every mutant (or the ones named), JOBS at a time.
-picked=0 n=0
+picked=0 n=0 index=0
 while IFS= read -r line; do
     [ -n "$line" ] || continue
+    index=$((index + 1))
     IFS=$'\t' read -r name file from to want <<<"$(row "$line")"
     if [ -z "$name" ] || [ -z "$file" ] || [ -z "$from" ] || [ -z "$to" ] || [ -z "$want" ] || [ ! -f "$here/$file" ]; then
         echo "tests/mutate: a malformed row (five fields, split at \" ¦ \", on a file that exists): $line"
@@ -144,6 +153,7 @@ while IFS= read -r line; do
     if [ $# -gt 0 ]; then
         case " $* " in *" $name "*) ;; *) continue ;; esac
     fi
+    [ $(((index - 1) % shard_n)) = $((shard_k - 1)) ] || continue # every row is still checked above
     picked=$((picked + 1))
     run_one "$name" "$file" "$from" "$to" "$want" &
     n=$((n + 1))

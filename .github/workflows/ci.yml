@@ -35,14 +35,21 @@ jobs:
   # Each check broken on purpose, in a copy: tests/run must fail on that
   # check's own case (common/gates.md, "A test of a check is proven by
   # breaking the check"). macOS: bash 3.2 and BSD tools, the strictest.
+  # Four shards: 44 mutants, each a full tests/run, didn't finish in one
+  # job's 40 minutes (2026-11-15).
   mutate:
     runs-on: macos-latest
     timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Every mutant killed by its own case
         env:
           JOBS: "3"
+          SHARD: ${{ matrix.shard }}/4
         run: tests/mutate
 
   static:
