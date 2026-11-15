@@ -5,6 +5,8 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+## 1.6.0 (2026-11-15)
+
 ### New
 
 - **Rules a machine can check are gates the agent can't skip.** On
