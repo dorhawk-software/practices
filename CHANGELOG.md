@@ -3,7 +3,7 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
-## Unreleased
+## 1.6.4 (2026-11-16)
 
 ### Fixed
 
