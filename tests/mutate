@@ -105,6 +105,10 @@ check-size ¦ scripts/check-size ¦ elif [ "$code" -gt "$limit" ]; then ¦ elif 
 check-unsafe ¦ scripts/check-unsafe ¦ if (line ~ /(^|[^A-Za-z0-9_])unsafe([^A-Za-z0-9_]|$)/) print ¦ if (0) print ¦ unsafe code fails
 check-private ¦ scripts/check-private ¦ 0) found=1 ;; ¦ 0) ;; ¦ a new file naming a client fails
 check-commit-msg ¦ scripts/check-commit-msg ¦ ^[A-Za-z-]+-session(-id)?:|claude\.ai/code/session_|session_[0-9A-Za-z]{16,} ¦ ^never matches$ ¦ a session trailer fails
+before-after ¦ scripts/check-commit-msg ¦ if [ -n "$why" ]; then ¦ if false; then ¦ a changed board without Before-after: fails
+before-after-file ¦ scripts/check-commit-msg ¦ [ -f "$page" ] || why= ¦ true || why= ¦ a Before-after: page that isn't there fails
+before-after-reason ¦ scripts/check-commit-msg ¦ wc -w | tr -d ' ')" -lt 3 ¦ wc -w | tr -d ' ')" -lt 0 ¦ Before-after: none without a reason fails
+before-after-hook ¦ hooks/commit-msg ¦ exec "$(git rev-parse --show-toplevel)/.practices/bin/check-commit-msg" "$1" ¦ exit 0 ¦ the commit-msg hook refuses a touched-up board without its page
 ROWS
 
 row() { # row LINE: the five fields, tab-separated

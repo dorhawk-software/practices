@@ -126,6 +126,34 @@ expect 1 "a message naming a client fails" "$p/.practices/bin/check-commit-msg" 
 printf 'Fix\n# GlobexCorp in a comment line\n' >"$work/m6"
 expect 0 "comment lines aren't the message" "$p/.practices/bin/check-commit-msg" "$work/m6"
 
+# --- check-commit-msg: a touch-up to a board names its before/after page
+p=$(project)
+mkdir -p "$p/design/changes"
+printf '<p>Board</p>\n' >"$p/design/board.html"
+git -C "$p" add design/board.html && git -C "$p" commit -q -m "A board"
+printf '<p>Board, touched up</p>\n' >"$p/design/board.html"
+printf '<p>New</p>\n' >"$p/design/new.html"
+git -C "$p" add design/new.html
+printf 'Add a board\n' >"$work/ba0"
+expect 0 "a new board needs no before/after" "$p/.practices/bin/check-commit-msg" "$work/ba0"
+git -C "$p" add design/board.html
+expect 1 "a changed board without Before-after: fails" "$p/.practices/bin/check-commit-msg" "$work/ba0"
+printf 'Touch up\n\nBefore-after: design/changes/board.html\n' >"$work/ba1"
+expect 1 "a Before-after: page that isn't there fails" "$p/.practices/bin/check-commit-msg" "$work/ba1"
+printf '<p>Before, after</p>\n' >"$p/design/changes/board.html"
+expect 0 "a Before-after: page in the repository passes" "$p/.practices/bin/check-commit-msg" "$work/ba1"
+printf 'Touch up\n\nBefore-after: https://example.com/changes/board\n' >"$work/ba2"
+expect 0 "a Before-after: link passes" "$p/.practices/bin/check-commit-msg" "$work/ba2"
+printf 'Touch up\n\nBefore-after: none, reindented\n' >"$work/ba3"
+expect 1 "Before-after: none without a reason fails" "$p/.practices/bin/check-commit-msg" "$work/ba3"
+printf 'Touch up\n\nBefore-after: none, only the markup was reindented\n' >"$work/ba4"
+expect 0 "Before-after: none with its reason passes" "$p/.practices/bin/check-commit-msg" "$work/ba4"
+printf 'Touch up\n# Before-after: design/changes/board.html\n' >"$work/ba5"
+expect 1 "a Before-after: in a comment line isn't the trailer" "$p/.practices/bin/check-commit-msg" "$work/ba5"
+"$p/.practices/bin/install-hooks" >/dev/null
+expect 1 "the commit-msg hook refuses a touched-up board without its page" git -C "$p" commit -q -F "$work/ba0"
+expect 0 "and lets it through with its page" git -C "$p" commit -q -F "$work/ba2"
+
 # --- install-hooks
 p=$(project)
 expect 1 "hooks not installed fails the check" "$p/.practices/bin/install-hooks" --check

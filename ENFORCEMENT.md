@@ -12,7 +12,7 @@ to the agent to fix. This is where each rule stands
 - **review**: it needs a person's judgement (taste, wording, whether
   an icon is ugly); reviewers check it.
 
-Today: 11 gate, 55 partial, 126 todo, 42 review
+Today: 11 gate, 56 partial, 126 todo, 42 review
 (audited rule by rule on 2026-11-15, each claim checked against the
 scripts, not the docs). `tests/enforcement` fails when a practice has a
 rule this file doesn't list, or lists one that's gone. The todo and
@@ -196,6 +196,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Proposals with options, then build "as chosen" | todo | - | check-commit-msg/pre-commit: a commit touching UI source must name a proposal path or canvas link ('as chosen'), and the proposal page must contain >=2 labelled options and one 'Recommended' marker, with the design doc's Rejected section touched in the same commit. |
 | The design holds only agreed designs | todo | - | check-ui on boards outside proposals/: flag any element with data-variant or text matching 'Option [A-Z]'/'Variant'/'Recommended' unless the page is marked rejected. |
 | Keep the design in sync with the code | todo | - | pre-commit: staged UI source with no staged design/board file fails unless the message carries a 'Design: unchanged, <reason>' trailer. |
+| A touch-up gets its own before and after | partial | check-commit-msg (commit-msg hook): a commit that changes an existing board (UI_BOARDS) needs a Before-after: trailer naming a page in the repository or an https link, or 'none, <reason>' | A design kept outside the repository (a canvas) isn't seen; a `before-after` script could render the board's crop at HEAD and in the working tree and write the page; whether the page shows one change only is judgement. |
 | Read the design's source, never a picture | todo | - | Diff check: every new colour, px/pt length, radius and string literal added to UI source must occur in the design's tokens or board source; unknown literals are listed for the agent. |
 | When the agent can't edit the design: a prompt and a sync-back list | todo | - | Markdown lint: every open item in design-sync-back.md references an entry in design-prompts.md whose status is 'sent' or 'returned <date>'. |
 | Match one to one, verified by screenshot | todo | - | Render the board and the demo-mode app (for web/RN-web in the same Chrome) at device DPR, crop each data-object, and diff row/column pixel profiles to report line weight, inset and height deltas over 0.5 px. |

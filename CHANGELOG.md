@@ -5,6 +5,20 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+### New
+
+- **A touch-up gets its own before and after** (ui/design-before-build.md).
+  A change to an agreed design is shown on a small page of its own: that
+  one change, before beside after, cropped to the object and naming where
+  to find it. A touch-up to Obálka's postmark went out as a new version of
+  a 70-screen canvas, and its owner couldn't see where to look; on its
+  own page it was accepted at a glance.
+  - `check-commit-msg` (the commit-msg hook) refuses a commit that changes
+    an existing board in `UI_BOARDS` without a `Before-after:` trailer
+    naming the page, a file in the repository or an https link. A change
+    that leaves the look alone says `Before-after: none, <why>`. A new
+    board needs none.
+
 ## 1.6.1 (2026-11-16)
 
 ### Fixed
