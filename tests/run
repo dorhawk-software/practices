@@ -333,6 +333,23 @@ echo "# ours" >"$p/.github/workflows/practices.yml"
 "$here/bin/install" "$p" >/dev/null
 [ "$(cat "$p/.github/workflows/practices.yml")" = "# ours" ] && ok || bad "install keeps the project's update workflow"
 
+# --- check-shots: a live switch draws what a fresh start draws (mobile/devices.md)
+p=$(project)
+node "$here/tests/shots/make.mjs" "$work/shots"
+shots="$p/.practices/bin/check-shots"
+expect 0 "check-shots passes two identical screens" "$shots" "$work/shots/same/fresh" "$work/shots/same/live"
+out=$("$shots" "$work/shots/glyph/fresh" "$work/shots/glyph/live" 2>&1)
+[ $? = 1 ] && grep -q 'switcher.png: 7×21 px differ at 60,40' <<<"$out" && ok ||
+    bad "check-shots finds the lost glyph and says where" "$out"
+expect 1 "check-shots finds a status bar that differs unless told to skip it" "$shots" "$work/shots/clock/fresh" "$work/shots/clock/live"
+expect 0 "check-shots skips the status bar it is told to" "$shots" --skip-top 12 "$work/shots/clock/fresh" "$work/shots/clock/live"
+out=$("$shots" "$work/shots/size/fresh" "$work/shots/size/live" 2>&1)
+[ $? = 1 ] && grep -q 'not the same screen size' <<<"$out" && ok || bad "check-shots refuses screens of two sizes" "$out"
+rm "$work/shots/same/live/switcher.png"
+out=$("$shots" "$work/shots/same/fresh" "$work/shots/same/live" 2>&1)
+[ $? = 2 ] && grep -q 'shoot every screen both ways' <<<"$out" && ok ||
+    bad "check-shots fails when a screen was shot only one way" "$out"
+
 # --- check-ui: each check catches its planted fault, and only clean boards pass
 # (common/gates.md, "Prove the gate can fail"). Needs Node and Chrome: on a
 # machine without them these fail, as the gate itself does.

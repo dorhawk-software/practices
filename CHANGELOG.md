@@ -3,6 +3,20 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### New
+
+- **A live switch draws what a fresh start draws** (mobile/devices.md).
+  A setting that changes the look while the app runs is walked both ways,
+  and the same screen is the same pixel for pixel. Obálka's "Testovací"
+  pill lost its "í" after a switch to dark and was whole after a restart;
+  every walk and check had looked at fresh starts.
+  - `check-shots FRESH LIVE` compares two screenshots, or two folders of
+    them by name, and lists each region that differs; `--skip-top PX`
+    leaves out the status bar. On Obálka's switcher it finds the lost
+    glyph, 7×21 px, and nothing between two fresh starts.
+
 ## 1.7.0 (2026-11-16)
 
 ### New

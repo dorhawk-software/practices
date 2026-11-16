@@ -156,6 +156,8 @@ own extra checks in `.practices/lint.d/`.
 | `check-copy` | each language's grammar in the copy (boards and `VOICE_FILES`): "V 10:20", "ve středu", "al", "an hour"; copy that names no language, or a language with no rules file, fails; a fact (`data-fact`) reads the same on every board |
 | `copy-audit.mjs` | check-copy's reading half (Node, no packages) |
 | `copy-rules` | the rules per language, `<lang>.mjs` (cs, en, es): checks of the grammar between words, and the words no button may say alone; a project adds its own in `.practices/copy-rules/` |
+| `check-shots` | a screen shot after a live switch (theme, language, text size) against the same screen after a fresh start: every region that differs, with `--skip-top` for the status bar; `shots-diff.mjs` measures |
+| `shots-diff.mjs` | check-shots' measuring half (Node, no packages) |
 | `check-size` | 700 lines per Rust, TS or JS file, 1000 per test file, a shrinking allowlist |
 | `check-unsafe` | `unsafe` only where the project allows it |
 | `check-coverage` | tests, measured, against per-crate per-OS floors; never lowered |

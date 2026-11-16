@@ -52,6 +52,10 @@ halo ¦ scripts/ui-audit.mjs ¦ add("halo", e, ¦ void ("halo", e, ¦ check-ui c
 inset ¦ scripts/ui-audit.mjs ¦ add("inset", s, ¦ void ("inset", s, ¦ check-ui catches tests/ui/inset.html
 inset-on-top ¦ scripts/ui-audit.mjs ¦ if (!(a0 === "left" ? onTop(c, mid, along) : onTop(c, along, mid))) continue; ¦ if (false) continue; ¦ check-ui passes tests/ui/inset-under.html
 inset-fills ¦ scripts/ui-audit.mjs ¦ const drawn = all.filter(fills) ¦ const drawn = all.filter(draws) ¦ check-ui passes tests/ui/inset-drawing.html
+shots ¦ scripts/shots-diff.mjs ¦ findings.push(`${name}: ${reg.r ¦ void (`${name}: ${reg.r ¦ check-shots finds the lost glyph and says where
+shots-skip ¦ scripts/shots-diff.mjs ¦ for (let y = skipTop; y < A.h; y++) { ¦ for (let y = 0; y < A.h; y++) { ¦ check-shots skips the status bar it is told to
+shots-size ¦ scripts/shots-diff.mjs ¦ if (A.w !== B.w || A.h !== B.h) { ¦ if (false) { ¦ check-shots refuses screens of two sizes
+shots-missing ¦ scripts/shots-diff.mjs ¦ if (!existsSync(join(live, n))) die( ¦ if (false) die( ¦ check-shots fails when a screen was shot only one way
 centre ¦ scripts/ui-audit.mjs ¦ add("centre", e, ¦ void ("centre", e, ¦ check-ui catches tests/ui/centre.html
 state ¦ scripts/ui-audit.mjs ¦ add("state", e, ¦ void ("state", e, ¦ check-ui catches tests/ui/state.html
 icon ¦ scripts/ui-audit.mjs ¦ add("icon", e, ¦ void ("icon", e, ¦ check-ui catches tests/ui/icon.html

@@ -12,7 +12,7 @@ to the agent to fix. This is where each rule stands
 - **review**: it needs a person's judgement (taste, wording, whether
   an icon is ugly); reviewers check it.
 
-Today: 14 gate, 59 partial, 125 todo, 42 review
+Today: 14 gate, 60 partial, 125 todo, 42 review
 (audited rule by rule on 2026-11-15, each claim checked against the
 scripts, not the docs). `tests/enforcement` fails when a practice has a
 rule this file doesn't list, or lists one that's gone. The todo and
@@ -399,6 +399,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Never test on a device that holds real data | todo | - | A PreToolUse Bash hook should refuse adb/emulator/simctl wipe, reset or test commands that name a device outside a DEMO_DEVICES list in .practices/config. |
 | The service's test environment, never production | partial | check-private refuses test-account IDs, but only if the project lists them in dev/private-terms | Nothing requires the IDs to be listed or that test passwords come from env; the test-account banner and per-account environment are project tests. |
 | A feature is done once it is walked on a device | review | - | A device walk is done by a person. |
+| A live switch draws what a fresh start draws | partial | check-shots: two shots of each screen, fresh and live, compared pixel for pixel outside the status bar | Shooting the screens needs the project's own walk (adb, simctl); nothing runs it on its own. |
 | A crash report from the field becomes a test | review | - | Linking a crash-report issue to its test needs judgement. |
 | Expected refusals from the OS aren't reported | todo | - | A project test per refusal code plus one other code still reported; nothing in the kit. |
 | Config that native tools rewrite is held by tests | todo | - | The kit could ship a lint.d check for known keys (ITSAppUsesNonExemptEncryption in Info.plist, allowBackup with dataExtractionRules); otherwise project tests. |
