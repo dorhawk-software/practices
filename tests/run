@@ -414,7 +414,7 @@ st=$?
 for want in 'design/board.html:2 "Ve 10:20": the hour is said "deset", so "V 10:20"' '"v středu" is "ve středu"' \
     'es.json:1 "a el" is "al"' 'strings.ts:3 "a hour" is "an hour"' 'pl.json 1 piece of copy in "pl", and no rules for it' \
     'note.md 1 piece of copy names no language' 'data-allow="copy: brand" gives no reason' '"practices-allow copy: name" gives no reason' \
-    '"swim" reads 2 ways: "St 16:30"' '"St 17:00"'; do
+    '"swim" reads 2 ways: "St 16:30"' '"St 17:00"' '"z SÚKL" is "ze SÚKL"'; do
     case $out in *"$want"*) ok ;; *) bad "check-copy finds $want" "$out" ;; esac
 done
 out=$("$p/.practices/bin/check-copy" design/week.html 2>&1)
@@ -487,6 +487,11 @@ out=$(ev Stop "" "" true | "$p/.practices/bin/claude-hook" 2>/dev/null)
 st=$?
 [ $st = 0 ] && case $out in *systemMessage*'still open in design/board.html'*) true ;; *) false ;; esac && ok ||
     bad "blocked twice on the same findings, the agent may stop and the person is told" "$out"
+cp "$here/tests/ui/clean.html" "$p/design/other.html"
+printf 'PRIVATE_TERMS=none\nUI_BOARDS=design/other.html\n' >"$p/.practices/config"
+ev PostToolUse Read | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok ||
+    bad "claude-hook stops checking a failing board once the gate no longer reads it"
+printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
 cp "$here/tests/ui/clean.html" "$p/design/board.html"
 ev PostToolUse Edit | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ev Stop "" "" false | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok ||
     bad "once the board is fixed, edits and the turn's end pass"

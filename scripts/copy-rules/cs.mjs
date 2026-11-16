@@ -19,6 +19,11 @@ const VE_HOURS = new Set([2, 3, 4, 12, 13, 14, 20, 21, 22, 23]);
 const SPOKEN = ["nula", "jedna", "dvě", "tři", "čtyři", "pět", "šest", "sedm", "osm", "devět", "deset", "jedenáct", "dvanáct",
   "třináct", "čtrnáct", "patnáct", "šestnáct", "sedmnáct", "osmnáct", "devatenáct", "dvacet", "dvacet jedna", "dvacet dva", "dvacet tři"];
 
+// An abbreviation with no vowel is read letter by letter, and a letter's name can start with a vowel:
+// "SMS" is "esemes", "FTP" is "ef té pé", so "z SMS" and "v FTP" are right. One read as a word
+// keeps the rule: "ze SÚKL". 1.7.1 asked Obálka for "ze SMS" (2026-11-16).
+const spelledFromVowel = (w) => w.length > 1 && w === w.toUpperCase() && !/[AEIOUYÁÉĚÍÓÚŮÝ]/u.test(w) && /^[SF]/u.test(w);
+
 export const rules = [
   {
     id: "v-ve-time",
@@ -45,14 +50,14 @@ export const rules = [
     what: "\"ve\" before a word that starts with v or f",
     fix: "Write \"ve\": \"ve vaně\", \"ve fázi\".",
     find: new RegExp(`${W}([Vv])${GAP}([VvFf][\\p{L}]*)`, "gu"),
-    check: (m) => `"${m[0]}" is "${as(m[1], "ve")} ${m[2]}".`,
+    check: (m) => (spelledFromVowel(m[2]) ? "" : `"${m[0]}" is "${as(m[1], "ve")} ${m[2]}".`),
   },
   {
     id: "s-z-before-sibilant",
     what: "\"se\" and \"ze\" before a word that starts with s, z, š or ž",
     fix: "Write \"se\" or \"ze\": \"se sestrou\", \"ze školy\".",
     find: new RegExp(`${W}([SsZz])${GAP}([SsZzŠšŽž][\\p{L}]*)`, "gu"),
-    check: (m) => `"${m[0]}" is "${as(m[1], m[1].toLowerCase() + "e")} ${m[2]}".`,
+    check: (m) => (spelledFromVowel(m[2]) ? "" : `"${m[0]}" is "${as(m[1], m[1].toLowerCase() + "e")} ${m[2]}".`),
   },
   {
     id: "k-before-k",

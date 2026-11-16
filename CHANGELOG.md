@@ -3,6 +3,25 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### Fixed
+
+- **`check-copy` asked for "ze SMS".** An abbreviation with no vowel is
+  read letter by letter, and "SMS" is "esemes", so "z SMS" and "v FTP"
+  are right; one read as a word keeps the rule, "ze SÚKL". Obálka's three
+  "kód z SMS" strings were findings.
+- **`check-copy` read code as copy in no language.** A module's path
+  (`from './strings'`), a type's members (`'app' | 'isds'`) and, in a
+  code catalogue with `cs` and `en` blocks, the ids and plural categories
+  outside the blocks are code. Obálka had 56 such findings in two
+  catalogues.
+- **The Claude Code hook kept checking files its gate no longer reads.**
+  A file that once failed was checked again after every tool call, even
+  after `COPY_FILES` (or `UI_BOARDS`, `VOICE_FILES`) left it out. In
+  Obálka, narrowing the copy to its catalogues still read all 327 source
+  files on every call.
+
 ## 1.7.1 (2026-11-16)
 
 ### New

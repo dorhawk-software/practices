@@ -120,10 +120,18 @@ copy-allow-catalogue ¦ scripts/voice-audit.py ¦ marks = [m for m in (COPY_ALLO
 copy-project-rules ¦ scripts/copy-audit.mjs ¦ projectDir ? resolve(projectDir) : "" ¦ "" ¦ check-copy passes copy that keeps
 copy-fact ¦ scripts/copy-audit.mjs ¦ if (g.size < 2) continue; ¦ continue; ¦ check-copy finds "St 17:00"
 copy-context ¦ scripts/check-copy ¦ [ -f "$f" ] && context+=(--context "$f") ¦ true ¦ check-copy FILE compares its facts
+copy-spelled ¦ scripts/copy-rules/cs.mjs ¦ check: (m) => (spelledFromVowel(m[2]) ? "" : `"${m[0]}" is "${as(m[1], m[1].toLowerCase() + "e")} ${m[2]}".`), ¦ check: (m) => `"${m[0]}" is "${as(m[1], m[1].toLowerCase() + "e")} ${m[2]}".`, ¦ check-copy passes copy that keeps
+copy-spelled-f ¦ scripts/copy-rules/cs.mjs ¦ check: (m) => (spelledFromVowel(m[2]) ? "" : `"${m[0]}" is "${as(m[1], "ve")} ${m[2]}".`), ¦ check: (m) => `"${m[0]}" is "${as(m[1], "ve")} ${m[2]}".`, ¦ check-copy passes copy that keeps
+copy-spelled-vowel ¦ scripts/copy-rules/cs.mjs ¦ && !/[AEIOUYÁÉĚÍÓÚŮÝ]/u.test(w) ¦ && true ¦ check-copy finds "z SÚKL"
+copy-module ¦ scripts/voice-audit.py ¦ if MODULE.search(said) or TYPE_LITERAL.search(said): ¦ if TYPE_LITERAL.search(said): ¦ check-copy passes copy that keeps
+copy-type ¦ scripts/voice-audit.py ¦ if MODULE.search(said) or TYPE_LITERAL.search(said): ¦ if MODULE.search(said): ¦ check-copy passes copy that keeps
+copy-blocks ¦ scripts/copy-audit.mjs ¦ if (!s.lang && blocks.has(s.path)) continue; ¦ if (false) continue; ¦ check-copy passes copy that keeps
 copy-lang ¦ scripts/copy-audit.mjs ¦ const fallback = langOf(opts.lang); ¦ const fallback = null; ¦ COPY_LANG names the language
 hook-copy ¦ scripts/claude-hook ¦ gate copy copy_files check-copy || failed=1 ¦ true ¦ claude-hook hands the copy's grammar back
 precommit-copy ¦ hooks/pre-commit ¦ xargs -0 "$bin/check-copy" || exit 1 ¦ true ¦ pre-commit refuses copy that breaks its grammar
 lint-copy ¦ scripts/lint ¦ step "the copy's grammar" "$PRACTICES_BIN/check-copy" ¦ true ¦ lint fails while the copy breaks its grammar
+hook-failing-listed ¦ scripts/claude-hook ¦ [ -f "$state.failing" ] && printf '%s\n' "$all" | grep -Fxf "$state.failing" ¦ [ -f "$state.failing" ] && cat "$state.failing" ¦ claude-hook stops checking a failing board
+hook-failing-kept ¦ scripts/claude-hook ¦ [ -f "$state.failing" ] && printf '%s\n' "$all" | grep -Fxf "$state.failing" ¦ true ¦ claude-hook keeps reporting a failing board
 hook-edit ¦ scripts/claude-hook ¦ gates || exit 2 ¦ true ¦ claude-hook hands a board
 hook-stop ¦ scripts/claude-hook ¦ if [ "$event" = Stop ] || [ "$event" = SubagentStop ]; then ¦ if false; then ¦ the Stop hook blocks
 precommit-ui ¦ hooks/pre-commit ¦ xargs -0 nice -n 10 "$bin/check-ui" || exit 1 ¦ true ¦ pre-commit refuses a board that fails check-ui

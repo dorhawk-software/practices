@@ -159,7 +159,12 @@ async function main(argv) {
   }
   const cat = readCatalogues(others);
   broken.push(...cat.broken);
+  // A code catalogue (a .ts or .js file with language blocks) keeps its copy in them; outside them
+  // are its ids, plural categories and format strings, code. 1.7.1 read Obálka's FAQ order and plural
+  // rules as copy in no language.
+  const blocks = new Set(cat.strings.filter((s) => s.lang && /\.[cm]?[jt]sx?$/.test(s.path)).map((s) => s.path));
   for (const s of cat.strings) {
+    if (!s.lang && blocks.has(s.path)) continue;
     if (s.allow !== null && words(s.allow) < 3) { note("allow", s.path, s.line, `"practices-allow copy: ${s.allow}" gives no reason of three words or more.`); continue; }
     if (/\p{L}{2}/u.test(s.text)) pieces.push({ file: s.path, text: s.text, chunks: [{ start: 0, lang: langOf(s.lang), allow: s.allow, line: s.line }] });
   }

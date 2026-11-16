@@ -70,6 +70,13 @@ def line_at(text, i):
     return text.count("\n", 0, i) + 1
 
 
+# A string that names a module (`from './strings'`, `require('x')`) or is a member of a type
+# (`type Group = 'app' | 'isds'`) is code. 1.7.1 read Obálka's import paths and type names as copy
+# in no language, 56 findings in two catalogues.
+MODULE = re.compile(r"(?:\bfrom|\bimport|\brequire\s*\(|\bimport\s*\(|\bmock\s*\()\s*$")
+TYPE_LITERAL = re.compile(r"(?:(?<!\|)\||\btype\s+\w+(?:<[^=]*>)?\s*=)$")
+
+
 def from_code(text, path):
     """String literals that aren't keys, outside comments, with the language of their block."""
     out = []  # (line, string, lang, allow-or-None)
@@ -125,6 +132,9 @@ def from_code(text, path):
             ternary = text[:start].rstrip().endswith("?")  # `k ? 'We…' : …` is copy, not a key
             if rest.startswith(":") and not rest.startswith("::") and not ternary:
                 continue  # a key
+            said = text[:start].rstrip()
+            if MODULE.search(said) or TYPE_LITERAL.search(said):
+                continue  # a module's path, or a type's name: code, not copy
             before = text[text.rfind("\n", 0, start) + 1:start]
             m = re.search(r"(?:^|[^\w])[\"']?(" + LANGS + r")[\"']?\s*:\s*$", before)
             lang = m.group(1) if m else (stack[-1][1] if stack else None)

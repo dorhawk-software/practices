@@ -80,7 +80,9 @@ only a reviewer's eye.
    its path (`cs.json`, `values-cs/`, `cs.lproj/`) or its block
    (`cs: {`). Copy that names none is a finding, never a guess. A
    project whose plain files (its changelog) are in one language sets it
-   once: `COPY_LANG=en` in `.practices/config`.
+   once: `COPY_LANG=en` in `.practices/config`. In a code catalogue (a
+   `.ts` file with `cs` and `en` blocks) the copy is in the blocks; its
+   ids, imports and type names outside them are code, not copy.
 2. A new language ships with its rules: `.practices/copy-rules/<lang>.mjs`.
    A language with copy and no rules file fails the build, so "we added
    German" means "we added German and its copy rules".

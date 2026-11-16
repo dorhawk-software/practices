@@ -1,3 +1,6 @@
+import { plural } from './plural';
+export type Topic = 'swim' | 'school';
+export const order: Topic[] = ['swim', 'school'];
 export const en = {
   hour: 'Wait an hour.',
   user: 'A user, an SMS, a one-off.',
@@ -7,3 +10,4 @@ export const en = {
 export const es = {
   go: 'Vamos al parque, padres e hijos, siete u ocho, agua y hielo.',
 };
+export const forms = { one: 'one', other: 'other' };
