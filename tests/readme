@@ -26,9 +26,9 @@ while IFS= read -r entry; do
     case "$entry" in README.md | LICENSE | .gitignore) continue ;; esac
     name=$entry
     [ -d "$entry" ] && name="$entry/"
-    printf '%s\n' "$names" | grep -qxF -- "$name" && continue
+    grep -qxF -- "$name" <<<"$names" && continue
     case "$entry" in
-        FROM-*.md) printf '%s\n' "$names" | grep -qxF 'FROM-*.md' && continue ;;
+        FROM-*.md) grep -qxF 'FROM-*.md' <<<"$names" && continue ;;
     esac
     # A path under it ("bin/install", ".github/workflows/") names it too.
     if [ -d "$entry" ]; then

@@ -202,7 +202,7 @@ run_one() { # run_one NAME FILE FROM TO WANT: writes $work/NAME.result
     status=$?
     if [ $status = 0 ]; then
         echo "SURVIVED: tests/run passes with $file broken" >"$work/$name.result"
-    elif printf '%s\n' "$out" | grep -F 'FAIL: ' | grep -qF -- "$want"; then
+    elif grep -F 'FAIL: ' <<<"$out" | grep -F -- "$want" >/dev/null; then
         echo "killed" >"$work/$name.result"
     else
         printf 'killed for another reason (no FAIL line with "%s"):\n%s\n' "$want" "$(printf '%s\n' "$out" | grep -m 5 'FAIL\|error' || printf '%s\n' "$out" | tail -n 5)" >"$work/$name.result"

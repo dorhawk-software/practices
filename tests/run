@@ -350,7 +350,9 @@ for f in "$here"/tests/ui/*.html; do
     *)
         rule=$name
         case $name in contrast-*) rule=contrast ;; text-size-*) rule=text-size ;; outcome-*) rule=outcome ;; allow-unreasoned) rule=allow ;; align-stretched) rule=align ;; mark-*) rule=mark ;; safe-*) rule=safe ;; width-own) rule=contain ;; same-look-*) rule=same-look ;; esac
-        [ $status = 1 ] && printf '%s\n' "$out" | grep -q "^\[$rule\]" && ok ||
+        # A here-string, not a pipe: under pipefail, grep -q leaving at the first match broke
+        # printf's pipe and failed a passing case (1.6.5's pre-commit run on contain).
+        [ $status = 1 ] && grep -q "^\[$rule\]" <<<"$out" && ok ||
             bad "check-ui catches tests/ui/$name.html as [$rule] (exit $status)" "$out" ;;
     esac
     rm "$p/design/$name.html"
