@@ -63,6 +63,9 @@ mark-brand ¦ scripts/ui-mark.mjs ¦ if (bh < minBrand) add( ¦ if (false) add( 
 mark-touch ¦ scripts/ui-mark.mjs ¦ if (stroke && gap > 1.5 && gap < 0.25 * stroke) ¦ if (false) ¦ check-ui catches tests/ui/mark-touch.html
 mark-small ¦ scripts/ui-mark.mjs ¦ if (least.h > small) add( ¦ if (false) add( ¦ check-ui catches tests/ui/mark-small.html
 allow ¦ scripts/ui-audit.mjs ¦ add("allow", e, ¦ void ("allow", e, ¦ check-ui catches tests/ui/allow-unreasoned.html
+ink ¦ scripts/ui-audit.mjs ¦ add("ink", svg, ¦ void ("ink", svg, ¦ check-ui catches tests/ui/ink.html
+ink-use ¦ scripts/ui-audit.mjs ¦ const src = id && document.getElementById(id); ¦ const src = null; ¦ check-ui catches tests/ui/ink.html
+ink-neutral ¦ scripts/ui-audit.mjs ¦ if (d < 0.12) return null; ¦ if (d < 0) return null; ¦ check-ui passes tests/ui/ink-ok.html
 covered ¦ scripts/ui-audit.mjs ¦ t.covered = t.lines.length > 0 && coveredAt(t.e, t.lines[0]); ¦ t.covered = false; ¦ check-ui passes tests/ui/covered.html
 no-chrome ¦ scripts/ui-audit.mjs ¦ process.exit(2); }; ¦ process.exit(0); }; ¦ check-ui without Chrome fails
 contain-clips ¦ scripts/ui-audit.mjs ¦ if (!s || scrolls(s) || clips(s)) continue; ¦ if (!s || scrolls(s)) continue; ¦ check-ui passes tests/ui/skips.html

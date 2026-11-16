@@ -12,7 +12,7 @@ to the agent to fix. This is where each rule stands
 - **review**: it needs a person's judgement (taste, wording, whether
   an icon is ugly); reviewers check it.
 
-Today: 11 gate, 56 partial, 126 todo, 42 review
+Today: 11 gate, 57 partial, 126 todo, 42 review
 (audited rule by rule on 2026-11-15, each claim checked against the
 scripts, not the docs). `tests/enforcement` fails when a practice has a
 rule this file doesn't list, or lists one that's gone. The todo and
@@ -250,6 +250,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | One object, one drawing | todo | - | check-ui: all elements with the same data-object (or use of the same symbol) across boards have the same effective stroke width in screen px (stroke-width x CTM scale), aspect ratio and corner radius. |
 | A drawing over an object reaches its edges | todo | - | check-ui: each overlay drawing (data-overlay/svg decoration inside an object) has a bounding rect equal to its parent's border box within 0.5 px, and corner path endpoints land on the parent's corners. |
 | A line weight per family | todo | - | check-ui: group strokes by family and fail if one family has more than one effective stroke width or differs from the weight declared in the design tokens. |
+| A glyph keeps one ink | partial | check-ui ink: a glyph's stroke and fills (its plane) in one hue, symbols through <use> included (claude-hook, Stop, pre-commit) | A plane under a glyph drawn as a bitmap, and a glyph whose stroke colour comes from a filled shape (an outlined font icon). |
 | A drawn icon set, grown from the idea | partial | check-ui icon: every button with words carries an icon, exceptions marked (claude-hook, Stop, pre-commit) | One family: the same stroke width and caps across every icon symbol; list and settings rows. |
 | Depth and texture from a concept | partial | check-ui shadow: no zero-offset halo, nothing falling up, offset at least a quarter of the blur (claude-hook, Stop, pre-commit) | One shadow recipe per elevation (data-elevation), light direction from the project's config, raised primaries and pressed selected states, grain where the identity declares texture. |
 | The system's own sign for the system's own act | todo | - | check-ui: on boards with data-platform, elements with data-system-act (unlock, share) use that platform's glyph id, and the per-platform glyphs share viewBox and stroke width; the per-platform render test stays in the project. |
