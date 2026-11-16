@@ -19,6 +19,15 @@ newest first, in the kinds common/changelog.md describes.
     that leaves the look alone says `Before-after: none, <why>`. A new
     board needs none.
 
+### Fixed
+
+- **`check-ui` read unscaled type as shrunk.** 1.6.1 measured a scale
+  as an element's drawn box over its `offsetWidth`/`offsetHeight`, which
+  round to whole pixels: an 11 px badge 19.6 px high read as 0.98 of
+  itself, 10.8 px, on Gentes's boards. The scale now comes from the
+  element's and its ancestors' `transform` and `scale`, multiplied, so a
+  tile in a scaled tile is measured too.
+
 ## 1.6.1 (2026-11-16)
 
 ### Fixed

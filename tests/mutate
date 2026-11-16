@@ -71,6 +71,9 @@ icon-segment ¦ scripts/ui-audit.mjs ¦ || segment(e) || allowNode(e, "icon") ¦
 align-flex-centre ¦ scripts/ui-audit.mjs ¦ if (text.length && text.every(centred)) { ¦ if (text.length && text.every((c) => cs(c).textAlign === "center")) { ¦ check-ui passes tests/ui/skips.html
 align-own-bar ¦ scripts/ui-audit.mjs ¦ const own = draws(row) || /absolute|fixed/.test(cs(row).position); ¦ const own = false; ¦ check-ui passes tests/ui/skips.html
 text-size-scaled ¦ scripts/ui-audit.mjs ¦ else size *= drawnScale(e); ¦ else size *= 1; ¦ check-ui catches tests/ui/text-size-scaled.html
+text-size-ancestors ¦ scripts/ui-audit.mjs ¦ for (let a = e; a instanceof Element; a = a.parentElement) { ¦ for (let a = e; a instanceof Element; a = null) { ¦ check-ui catches tests/ui/text-size-scaled.html
+text-size-prop ¦ scripts/ui-audit.mjs ¦ k *= Math.min(x, y); ¦ k *= 1; ¦ check-ui catches tests/ui/text-size-scale-prop.html
+text-size-rounded ¦ scripts/ui-audit.mjs ¦ return Math.min(k, 1); ¦ return Math.min(k, e.getBoundingClientRect().height / (e.offsetHeight || 1), 1); ¦ check-ui passes tests/ui/rounded.html
 same-look-role ¦ scripts/ui-audit.mjs ¦ + (e.getAttribute("role") ? `[role=${e.getAttribute("role")}]` : ""); ¦ + ""; ¦ check-ui passes tests/ui/skips.html
 outcome-cs ¦ scripts/ui-audit.mjs ¦ |dismiss|zrušit|storno|ano|ne|potvrdit|přijmout|odmítnout|přerušit)$/iu; ¦ |dismiss)$/iu; ¦ check-ui catches tests/ui/outcome-cs.html
 same-look-wordless ¦ scripts/ui-audit.mjs ¦ + (wordless ? " (icon only)" : "") ¦ + "" ¦ check-ui passes tests/ui/skips.html

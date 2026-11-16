@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>text-size-scale-prop</title>
+<!-- A tile scaled by the `scale` property, its text by a transform of its own: 0.8 × 0.8 of
+     14 px is 9 px on the screen. Either scale alone leaves 11.2 px, so this fails only when
+     both are read and multiplied (1.6.2). -->
+<style>
+body{font:14px/1.4 Helvetica,Arial,sans-serif;background:#fff;color:#222;margin:24px}
+.tile{scale:.8;transform-origin:0 0;width:320px;background:#f2f2f2;padding:16px}
+.tile p{transform:scale(.8);transform-origin:0 0}
+</style></head>
+<body>
+<div class="tile"><p>The reply, a tile in a tile, still read.</p></div>
+</body></html>
