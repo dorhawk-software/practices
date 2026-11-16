@@ -49,6 +49,9 @@ text-size ¦ scripts/ui-audit.mjs ¦ add("text-size", e, ¦ void ("text-size", e
 ring ¦ scripts/ui-audit.mjs ¦ add("ring", e, ¦ void ("ring", e, ¦ check-ui catches tests/ui/ring.html
 shadow ¦ scripts/ui-audit.mjs ¦ add("shadow", e, ¦ void ("shadow", e, ¦ check-ui catches tests/ui/shadow.html
 halo ¦ scripts/ui-audit.mjs ¦ add("halo", e, ¦ void ("halo", e, ¦ check-ui catches tests/ui/halo.html
+inset ¦ scripts/ui-audit.mjs ¦ add("inset", s, ¦ void ("inset", s, ¦ check-ui catches tests/ui/inset.html
+inset-on-top ¦ scripts/ui-audit.mjs ¦ if (!(a0 === "left" ? onTop(c, mid, along) : onTop(c, along, mid))) continue; ¦ if (false) continue; ¦ check-ui passes tests/ui/inset-under.html
+inset-fills ¦ scripts/ui-audit.mjs ¦ const drawn = all.filter(fills) ¦ const drawn = all.filter(draws) ¦ check-ui passes tests/ui/inset-drawing.html
 centre ¦ scripts/ui-audit.mjs ¦ add("centre", e, ¦ void ("centre", e, ¦ check-ui catches tests/ui/centre.html
 state ¦ scripts/ui-audit.mjs ¦ add("state", e, ¦ void ("state", e, ¦ check-ui catches tests/ui/state.html
 icon ¦ scripts/ui-audit.mjs ¦ add("icon", e, ¦ void ("icon", e, ¦ check-ui catches tests/ui/icon.html

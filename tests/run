@@ -344,7 +344,7 @@ for f in "$here"/tests/ui/*.html; do
     out=$("$p/.practices/bin/check-ui" "design/$name.html" 2>&1)
     status=$?
     case $name in
-    clean | allowed | covered | covered-wide | align-forward | mark-ok | skips | rounded | ink-ok)
+    clean | allowed | covered | covered-wide | align-forward | mark-ok | skips | rounded | ink-ok | inset-ok | inset-under | inset-drawing)
         [ $status = 0 ] && ok || bad "check-ui passes tests/ui/$name.html" "$out" ;;
     *)
         rule=$name
