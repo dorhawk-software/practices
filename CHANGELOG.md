@@ -5,6 +5,8 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+## 1.6.1 (2026-11-16)
+
 ### Fixed
 
 - **`check-voice` missed "we" it should have read.** Obálka's update to
