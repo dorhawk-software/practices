@@ -5,7 +5,7 @@
 #
 #   tests/mutate            # every mutant, JOBS at a time (default 4)
 #   tests/mutate NAME...    # just these
-#   SHARD=2/4 tests/mutate  # every 4th mutant, from the 2nd (CI runs 4 shards)
+#   SHARD=2/8 tests/mutate  # every 8th mutant, from the 2nd (CI runs 8 shards)
 #
 # Why: on 2026-11-15 an agent's ad-hoc mutation run reported every check
 # "caught" while it measured nothing. Its copies sat outside a git
