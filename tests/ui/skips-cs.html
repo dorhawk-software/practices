@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="cs"><head><meta charset="utf-8"><title>skips-cs</title>
+<!-- What the checks must not flag, from Scops (2026-11-16): a weekday picker,
+     a group of toggles that each say whether they're pressed, is one control
+     (no gap, no icon per day), and its "Ne" is Neděle (Sunday) by its
+     accessible name, not "no". -->
+<style>
+body{font:14px/1.4 Helvetica,Arial,sans-serif;background:#fff;color:#222;margin:24px}
+.card{background:#f2f2f2;padding:16px;width:320px;border-radius:8px}
+.week{display:flex;gap:2px;margin-top:8px}
+.week button{white-space:nowrap;font:inherit;color:#222;background:#e2e2e2;border:0;border-radius:6px;width:40px;height:36px;padding:0;justify-content:center;display:inline-flex;align-items:center}
+.week button[aria-pressed=true]{background:#cfe3d4}
+</style></head>
+<body>
+<div class="card"><p style="margin:0">Opakovat ve dnech</p>
+<div class="week" role="group" aria-label="Dny v týdnu"><button aria-pressed="true" aria-label="Pondělí">Po</button><button aria-pressed="false" aria-label="Úterý">Út</button><button aria-pressed="true" aria-label="Středa">St</button><button aria-pressed="false" aria-label="Čtvrtek">Čt</button><button aria-pressed="false" aria-label="Pátek">Pá</button><button aria-pressed="false" aria-label="Sobota">So</button><button aria-pressed="false" aria-label="Neděle">Ne</button></div></div>
+</body></html>

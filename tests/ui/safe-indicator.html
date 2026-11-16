@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>safe-indicator</title>
+<style>
+body{font:14px/1.4 Helvetica,Arial,sans-serif;background:#fff;color:#222;margin:24px}
+.card{background:#f2f2f2;padding:16px;width:320px;border-radius:8px}
+.row{display:flex;gap:8px;margin-top:16px}
+button{white-space:nowrap;font:inherit;color:#222;background:#e2e2e2;border:0;border-radius:6px;padding:6px 12px;display:inline-flex;gap:6px;align-items:center}
+button svg{width:12px;height:12px}
+.phone{position:relative;width:390px;height:500px;background:#f2f2f2;border-radius:32px;overflow:hidden}
+.home{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:#222}
+.main{position:absolute;left:16px;right:16px;bottom:50px}
+.main button{width:100%;justify-content:center}
+.screen p{margin:0;padding:70px 16px 0}
+
+</style></head>
+<body>
+<div class="phone screen" data-frame="phone"><p>A phone without its home indicator: nothing shows the reserved area.</p><div class="main"><button><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#222"/></svg>Continue</button></div></div>
+</body></html>

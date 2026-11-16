@@ -12,7 +12,7 @@ to the agent to fix. This is where each rule stands
 - **review**: it needs a person's judgement (taste, wording, whether
   an icon is ugly); reviewers check it.
 
-Today: 11 gate, 57 partial, 126 todo, 42 review
+Today: 14 gate, 59 partial, 125 todo, 42 review
 (audited rule by rule on 2026-11-15, each claim checked against the
 scripts, not the docs). `tests/enforcement` fails when a practice has a
 rule this file doesn't list, or lists one that's gone. The todo and
@@ -173,7 +173,8 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 
 | Rule | Status | Enforced by | Still to check |
 | --- | --- | --- | --- |
-| The product speaks as itself, never as "we" | partial | check-voice: "we" in English and Czech, in any case (pronouns, jsme/budeme, the -me verb), in string literals, ternary branches, JSX text, JSON, .strings, .xcstrings, .ftl, .po, strings.xml, store text, the changelog and content/ (claude-hook after edits and on Stop, pre-commit, lint) | "I" is review (the person's own words use it); the copy on design boards isn't read; other languages only through VOICE_WORDS. |
+| The product speaks as itself, never as "we" | partial | check-voice: "we" in English and Czech, in any case (pronouns, jsme/budeme, the -me verb), in string literals, ternary branches, JSX text, JSON, .strings, .xcstrings, .ftl, .po, strings.xml, store text, the changelog and content/ (claude-hook after edits and on Stop, pre-commit, lint) | "I" is review (the person's own words use it); the copy on design boards isn't read for "we" (check-copy reads them for grammar); other languages only through VOICE_WORDS. |
+| Each language's grammar is checked | partial | check-copy: each language's rules (copy-rules/<lang>.mjs: cs, en, es, and the project's own) on its own copy, by <html lang>, path or block; copy that names no language, a language without rules, and an exception without a reason are findings; boards and VOICE_FILES (claude-hook after edits and on Stop, pre-commit, lint) | Boards are read as written: text a script writes at load isn't read. Wording that is wrong but not mechanical stays with the reviewer. |
 
 ## UI design (ui/)
 
@@ -203,6 +204,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Pixel by pixel: the owner's eye is the bar | partial | check-ui contain, clip (claude-hook, Stop, pre-commit) | Lines, glyphs, the face that renders and the words: compare the built screen's DOM and captures with the board's (fonts via CDP CSS.getPlatformFontsForNode). |
 | A value the scale doesn't have is a question for the owner | todo | - | check-ui loads the project's scale tokens and flags every computed margin, padding, gap, radius and font-size not on the scale unless data-allow names it as the object's own geometry; a lint.d grep does the same in lint-exempt theme folders. |
 | Review a proposal in its place, with fresh eyes | todo | - | Structure check on proposal pages: a section answering the six questions (six non-empty items), a before/after pair, and a linked critique record; the critique's quality stays human. |
+| Every fact a screen uses was entered earlier | partial | check-copy fact: every element marked data-fact="KEY" reads the same on every board, per language; a board changed alone is compared with all (claude-hook, Stop, pre-commit, lint) | Whether an earlier step supplies each fact: a click-through test of the prototype could list each data-fact's first screen in flow order and fail when a screen uses one before the step that collects it. |
 
 ### [ui/drag-and-drop.md](ui/drag-and-drop.md)
 
@@ -255,8 +257,8 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Depth and texture from a concept | partial | check-ui shadow: no zero-offset halo, nothing falling up, offset at least a quarter of the blur (claude-hook, Stop, pre-commit) | One shadow recipe per elevation (data-elevation), light direction from the project's config, raised primaries and pressed selected states, grain where the identity declares texture. |
 | The system's own sign for the system's own act | todo | - | check-ui: on boards with data-platform, elements with data-system-act (unlock, share) use that platform's glyph id, and the per-platform glyphs share viewBox and stroke width; the per-platform render test stays in the project. |
 | Compact, not breathy | todo | - | check-ui: per screen, distance from header bottom to first content/control top above a threshold (one large scale step) fails, as does empty space between the last content and the board's bottom over a step, unless data-allow. |
-| Separate targets keep their distance | gate | check-ui gap: 8 px between targets, across and down; the three exceptions marked data-allow (claude-hook, Stop, pre-commit) | - |
-| Spacing is measured from what you see | partial | check-ui halo: rings of 2 px or more and glows keep 16 px from text; check-ui inset: a filled box over a surface's edge leaves the surface's padding to its text (claude-hook, Stop, pre-commit) | The painted extent of drawings (an SVG's disc behind a mascot) to the text above it. |
+| Separate targets keep their distance | gate | check-ui gap: 8 px between targets, across and down; segmented controls (tablist, radiogroup, a group of aria-pressed toggles) need no mark, the other exceptions are marked data-allow; a page behind an open sheet (aria-hidden, inert) isn't measured (claude-hook, Stop, pre-commit) | - |
+| Spacing is measured from what you see | partial | check-ui halo: rings of 2 px or more and glows keep 16 px from the ink of text, not its line box; check-ui inset: a filled box over a surface's edge leaves the surface's padding to its text (claude-hook, Stop, pre-commit) | The painted extent of drawings (an SVG's disc behind a mascot) to the text above it. |
 | Centred means on the axis | partial | check-ui centre: a centred block more than 3 px off its column's axis (claude-hook, Stop, pre-commit) | A lone centred block among left-aligned siblings. |
 | Rank what the screen says | review | - | Which facts a string carries and which leads is semantic; only side checks like abbr/short forms having a full aria-label or title are measurable. |
 | A shortcut view says it is a shortcut | review | - | Knowing a list shows part of a range is semantic; once marked data-partial, a heading and a 'whole' link could be structure-checked. |
@@ -265,16 +267,18 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | A counting mark keeps one scale | todo | - | check-ui: every element with data-count-unit has the same size and centre-to-centre pitch per unit across all boards. |
 | Decoration never half-hides what you read or click | partial | check-ui contrast against the pixels behind text, drawings included; covered text skipped (claude-hook, Stop, pre-commit) | A row or control partly covered by a drawing in front of it (elementsFromPoint across its box). |
 | Nothing anyone reads under 11 px | gate | check-ui text-size, SVG text at its drawn size; glyphs in shapes marked data-allow (claude-hook, Stop, pre-commit) | - |
-| One anatomy per job | partial | check-ui same-look: like targets (same tag, classes and role; icon buttons apart) share height, type, radius and padding (claude-hook, Stop, pre-commit) | Non-target components (toasts, cards) by a declared component name. |
+| One anatomy per job | partial | check-ui same-look: like targets (same tag, classes and role; icon buttons apart) share height, type, radius and padding; unclassed ones are asked to name their component (claude-hook, Stop, pre-commit) | Non-target components (toasts, cards) by a declared component name; that the classes match the design doc's component list. |
 | A choice changes everything it owns | partial | check-ui state: a focus, hover, active or pressed state never moves or resizes content; same-look (claude-hook, Stop, pre-commit) | Icon colour and dependent fields after a click: a test that clicks each option in a prototype. |
 | Show it in real context | todo | - | check-ui: every phone/desktop board contains the shared frame component with a data-source naming its kit, has a distinct dark render, a pseudo-locale variant, and no lorem/placeholder copy. |
-| Both safe areas belong to the frame | todo | - | check-ui: every phone board draws the home indicator, every target ends >=34+8 px above the frame bottom and below the status bar, and bottom sheets include the safe area in their padding. |
-| Words in the product's voice | partial | check-ui outcome: no button labelled only OK, Yes, No or another word with no outcome (claude-hook, Stop, pre-commit) | check-ui: dialog body <=2 line boxes; boards mentioning a person present each gender variant; tone and jokes stay human (review). |
+| Both safe areas belong to the frame | gate | check-ui safe: in a data-frame="phone", every target ends 34 + 8 px above the bottom (a tab bar 34) and starts below the status bar (54; data-safe-top/-bottom for others), what scrolls is skipped; a frame without its data-home-indicator, and a phone-width board (fixed at 480 px or less) without a frame, are findings (claude-hook, Stop, pre-commit) | - |
+| A sheet's page is inert, and the board says so | gate | check-ui sheet: an open dialog (role=dialog/alertdialog, dialog[open]) while a target drawn before it in its screen is live; aria-hidden and inert pages are skipped by every check (claude-hook, Stop, pre-commit) | - |
+| Words in the product's voice | partial | check-ui outcome: no button labelled only OK, Yes, No or another word with no outcome; check-copy: each language's mechanical grammar (claude-hook, Stop, pre-commit, lint) | check-ui: dialog body <=2 line boxes; boards mentioning a person present each gender variant; tone and jokes stay human (review). |
 | Answer the next question where it arises | review | - | What the user will ask next is semantic; only 'every failed/error state has a next-action button' is a structure check. |
 | Motion with a reason | todo | - | check-ui: render with emulated prefers-reduced-motion and assert no running animations/transitions and that all checks still pass; infinite animations need data-allow; generic spinners (known spinner classes, rotating circle) are flagged. |
 | Nothing runs past its surface | gate | check-ui contain and clip, at every width and theme (claude-hook, Stop, pre-commit) | - |
+| A button label stays on one line | gate | check-ui wrap: the text of a button, tab, radio, switch or menu item never runs onto a second line, unless it sits in a flex column inside the target (claude-hook, Stop, pre-commit) | - |
 | Buttons follow the column | partial | check-ui align: a row of buttons starts at its column's leading edge, fills it, or is centred in a centred column; a lone button may sit at the trailing edge; a lone button never stretches across a surface wider than 480 px (claude-hook, Stop, pre-commit) | Whether a lone trailing button moves on (its wording) is review; equal widths in a full-width row aren't checked. |
-| Every button names its outcome | partial | check-ui outcome: no button labelled only Cancel, OK, Okay, Yes, No, Confirm, Submit, Accept, Decline, Proceed, Abort or Dismiss, and their Czech words (claude-hook, Stop, pre-commit) | Whether a specific label says the outcome ("Keep the app" beside "Remove") is review. |
+| Every button names its outcome | partial | check-ui outcome: no button whose accessible name is only a word that names no outcome, from the vagueButtons of the language it is in (copy-rules/<lang>.mjs: Cancel, OK, Yes, No, Zrušit, Ano, Cancelar…) (claude-hook, Stop, pre-commit) | Whether a specific label says the outcome ("Keep the app" beside "Remove") is review. |
 
 ### [ui/window-buttons.md](ui/window-buttons.md)
 

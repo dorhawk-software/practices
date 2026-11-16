@@ -2,6 +2,7 @@
 """check-voice's reading half: finds "we" in the copy people see.
 
     voice-audit.py [--words REGEX] FILE...
+    voice-audit.py --strings FILE...    every string as JSON, for check-copy
 
 Reads only what people see: string literals in code (not their keys, not
 comments), values in JSON, .strings, .xcstrings and .arb files, messages
@@ -207,9 +208,45 @@ def from_lines(text, path):
 
 
 ALLOW = re.compile(r"practices-allow\s+voice\s*:\s*(.*)")
+COPY_ALLOW = re.compile(r"practices-allow\s+copy\s*:\s*(.*)")
+
+
+def read(path):
+    """The file's text, and its strings as (line, string, language or None)."""
+    text = open(path, encoding="utf-8").read()
+    if path.endswith(JSONISH):
+        strings = from_json(text, path)
+    elif path.endswith(CODE):
+        strings = from_code(text, path)
+        if path.endswith((".tsx", ".jsx")):
+            strings += from_jsx(text, path)
+    else:
+        strings = from_lines(text, path)
+    fixed = path_lang(path)
+    return text, [(ln, s, fixed or lang) for ln, s, lang in strings]
+
+
+def dump(argv):
+    """--strings: every string as JSON, for check-copy (copy-audit.mjs), which checks each language's grammar."""
+    out = {"strings": [], "broken": []}
+    for path in argv:
+        try:
+            text, strings = read(path)
+        except (OSError, UnicodeDecodeError, ValueError) as e:
+            out["broken"].append(f"{path}: {e}")
+            continue
+        lines = text.split("\n")
+        for ln, s, lang in strings:
+            marks = [m for m in (COPY_ALLOW.search(x) for x in lines[max(0, ln - 2):ln]) if m]
+            allow = re.sub(r"\s*(\*/|-->)\s*$", "", marks[-1].group(1)).strip() if marks else None
+            out["strings"].append({"path": path, "line": ln, "text": s, "lang": lang, "allow": allow})
+    json.dump(out, sys.stdout, ensure_ascii=False)
+    return 0
 
 
 def main(argv):
+    if argv[:1] == ["--strings"]:
+        return dump(argv[1:])
     extra = None
     if argv[:1] == ["--words"]:
         extra, argv = argv[1], argv[2:]
@@ -218,22 +255,12 @@ def main(argv):
     findings, broken = [], []
     for path in argv:
         try:
-            text = open(path, encoding="utf-8").read()
-            if path.endswith(JSONISH):
-                strings = from_json(text, path)
-            elif path.endswith(CODE):
-                strings = from_code(text, path)
-                if path.endswith((".tsx", ".jsx")):
-                    strings += from_jsx(text, path)
-            else:
-                strings = from_lines(text, path)
+            text, strings = read(path)
         except (OSError, UnicodeDecodeError, ValueError) as e:
             broken.append(f"{path}: {e}")
             continue
         lines = text.split("\n")
-        fixed = path_lang(path)
         for ln, s, lang in strings:
-            lang = fixed or lang
             said = re.sub(r"\{[^{}]*\}|%\d*\$?[@sdif]|\$\w+", " ", s)  # placeholders aren't words
             said = re.sub(r"\b[a-z][a-z0-9+.-]*://\S+|\bwww\.\S+", " ", said)  # nor web addresses (/us/)
             hits = [m.group(1) for m in everywhere.finditer(said)

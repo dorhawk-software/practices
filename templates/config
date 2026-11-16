@@ -42,3 +42,13 @@
 # More "we" words to flag, as a regex alternation, for a language the
 # check doesn't know (it knows English and Czech):
 #VOICE_WORDS='wir|uns|unser(?:e|er|en|em)?'
+
+# The files check-copy reads for each language's grammar (git pathspecs);
+# empty: the design boards and the copy files above.
+#COPY_FILES=''
+# The language of copy that names none (a changelog, a content/ folder);
+# empty: such copy is a finding, never a guess.
+#COPY_LANG='en'
+# The project's own copy-rules/<lang>.mjs files: a language the kit has
+# no rules for (it has cs, en and es), or more rules for one it has.
+#COPY_RULES='.practices/copy-rules'

@@ -58,7 +58,7 @@ icon ¦ scripts/ui-audit.mjs ¦ add("icon", e, ¦ void ("icon", e, ¦ check-ui c
 outcome ¦ scripts/ui-audit.mjs ¦ add("outcome", e, ¦ void ("outcome", e, ¦ check-ui catches tests/ui/outcome.html
 same-look ¦ scripts/ui-audit.mjs ¦ add("same-look", looks[1][1], ¦ void ("same-look", looks[1][1], ¦ check-ui catches tests/ui/same-look.html
 contrast ¦ scripts/ui-audit.mjs ¦ add("contrast", e, ¦ void ("contrast", e, ¦ check-ui catches tests/ui/contrast.html
-contrast-pixels ¦ scripts/ui-audit.mjs ¦ result.findings.push({ rule: "contrast", ¦ void ({ rule: "contrast", ¦ check-ui catches tests/ui/contrast-gradient.html
+contrast-pixels ¦ scripts/ui-pixels.mjs ¦ result.findings.push({ rule: "contrast", ¦ void ({ rule: "contrast", ¦ check-ui catches tests/ui/contrast-gradient.html
 mark-thin ¦ scripts/ui-mark.mjs ¦ if ((2 * v - 1) * scale < minStroke) thin[j] = 1; ¦ if (false) thin[j] = 1; ¦ check-ui catches tests/ui/mark-thin.html
 mark-fragment ¦ scripts/ui-mark.mjs ¦ if (c.area < 1.5 * stroke * stroke && !dotLike) ¦ if (false) ¦ check-ui catches tests/ui/mark-fragment.html
 mark-dot ¦ scripts/ui-mark.mjs ¦ const dotLike = c.area ¦ const dotLike = false && c.area ¦ check-ui passes tests/ui/mark-ok.html
@@ -82,8 +82,44 @@ text-size-ancestors ¦ scripts/ui-audit.mjs ¦ for (let a = e; a instanceof Elem
 text-size-prop ¦ scripts/ui-audit.mjs ¦ k *= Math.min(x, y); ¦ k *= 1; ¦ check-ui catches tests/ui/text-size-scale-prop.html
 text-size-rounded ¦ scripts/ui-audit.mjs ¦ return Math.min(k, 1); ¦ return Math.min(k, e.getBoundingClientRect().height / (e.offsetHeight || 1), 1); ¦ check-ui passes tests/ui/rounded.html
 same-look-role ¦ scripts/ui-audit.mjs ¦ + (e.getAttribute("role") ? `[role=${e.getAttribute("role")}]` : ""); ¦ + ""; ¦ check-ui passes tests/ui/skips.html
-outcome-cs ¦ scripts/ui-audit.mjs ¦ |dismiss|zrušit|storno|ano|ne|potvrdit|přijmout|odmítnout|přerušit)$/iu; ¦ |dismiss)$/iu; ¦ check-ui catches tests/ui/outcome-cs.html
+outcome-cs ¦ scripts/copy-rules/cs.mjs ¦ "zrušit", "storno", ¦ "storno", ¦ check-ui catches tests/ui/outcome-cs.html
 same-look-wordless ¦ scripts/ui-audit.mjs ¦ + (wordless ? " (icon only)" : "") ¦ + "" ¦ check-ui passes tests/ui/skips.html
+safe ¦ scripts/ui-audit.mjs ¦ if (from < need - 0.05) add("safe", t, ¦ if (false) add("safe", t, ¦ check-ui catches tests/ui/safe.html
+safe-indicator ¦ scripts/ui-audit.mjs ¦ add("safe", f, ¦ void ("safe", f, ¦ check-ui catches tests/ui/safe-indicator.html
+safe-top ¦ scripts/ui-audit.mjs ¦ else if (r.top - fr.top < top - 0.05) add("safe", t, ¦ else if (false) add("safe", t, ¦ check-ui catches tests/ui/safe-top.html
+safe-frame ¦ scripts/ui-audit.mjs ¦ add("safe", document.body, ¦ void ("safe", document.body, ¦ check-ui catches tests/ui/safe-frame.html
+safe-bar ¦ scripts/ui-audit.mjs ¦ const need = bottom + (bar ? 0 : cfg.safeGap) ¦ const need = bottom + cfg.safeGap ¦ check-ui passes tests/ui/skips-phone.html
+safe-scroll ¦ scripts/ui-audit.mjs ¦ || scrollsIn(t, f) || ¦ || ¦ check-ui passes tests/ui/skips-phone.html
+wrap ¦ scripts/ui-audit.mjs ¦ add("wrap", target, ¦ void ("wrap", target, ¦ check-ui catches tests/ui/wrap.html
+sheet ¦ scripts/ui-audit.mjs ¦ if (live.length) add("sheet", d, ¦ if (false) add("sheet", d, ¦ check-ui catches tests/ui/sheet.html
+inert-targets ¦ scripts/ui-audit.mjs ¦ const asleep = (e) => !!e.closest("[aria-hidden=true], [inert]"); ¦ const asleep = (e) => !!e.closest("[aria-hidden=true]"); ¦ check-ui passes tests/ui/covered.html
+inert-text ¦ scripts/ui-audit.mjs ¦ (t.e.closest("[inert]") !== null || coveredAt(t.e, t.lines[0])) ¦ coveredAt(t.e, t.lines[0]) ¦ check-ui passes tests/ui/covered.html
+group-segment ¦ scripts/ui-audit.mjs ¦ if (!g || g.getAttribute("role") !== "group") return g; ¦ return g && g.getAttribute("role") !== "group" ? g : null; ¦ check-ui passes tests/ui/skips-cs.html
+outcome-name ¦ scripts/ui-audit.mjs ¦ e.value : name || words(e)) ¦ e.value : words(e)) ¦ check-ui passes tests/ui/skips-cs.html
+halo-ink ¦ scripts/ui-audit.mjs ¦ for (const q of ink(t)) { ¦ for (const q of t.lines) { ¦ check-ui passes tests/ui/halo-ink.html
+same-look-unnamed ¦ scripts/ui-audit.mjs ¦ const unnamed = /^[A-Z]+\.(?:$| |\[)/.test(key) ? ¦ const unnamed = false ? ¦ check-ui's same-look asks unclassed buttons
+width-own ¦ scripts/ui-audit.mjs ¦ const widths = own ? [own] : ¦ const widths = false ? [own] : ¦ check-ui catches tests/ui/width-own.html
+width-canvas ¦ scripts/ui-board.mjs ¦ if (b && +b.w > 0) return +b.w; ¦ if (false) return +b.w; ¦ check-ui renders a board at the width canvas.json gives it
+themes-once ¦ scripts/ui-audit.mjs ¦ if (theme !== themes[0] && !themed) continue; ¦ if (false) continue; ¦ check-ui renders a board with no dark rules in one theme
+themes-dark ¦ scripts/ui-audit.mjs ¦ themed = t.exceptionDetails ? true : t.result.value !== false; ¦ themed = false; ¦ check-ui catches tests/ui/contrast-dark.html
+chrome-tries ¦ scripts/ui-chrome.mjs ¦ for (let attempt = 1; attempt <= 3; attempt++) { ¦ for (let attempt = 1; attempt <= 0; attempt++) { ¦ check-ui with a Chrome that opens no page fails
+copy-time ¦ scripts/copy-rules/cs.mjs ¦ const h = +m[2], want = VE_HOURS.has(h) ? "ve" : "v"; ¦ const h = +m[2], want = m[1].toLowerCase(); ¦ check-copy finds design/board.html:2 "Ve 10:20"
+copy-day ¦ scripts/copy-rules/cs.mjs ¦ const want = /^(středu|čtvrtek)$/i.test(m[2]) ? "ve" : "v"; ¦ const want = m[1].toLowerCase(); ¦ check-copy finds "v středu"
+copy-es ¦ scripts/copy-rules/es.mjs ¦ check: (m) => `"${m[0]}" is "${as(m[1], m[1].toLowerCase() === "a" ¦ check: (m) => "" && `"${m[0]}" is "${as(m[1], m[1].toLowerCase() === "a" ¦ check-copy finds es.json:1
+copy-en ¦ scripts/copy-rules/en.mjs ¦ if (said.toLowerCase() === want) return ""; ¦ return ""; ¦ check-copy finds strings.ts:3
+copy-main ¦ scripts/copy-audit.mjs ¦ self(process.argv[1]) === self(fileURLToPath(import.meta.url)) ¦ process.argv[1] === fileURLToPath(import.meta.url) ¦ check-copy fails on copy that breaks
+copy-unknown ¦ scripts/copy-audit.mjs ¦ if (!lang) { unknown.set(p.file, (unknown.get(p.file) || 0) + 1); continue; } ¦ if (!lang) continue; ¦ check-copy finds note.md
+copy-missing ¦ scripts/copy-audit.mjs ¦ missing.set(k, (missing.get(k) || 0) + 1); continue; } ¦ continue; } ¦ check-copy finds pl.json
+copy-allow ¦ scripts/copy-audit.mjs ¦ else if (rule.trim() === "copy") allow = reason; ¦ else if (false) allow = reason; ¦ check-copy passes copy that keeps
+copy-allow-reason ¦ scripts/copy-audit.mjs ¦ if (words(reason) < 3) marks.push( ¦ if (false) marks.push( ¦ check-copy finds data-allow="copy: brand"
+copy-allow-catalogue ¦ scripts/voice-audit.py ¦ marks = [m for m in (COPY_ALLOW.search(x) for x ¦ marks = [m for m in (None for x ¦ check-copy passes copy that keeps
+copy-project-rules ¦ scripts/copy-audit.mjs ¦ projectDir ? resolve(projectDir) : "" ¦ "" ¦ check-copy passes copy that keeps
+copy-fact ¦ scripts/copy-audit.mjs ¦ if (g.size < 2) continue; ¦ continue; ¦ check-copy finds "St 17:00"
+copy-context ¦ scripts/check-copy ¦ [ -f "$f" ] && context+=(--context "$f") ¦ true ¦ check-copy FILE compares its facts
+copy-lang ¦ scripts/copy-audit.mjs ¦ const fallback = langOf(opts.lang); ¦ const fallback = null; ¦ COPY_LANG names the language
+hook-copy ¦ scripts/claude-hook ¦ gate copy copy_files check-copy || failed=1 ¦ true ¦ claude-hook hands the copy's grammar back
+precommit-copy ¦ hooks/pre-commit ¦ xargs -0 "$bin/check-copy" || exit 1 ¦ true ¦ pre-commit refuses copy that breaks its grammar
+lint-copy ¦ scripts/lint ¦ step "the copy's grammar" "$PRACTICES_BIN/check-copy" ¦ true ¦ lint fails while the copy breaks its grammar
 hook-edit ¦ scripts/claude-hook ¦ gates || exit 2 ¦ true ¦ claude-hook hands a board
 hook-stop ¦ scripts/claude-hook ¦ if [ "$event" = Stop ] || [ "$event" = SubagentStop ]; then ¦ if false; then ¦ the Stop hook blocks
 precommit-ui ¦ hooks/pre-commit ¦ xargs -0 nice -n 10 "$bin/check-ui" || exit 1 ¦ true ¦ pre-commit refuses a board that fails check-ui

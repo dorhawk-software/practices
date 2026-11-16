@@ -41,10 +41,10 @@ version=$(git -C "$here" describe --tags --match 'v[0-9]*.[0-9]*.[0-9]*' --alway
 kit=$project/.practices
 rm -rf "${kit:?}/bin" "${kit:?}/hooks"
 mkdir -p "$kit/bin" "$kit/hooks"
-cp "$here"/scripts/* "$kit/bin/"
+cp -R "$here"/scripts/* "$kit/bin/"
 cp "$here"/hooks/* "$kit/hooks/"
 chmod +x "$kit"/bin/* "$kit"/hooks/*
-chmod -x "$kit/bin/lib.sh"
+chmod -x "$kit/bin/lib.sh" "$kit"/bin/copy-rules/*
 printf '%s\n' "$version" >"$kit/VERSION"
 cat >"$kit/README.md" <<EOF
 # .practices
@@ -52,7 +52,8 @@ cat >"$kit/README.md" <<EOF
 The shared practices kit from github.com/dorhawk-software/practices
 ($version). bin/, hooks/, docs/, rules.md and the skills listed in
 skills are synced from there: change them there, not here. config,
-coverage-floors, size-allowlist and lint.d/ are this project's own. Once
+coverage-floors, size-allowlist, lint.d/ and copy-rules/ are this
+project's own. Once
 per clone: \`.practices/bin/install-hooks\`.
 EOF
 

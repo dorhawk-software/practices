@@ -5,3 +5,7 @@
 # so: the privacy check never assumes "nothing to check" on its own. A real
 # project keeps the names in dev/private-terms (git-ignored) instead.
 PRIVATE_TERMS=none
+
+# Its copy (the changelog) names no language: say which, so check-copy
+# runs English's rules on it. Copy with no language named is a finding.
+COPY_LANG=en

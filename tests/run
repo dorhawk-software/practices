@@ -128,6 +128,7 @@ expect 0 "comment lines aren't the message" "$p/.practices/bin/check-commit-msg"
 
 # --- check-commit-msg: a touch-up to a board names its before/after page
 p=$(project)
+echo "COPY_LANG=en" >>"$p/.practices/config" # its boards name no language
 mkdir -p "$p/design/changes"
 printf '<p>Board</p>\n' >"$p/design/board.html"
 git -C "$p" add design/board.html && git -C "$p" commit -q -m "A board"
@@ -344,11 +345,11 @@ for f in "$here"/tests/ui/*.html; do
     out=$("$p/.practices/bin/check-ui" "design/$name.html" 2>&1)
     status=$?
     case $name in
-    clean | allowed | covered | covered-wide | align-forward | mark-ok | skips | rounded | ink-ok | inset-ok | inset-under | inset-drawing)
+    clean | allowed | covered | covered-wide | align-forward | mark-ok | skips | skips-* | rounded | ink-ok | inset-ok | inset-under | inset-drawing | halo-ink)
         [ $status = 0 ] && ok || bad "check-ui passes tests/ui/$name.html" "$out" ;;
     *)
         rule=$name
-        case $name in contrast-gradient) rule=contrast ;; text-size-*) rule=text-size ;; outcome-*) rule=outcome ;; allow-unreasoned) rule=allow ;; align-stretched) rule=align ;; mark-*) rule=mark ;; esac
+        case $name in contrast-*) rule=contrast ;; text-size-*) rule=text-size ;; outcome-*) rule=outcome ;; allow-unreasoned) rule=allow ;; align-stretched) rule=align ;; mark-*) rule=mark ;; safe-*) rule=safe ;; width-own) rule=contain ;; same-look-*) rule=same-look ;; esac
         [ $status = 1 ] && printf '%s\n' "$out" | grep -q "^\[$rule\]" && ok ||
             bad "check-ui catches tests/ui/$name.html as [$rule] (exit $status)" "$out" ;;
     esac
@@ -357,11 +358,76 @@ done
 cp "$here/tests/ui/contain.html" "$p/design/board.html"
 out=$("$p/.practices/bin/check-ui" 2>&1)
 case $out in *'"Choose a Folder…" runs'*'past the right of div.card'*) ok ;; *) bad "check-ui finds the boards by UI_BOARDS and names the element and the edge" "$out" ;; esac
+cp "$here/tests/ui/same-look-unnamed.html" "$p/design/board.html"
+out=$("$p/.practices/bin/check-ui" 2>&1)
+case $out in *'These have no class: name each component'*) ok ;; *) bad "check-ui's same-look asks unclassed buttons to name their component" "$out" ;; esac
+# A board with no dark rules renders in one theme; one with them, in both (Scops: 348 renders where 87 would do).
+cp "$here/tests/ui/clean.html" "$p/design/board.html"
+out=$("$p/.practices/bin/check-ui" 2>&1)
+case $out in *'1 board, 2 renders ('*) ok ;; *) bad "check-ui renders a board with no dark rules in one theme" "$out" ;; esac
+# A fixed-width board's width, from canvas.json beside it (the viewport meta is tests/ui/width-own.html).
+sed 's|<meta name="viewport" content="width=390">||' "$here/tests/ui/safe-frame.html" >"$p/design/board.html"
+printf '{"boards": {"board.html": {"w": 390}}}\n' >"$p/design/canvas.json"
+out=$("$p/.practices/bin/check-ui" 2>&1)
+case $out in *'drawn 390 px wide, a phone'*'1 render ('*) ok ;; *) bad "check-ui renders a board at the width canvas.json gives it" "$out" ;; esac
+rm "$p/design/canvas.json"
 echo "UI_CHROME=$work/no-chrome" >>"$p/.practices/config"
 "$p/.practices/bin/check-ui" >/dev/null 2>&1
 st=$?
 [ $st = 2 ] && ok || bad "check-ui without Chrome fails (exit 2), never passes"
+printf 'PRIVATE_TERMS=none\nUI_CHROME=%s\n' "$here/tests/ui/fake-chrome" >"$p/.practices/config"
+out=$("$p/.practices/bin/check-ui" 2>&1)
+st=$?
+[ $st = 2 ] && case $out in *"Chrome didn't open a page in 3 tries"*) true ;; *) false ;; esac && ok ||
+    bad "check-ui with a Chrome that opens no page fails (exit 2), saying so (exit $st)" "$out"
 printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
+
+# --- check-copy: each language's rules on its own copy, the language always
+# named, a fact read the same on every board, exceptions with their reason.
+p=$(project)
+expect 0 "check-copy with no copy files passes, saying so" "$p/.practices/bin/check-copy"
+cp -R "$here/tests/copy/clean/." "$p/"
+expect 0 "check-copy passes copy that keeps its language's grammar" "$p/.practices/bin/check-copy"
+cp -R "$here/tests/copy/bad/." "$p/"
+out=$("$p/.practices/bin/check-copy" 2>&1)
+st=$?
+[ $st = 1 ] && ok || bad "check-copy fails on copy that breaks its grammar (exit $st)" "$out"
+for want in 'design/board.html:2 "Ve 10:20": the hour is said "deset", so "V 10:20"' '"v středu" is "ve středu"' \
+    'es.json:1 "a el" is "al"' 'strings.ts:3 "a hour" is "an hour"' 'pl.json 1 piece of copy in "pl", and no rules for it' \
+    'note.md 1 piece of copy names no language' 'data-allow="copy: brand" gives no reason' '"practices-allow copy: name" gives no reason' \
+    '"swim" reads 2 ways: "St 16:30"' '"St 17:00"'; do
+    case $out in *"$want"*) ok ;; *) bad "check-copy finds $want" "$out" ;; esac
+done
+out=$("$p/.practices/bin/check-copy" design/week.html 2>&1)
+case $out in *'"swim" reads 2 ways'*) ok ;; *) bad "check-copy FILE compares its facts with every board" "$out" ;; esac
+echo "COPY_LANG=en" >>"$p/.practices/config"
+out=$("$p/.practices/bin/check-copy" 2>&1)
+case $out in *'note.md'*) bad "COPY_LANG names the language of copy that names none" "$out" ;; *) ok ;; esac
+printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
+# The gate runs where the others do: after an edit, before a commit, in lint.
+p=$(project)
+"$p/.practices/bin/install-hooks" >/dev/null
+mkdir -p "$p/design"
+cp "$here/tests/copy/clean/design/board.html" "$p/design/board.html"
+ev() { printf '{"hook_event_name":"%s","tool_name":"%s","tool_input":{"command":"%s"},"stop_hook_active":%s}' "$1" "$2" "${3:-}" "${4:-false}"; }
+mv "$p/.practices/bin/check-ui" "$p/.practices/bin/check-ui.real" # the copy gate alone: no Chrome needed here
+printf '#!/bin/sh\nexit 0\n' >"$p/.practices/bin/check-ui"
+chmod +x "$p/.practices/bin/check-ui"
+ev PostToolUse Edit | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok || bad "claude-hook passes copy that keeps its grammar"
+cp "$here/tests/copy/bad/design/board.html" "$p/design/board.html"
+out=$(ev PostToolUse Edit | "$p/.practices/bin/claude-hook" 2>&1)
+st=$?
+[ $st = 2 ] && case $out in *'[v-ve-time]'*) true ;; *) false ;; esac && ok ||
+    bad "claude-hook hands the copy's grammar back to the agent" "$out"
+out=$("$p/.practices/bin/lint" 2>&1)
+st=$?
+[ $st != 0 ] && case $out in *"the copy's grammar failed"*'[v-ve-time]'*) true ;; *) false ;; esac && ok ||
+    bad "lint fails while the copy breaks its grammar" "$out"
+git -C "$p" add design/board.html
+git -C "$p" commit -qm "Board" >/dev/null 2>&1 && bad "pre-commit refuses copy that breaks its grammar" || ok
+cp "$here/tests/copy/clean/design/board.html" "$p/design/board.html"
+git -C "$p" add design/board.html
+git -C "$p" commit -qm "Board" >/dev/null 2>&1 && ok || bad "pre-commit lets copy that keeps its grammar through"
 
 # --- check-voice: every "we" in the copy, in each language and format it
 # reads; nothing in comments, keys, or the person's own words.

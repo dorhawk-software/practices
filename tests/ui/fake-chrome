@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+// A Chrome that starts but never opens a page: it answers every call with an error, as Chrome in a
+// container did half the time (Scops, 2026-11-16). check-ui must fail (exit 2) and say so.
+const fs = require("fs");
+const out = fs.createWriteStream(null, { fd: 4 });
+let buf = "";
+fs.createReadStream(null, { fd: 3 }).on("data", (d) => {
+  buf += d;
+  for (let at; (at = buf.indexOf("\0")) >= 0; buf = buf.slice(at + 1)) {
+    const m = JSON.parse(buf.slice(0, at));
+    out.write(JSON.stringify({ id: m.id, error: { message: "No target with given id found" } }) + "\0");
+  }
+});
