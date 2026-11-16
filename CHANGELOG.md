@@ -5,6 +5,8 @@ newest first, in the kinds common/changelog.md describes.
 
 ## Unreleased
 
+## 1.6.2 (2026-11-16)
+
 ### New
 
 - **A touch-up gets its own before and after** (ui/design-before-build.md).
