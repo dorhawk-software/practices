@@ -3,6 +3,21 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### Fixed
+
+- **`check-voice` reads an Xcode app's English.** In a string catalog the
+  English copy is each entry's key, and keys were never read: an app's
+  "Contact us" and "kept our phones down" passed. A key is now its
+  `sourceLanguage` copy when the entry has no localization of that
+  language; a stale entry is skipped. A real quote is marked in the
+  entry's comment (`practices-allow voice: <reason>`), where Xcode keeps
+  it.
+- **Czech "nevezme" and "přijme" are he, not we.** The third person of
+  vzít and of the -jmout verbs ends in -me too; "žádný z nich ti už nikdo
+  nevezme" was a finding.
+
 ## 1.9.0 (2026-11-18)
 
 ### New

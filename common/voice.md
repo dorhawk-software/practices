@@ -43,7 +43,10 @@ guess who is acting.
    and "I".
 5. A real quote of someone speaking keeps its words. Mark it, with its
    reason, in a comment on the same line or the line above:
-   `practices-allow voice: a quote from the statute`.
+   `practices-allow voice: a quote from the statute`. In an Xcode string
+   catalog (`.xcstrings`) the mark goes in the entry's comment, which
+   Xcode keeps: "Quote by Seneca. practices-allow voice: a real quote,
+   attributed on screen".
 
 **Check.** `check-voice` reads every string people see (`VOICE_FILES`:
 the project's strings files, and the code files that hold its copy) and
@@ -90,7 +93,9 @@ only a reviewer's eye.
 1. Name the language of all copy. A board says `<html lang="cs">` (a
    part in another language, `<span lang="en">`). A catalogue says it in
    its path (`cs.json`, `values-cs/`, `cs.lproj/`) or its block
-   (`cs: {`); a Markdown page in its front matter (`lang: cs`). Copy that names none is a finding, never a guess. A
+   (`cs: {`); a Markdown page in its front matter (`lang: cs`). An Xcode
+   string catalog's key is its `sourceLanguage` copy when the entry has
+   no localization of that language, and a stale entry isn't read. Copy that names none is a finding, never a guess. A
    project whose plain files (its changelog) are in one language sets it
    once: `COPY_LANG=en` in `.practices/config`. In a code catalogue (a
    `.ts` file with `cs` and `en` blocks) the copy is in the blocks; its

@@ -551,6 +551,15 @@ for want in 'strings.ts:2 [cs]' '"jsme"' '"Upozorníme"' '"my"' "\"we'll\"" '"us
     case $out in *"$want"*) ok ;; *) bad "check-voice finds $want" "$out" ;; esac
 done
 case $out in *'Welcome'* | *'comments for translators'* | *'never read'* | *'hold the token'*) bad "check-voice reads only strings people see" "$out" ;; *) ok ;; esac
+# A string catalog's key is its source language's copy when the entry has
+# no localization of that language: an Xcode app's English "Contact us"
+# and "kept our phones down" were never read (1.9.1). A real quote is
+# marked in the entry's comment, where Xcode keeps it; a stale entry
+# doesn't ship. "nevezme" and "přijme" are he, not we.
+case $out in *'app.xcstrings:11 [en] "We saved your plan."'*) ok ;; *) bad "check-voice reads a catalog key as its source language's copy" "$out" ;; esac
+case $out in *'postponing'* | *'otálíme'*) bad "check-voice takes a mark in a catalog entry's comment" "$out" ;; *) ok ;; esac
+case $out in *'Our old banner'* | *'Náš starý'*) bad "check-voice skips a stale catalog entry" "$out" ;; *) ok ;; esac
+case $out in *'nevezme'* | *'Přijme'*) bad "check-voice reads -vezme and -jme as he, not we" "$out" ;; *) ok ;; esac
 
 # Copy that names no language is COPY_LANG's, as check-copy reads it: a
 # Czech page with no cs in its path said "a říkáme to rovnou" (and we say

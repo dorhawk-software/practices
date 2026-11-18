@@ -7,6 +7,28 @@
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Pošleme to znovu." } },
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Welcome back." } }
       }
+    },
+    "We saved your plan." : {
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Plán je uložený." } }
+      }
+    },
+    "While we are postponing, life speeds by." : {
+      "comment" : "Quote by Seneca. practices-allow voice: a real quote, attributed on screen",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zatímco otálíme, život utíká." } }
+      }
+    },
+    "Our old banner" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Náš starý banner" } }
+      }
+    },
+    "Nobody can take them away." : {
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Žádný z nich ti už nikdo nevezme. Přijme to." } }
+      }
     }
   }
 }
