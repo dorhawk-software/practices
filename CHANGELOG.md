@@ -21,6 +21,21 @@ newest first, in the kinds common/changelog.md describes.
   (motion, `ui/visual-craft.md`, "Motion with a reason"): every board is
   measured with reduced motion on, and an animation still looping there
   is a finding, unless the loop is the content and is marked.
+- **`check-proven`: a commit that changes a check says how it was
+  proven.** Set `CHECK_FILES` to the project's own checks, and a commit
+  that adds or changes one needs a `Proven:` line: what was broken, and
+  which case failed (`common/gates.md`, "A new check is broken once,
+  then trusted"). `check-commit-msg` runs it, so the commit-msg hook
+  does.
+
+### Changed
+
+- **Mutation testing is a check broken once, while it is added.** The
+  break is undone and the commit says how it went; nothing keeps or
+  reruns it. The kit's `tests/mutate`, 141 stored breaks rerun in twelve
+  CI shards on every push, is gone: a run took about an hour and proved
+  nothing new after its first. `tests/run WORD` runs one section, so a
+  break is seen failing in seconds.
 
 ## 1.7.3 (2026-11-18)
 

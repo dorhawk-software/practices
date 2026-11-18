@@ -74,6 +74,12 @@ VOICE_WORDS=''
 COPY_FILES=''
 COPY_LANG=''
 COPY_RULES='.practices/copy-rules'
+# The project's own checks (git pathspecs: a lint.d script, a scanner's
+# rules). A commit that adds or changes one says, in a "Proven:" line, how
+# the check was broken once and its test failed (check-proven,
+# common/gates.md). Empty: off. The environment may set it, as the
+# practices repository's own commit-msg hook does.
+CHECK_FILES=${CHECK_FILES-}
 
 if [ -f .practices/config ]; then
     # shellcheck source=/dev/null

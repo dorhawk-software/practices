@@ -4,10 +4,33 @@
 # check missed a 736-line file; its privacy check passed everything on
 # macOS). Where macOS' bash 3.2 is at /bin/bash, the scripts run under it.
 #
-#   tests/run
+#   tests/run            # every section
+#   tests/run WORD...    # only the sections whose "# --- " heading holds a word
+#
+# A section alone (`tests/run check-ui`) takes seconds where the whole file
+# takes minutes: run it while a new check is proven by breaking it once
+# (common/gates.md). The lines before the first section, and the count,
+# always run. A section that leans on one before it fails alone, so an
+# unbroken run of the same words must pass first.
 # shellcheck disable=SC2015 # ok() never fails
 set -uo pipefail
-here=$(cd "$(dirname "$0")/.." && pwd)
+if [ $# -gt 0 ]; then
+    picked=$(mktemp)
+    awk -v words="$*" 'BEGIN { n = split(words, w, " "); on = 1 }
+        /^# --- / { on = 0; for (i = 1; i <= n; i++) if (index($0, w[i])) on = 1; if (on) found = 1 }
+        /^echo "\$passed passed/ { on = 1 }
+        on { print }
+        END { exit(found ? 0 : 3) }' "$0" >"$picked" || {
+        echo "tests/run: no section's heading holds \"$*\" (grep '^# --- ' tests/run lists them)."
+        rm -f "$picked"
+        exit 2
+    }
+    TESTS_RUN_HERE=$(cd "$(dirname "$0")/.." && pwd) bash "$picked"
+    status=$?
+    rm -f "$picked"
+    exit $status
+fi
+here=${TESTS_RUN_HERE:-$(cd "$(dirname "$0")/.." && pwd)}
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
@@ -113,6 +136,9 @@ rm "$p/README"
 printf 'GlobexCorp\n' >"$p/dev/private-terms"
 
 # --- check-commit-msg
+p=$(project) # its own: the client below is a private term (tests/run check-commit-msg runs it alone)
+: >"$p/.practices/config"
+mkdir -p "$p/dev" && printf 'GlobexCorp\n' >"$p/dev/private-terms" && echo dev/private-terms >"$p/.gitignore"
 printf 'Fix the thing\n\nCo-Authored-By: Claude <noreply@anthropic.com>\n' >"$work/m1"
 expect 0 "a plain message with Co-Authored-By passes" "$p/.practices/bin/check-commit-msg" "$work/m1"
 printf 'Fix\n\nClaude-Session: https://claude.ai/code/session_01AbCdEfGhIjKlMnOpQrStUv\n' >"$work/m2"
@@ -154,6 +180,27 @@ expect 1 "a Before-after: in a comment line isn't the trailer" "$p/.practices/bi
 "$p/.practices/bin/install-hooks" >/dev/null
 expect 1 "the commit-msg hook refuses a touched-up board without its page" git -C "$p" commit -q -F "$work/ba0"
 expect 0 "and lets it through with its page" git -C "$p" commit -q -F "$work/ba2"
+
+# --- check-commit-msg: a commit that changes a check says how it was proven
+p=$(project)
+mkdir -p "$p/lint.d"
+echo 'CHECK_FILES=":(glob)lint.d/*"' >>"$p/.practices/config"
+printf 'echo one\n' >"$p/lint.d/no-todo" && git -C "$p" add lint.d/no-todo
+printf 'Add a check\n' >"$work/pr0"
+expect 1 "a new check without Proven: fails" "$p/.practices/bin/check-commit-msg" "$work/pr0"
+printf 'Add a check\n\nProven: yes\n' >"$work/pr1"
+expect 1 "Proven: without what was broken fails" "$p/.practices/bin/check-commit-msg" "$work/pr1"
+printf 'Add a check\n\nProven: its grep turned off; the TODO case failed\n' >"$work/pr2"
+expect 0 "a new check with its Proven: line passes" "$p/.practices/bin/check-commit-msg" "$work/pr2"
+printf 'Add a check\n# Proven: its grep turned off; the TODO case failed\n' >"$work/pr3"
+expect 1 "a Proven: in a comment line doesn't count" "$p/.practices/bin/check-commit-msg" "$work/pr3"
+git -C "$p" commit -q -F "$work/pr2" --no-verify
+printf 'A note\n' >"$p/NOTES.md" && git -C "$p" add NOTES.md
+expect 0 "a commit that changes no check needs no Proven:" "$p/.practices/bin/check-commit-msg" "$work/pr0"
+printf 'echo two\n' >"$p/lint.d/no-todo" && git -C "$p" add lint.d/no-todo
+expect 1 "a changed check without Proven: fails" "$p/.practices/bin/check-commit-msg" "$work/pr0"
+"$p/.practices/bin/install-hooks" >/dev/null
+expect 1 "the commit-msg hook refuses a changed check without Proven:" git -C "$p" commit -q -F "$work/pr0"
 
 # --- install-hooks
 p=$(project)

@@ -26,7 +26,9 @@ check let every commit through on macOS until 2026-10-26.
 3. Pin scanners and their actions by commit, like any third-party action
    ([ci-caching.md](ci-caching.md#pin-third-party-actions-by-commit)).
 
-**Check.** Break the check's config on a branch: the canary fails the job.
+**Check.** Break the check's config once, while the canary is added: the
+canary fails the job. Then undo the break, and say so in the commit
+([below](#a-new-check-is-broken-once-then-trusted)).
 
 ## A rule a machine can check runs where the agent can't skip it
 
@@ -63,36 +65,60 @@ varies from run to run; a hook doesn't.
 
 **Check.** `tests/enforcement` fails when a practice has a rule that
 ENFORCEMENT.md doesn't classify. Every gate has a planted fault in
-`tests/run` and a mutant in `tests/mutate`
-([below](#a-test-of-a-check-is-proven-by-breaking-the-check)).
+`tests/run`, and was broken once while it was added
+([below](#a-new-check-is-broken-once-then-trusted)).
 
-## A test of a check is proven by breaking the check
+## A new check is broken once, then trusted
 
-**What.** A check's test (its canary) proves the check works only if the
-test fails when the check is broken. So each check has a mutant: one
-line of the check, broken on purpose, in a copy. The test suite must then
-fail on that check's own case.
+**What.** This is what mutation testing means here, and all it means. The
+owner, 2026-11-18: "a mutation testing is only done when incorporating a
+new rule, and the mutation validates during this addition of that single
+rule that the rule catches it, after mutation verifies it works, the
+mutation is no longer present and the script with its test (a quick one)
+is taken as true". So a check is broken on purpose once, while it is
+added or changed, and its test must fail on its own case. Then the break
+is undone, and the commit says how it was proven. No break is stored,
+and nothing reruns one.
 
-**Why.** On 2026-11-15 an agent proved its new checks by breaking them
-by hand. It reported every one "caught". None was: its copies sat
-outside a git repository, so every run stopped before checking, and the
-refusal counted as a kill. Its baseline then read the exit status of the
-wrong command, and passed every board, faults included. A test of a test
-needs its own guards.
+**Why.** Two incidents. On 2026-11-15 an agent proved its new checks by
+breaking them by hand, and reported every one "caught". None was: its
+copies sat outside a git repository, so every run stopped before
+checking, and the refusal counted as a kill. Its baseline read the exit
+status of the wrong command. A break needs its guards. Then the breaks
+were kept: 141 of them, each a full copy of the kit rerunning the whole
+Chrome-backed `tests/run`. A run took about an hour, loaded the owner's
+Mac, and ran again in twelve CI shards on every push. After its first
+run it proved nothing new. The owner, 2026-11-18: "yea, those mutations
+are bullshit", and "stop the local mutation tests, they are pointless".
 
 **Apply.**
-1. A mutant breaks one line, in a full copy of the project (its `.git`
-   too, so it runs as the real one does). Never mutate the real files: an
-   interrupted run leaves the break behind.
-2. First, the unmutated copy passes the whole suite. If it doesn't, no
-   result counts.
-3. A mutation that matches nothing fails the run. A no-op isn't a kill.
-4. Each mutant names the test case it must fail. A failure for another
-   reason (a crash, a refused start) is reported, not counted.
+1. Plant the fault first: a case in the check's test that the check must
+   catch, on its own rule.
+2. Run that test unbroken: it passes. Without a green baseline, no
+   failure means anything.
+3. Break one line of the check, in the working tree, inside the
+   repository. Not in a copy outside it: 2026-11-15's copies failed
+   before checking.
+4. Run the check's test, or only its part (`tests/run check-ui` here).
+   It must fail with a line naming the check's own case. A failure for
+   another reason (a crash, a refused start, a parse error) proves
+   nothing.
 5. Capture a command's exit status on the next line, into a variable.
+6. Undo the break, and see `git diff` hold only the change you meant.
+   The test passes again.
+7. Say it in the commit, on a line of its own: `Proven: the gap check
+   turned off; tests/run failed on gap.html`.
+8. Keep nothing else: no list of breaks, no job that reruns them. The
+   check and its quick test are taken as true.
 
-**Check.** The practices repository runs `tests/mutate` in CI: every
-check in the kit has a mutant, and each one is killed by its own case.
+**Check.** `check-proven`, run by `check-commit-msg` (the commit-msg
+hook): a commit that adds or changes one of the project's checks
+(`CHECK_FILES`) carries a `Proven:` line of three words or more. This
+repository's own commit-msg hook sets `CHECK_FILES` to the kit's
+scripts and hooks. Whether the break was really tried, and failed on its
+own case, is review. Until 2026-11-18 this rule was "A test of a check
+is proven by breaking the check": every check kept a mutant in
+`tests/mutate`, and CI reran them all on every push.
 
 ## Every finding says how to fix it
 

@@ -162,7 +162,8 @@ own extra checks in `.practices/lint.d/`.
 | `check-size` | 700 lines per Rust, TS or JS file, 1000 per test file, a shrinking allowlist |
 | `check-unsafe` | `unsafe` only where the project allows it |
 | `check-coverage` | tests, measured, against per-crate per-OS floors; never lowered |
-| `check-commit-msg` | no session IDs or session links in commit messages; a commit that changes a design board names its before/after page |
+| `check-commit-msg` | no session IDs or session links in commit messages; a commit that changes a design board names its before/after page; a commit that changes a check says how it was proven (`check-proven`) |
+| `check-proven` | a commit that adds or changes one of the project's checks (`CHECK_FILES`) has a `Proven:` line: the check broken once, its case seen failing |
 | `check-ui` | design boards (`design/**/*.html`), rendered in headless Chrome at each width, light and dark: nothing past its surface or cut off, buttons that follow their column and name their outcome, 8 px between targets, 11 px text, rings drawn with outline, shadows away from the light, 16 px from a ring to text's ink, centring, states that don't move content, icons on buttons, like controls alike, labels on one line, both safe areas of a phone frame, a page behind an open sheet marked inert, contrast against the pixels behind the text, and each mark (`data-mark`) at its smallest size: no stroke under 1 px, no leftover piece of a cut, the brand element 10 px or taller; a busy control (`aria-busy="true"`) disabled, without a pointer cursor, its words ending in "…" and something in it moving; nothing still looping with reduced motion |
 | `ui-audit.mjs` | check-ui's measuring half (Node, no packages; drives Chrome over a pipe) |
 | `ui-chrome.mjs` | check-ui's Chrome: started headless, spoken to over a pipe, its first page opened or retried, each board loaded under the media features asked for |

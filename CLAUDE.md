@@ -27,8 +27,15 @@ README.md is the map; read it first.
   - A rule a script could check, but none does yet, is a todo there and
     a task in ROADMAP.md, in the same commit.
   - A new check comes with a planted fault in tests/run (it must catch
-    it, on its own rule) and a mutant in tests/mutate (breaking the
-    check must fail that case).
+    it, on its own rule), and is broken once by hand while it is added:
+    tests/run (or its section, `tests/run check-ui`) must fail on that
+    case. The break is undone, never kept, and the commit body says what
+    was broken and which case failed, on a `Proven:` line (the commit-msg
+    hook refuses a changed check without one; common/gates.md, "A new
+    check is broken once, then trusted"). The owner, 2026-11-18: "after
+    mutation verifies it works, the mutation is no longer present and
+    the script with its test (a quick one) is taken as true". Until
+    2026-11-18 every check kept a mutant in tests/mutate, rerun in CI.
 - **Public repository.** No client or company names from private work,
   no real hosts or non-documentation addresses, no email addresses or
   account names, no people's names (roles only). Examples use ACME,
@@ -51,8 +58,8 @@ README.md is the map; read it first.
 
 ```sh
 tests/check     # the gate: shellcheck, links, readme, versions, enforcement, tests/run
-tests/run       # the kit's checks on throwaway projects (seconds)
-tests/mutate    # each check broken in a copy: tests/run must fail on its case (minutes)
+tests/run       # the kit's checks on throwaway projects (minutes)
+tests/run WORD  # only the sections whose "# --- " heading holds WORD (seconds)
 tests/enforcement # ENFORCEMENT.md classifies every rule of every practice
 tests/links     # every relative link in the docs resolves
 tests/readme    # README names every top-level entry, practice, guide and script
@@ -60,14 +67,16 @@ tests/versions  # the plugin's version is the newest release in CHANGELOG.md
 tests/example   # the kit end to end on examples/rust-workspace (needs Rust)
 ```
 
-The pre-commit hook runs `tests/check` (once per clone:
+The pre-commit hook runs `tests/check`, and the commit-msg hook asks a
+commit that changes a check for its `Proven:` line (once per clone:
 `git config core.hooksPath .githooks`). Until 2026-11-12 the checks ran
 only in CI, and a commit that failed shellcheck reached main.
 
 CI (.github/workflows/ci.yml) runs all of them, tests/run on Linux and
-macOS, tests/mutate on macOS, plus actionlint and the commit-message
-check. tests/run and tests/mutate need Node and Chrome (check-ui renders
-boards); without them they fail, as the gate does.
+macOS, plus actionlint and the commit-message check. tests/run needs
+Node and Chrome (check-ui renders boards); without them it fails, as the
+gate does. Until 2026-11-18 CI also ran tests/mutate, 141 stored breaks
+in twelve macOS shards, about an hour on every push; it is gone.
 
 ## Adding a practice or a project
 

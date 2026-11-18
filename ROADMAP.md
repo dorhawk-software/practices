@@ -143,7 +143,8 @@ is the source of everything Rust here; its commit links are in each doc.
     CI: contain, clip, align, gap, text-size, ring, shadow, halo, centre,
     state, icon, same-look, contrast (on the pixels behind the text).
     Each check has a planted fault in `tests/run` and a mutant in
-    `tests/mutate` (1.6.0). ink: one hue per glyph (1.6.3). inset: what
+    `tests/mutate` (1.6.0; the stored mutants were dropped on
+    2026-11-18, each check now broken once while it is added). ink: one hue per glyph (1.6.3). inset: what
     covers an edge takes room from the padding (1.6.5).
   - [x] Scops' round 2 (2026-11-16, 903 findings on 87 boards, then 0):
     both safe areas of a phone frame, labels on one line, the page behind
@@ -253,8 +254,10 @@ rows are this list's source; the most valuable first.
     (1.7.3).
   - [ ] check-voice knows more languages' we-words than English and
     Czech.
-  - [ ] tests/mutate lists the kit's checks and fails when one has no
-    mutant ("A test of a check is proven by breaking the check").
+  - [x] A check is proven by breaking it once, while it is added, and
+    the commit says so: `check-proven` asks for a `Proven:` line
+    (Unreleased). Until 2026-11-18 this item asked tests/mutate to keep
+    a mutant for every check; tests/mutate and its CI shards are gone.
 - **Rust:**
   - [ ] `clippy::allow_attributes` and `allow_attributes_without_reason`
     denied in Cargo-lints.toml.

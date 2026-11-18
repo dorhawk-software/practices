@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# This repository's commit-msg hook: a commit that adds or changes one of
+# the kit's checks says how it was proven, broken once with its case seen
+# failing (scripts/check-proven; common/gates.md, "A new check is broken
+# once, then trusted"). Session IDs and links are CI's check, on every
+# pushed commit.
+CHECK_FILES=':(glob)scripts/check-* :(glob)scripts/*.mjs :(glob)scripts/*.py :(glob)scripts/copy-rules/* :(glob)scripts/claude-hook :(glob)scripts/lint :(glob)scripts/disk-guard :(glob)hooks/*' \
+    exec "$(git rev-parse --show-toplevel)/scripts/check-proven" "$1"
