@@ -162,6 +162,9 @@ voice-html-attr ¦ scripts/voice-audit.py ¦ for k in SPOKEN: ¦ for k in (): ¦
 voice-default-lang ¦ scripts/voice-audit.py ¦ fixed or lang or default) ¦ fixed or lang) ¦ check-voice reads copy that names no language as COPY_LANG
 voice-copy-lang ¦ scripts/check-voice ¦ --lang "$COPY_LANG" ¦ --lang "" ¦ check-voice reads copy that names no language as COPY_LANG
 voice-boards ¦ scripts/lib.sh ¦ [ -z "$UI_BOARDS" ] || ui_boards ¦ true ¦ check-voice finds page.html:4 [cs]
+voice-front-lang ¦ scripts/voice-audit.py ¦ out.append((ln, s, page_lang)) ¦ out.append((ln, s, None)) ¦ check-voice reads a Markdown page's lang from its front matter
+voice-front-skip ¦ scripts/voice-audit.py ¦ if ln <= skip: ¦ if False: ¦ check-voice reads English front matter as English, and never the front matter itself
+voice-front-md ¦ scripts/voice-audit.py ¦ front_matter(text) if path.endswith(".md") else (0, None) ¦ (0, None) ¦ check-voice reads a Markdown page's lang from its front matter
 voice-changelog ¦ scripts/lib.sh ¦ VOICE_FILES=':(glob)CHANGELOG*.md ¦ VOICE_FILES=' ¦ check-voice finds CHANGELOG.md:7
 voice-content ¦ scripts/lib.sh ¦ :(glob)**/content/**/*.ts :(glob)**/content/**/*.tsx ¦ :(glob)**/content/**/*.tsx ¦ check-voice finds content/faq.ts:2
 hook-voice ¦ scripts/claude-hook ¦ gate voice voice_files check-voice || failed=1 ¦ true ¦ claude-hook hands we in the copy back to the agent

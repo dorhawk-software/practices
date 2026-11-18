@@ -12,6 +12,11 @@ newest first, in the kinds common/changelog.md describes.
   that names no language takes `COPY_LANG`, as `check-copy` reads it. A
   Czech page said "a říkáme to rovnou" (and we say so plainly): its path
   named no language, so only the English page's "we" was found.
+- **A Markdown page names its language in its front matter** (`lang:
+  cs`), for `check-voice` and `check-copy`, over `COPY_LANG`. A website
+  with English `index.md` pages and one Czech one could set neither
+  language for all of them: `COPY_LANG=cs` read "Crake's service" as
+  Czech and asked for "se service".
 
 ### Changed
 

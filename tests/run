@@ -477,6 +477,16 @@ out=$("$p/.practices/bin/check-voice" 2>&1)
 st=$?
 [ $st = 1 ] && case $out in *'about.md:1 [cs]'*'"odešleme"'*) true ;; *) false ;; esac && ok ||
     bad "check-voice reads copy that names no language as COPY_LANG" "$out"
+# A Markdown page names its language in its front matter, over COPY_LANG: a
+# website's English index.md files beside one Czech one (1.7.3).
+cp -R "$here/tests/voice/front/." "$p/"
+out=$("$p/.practices/bin/check-voice" 2>&1)
+case $out in *'files.md'* | *'zasilka.md:3'*) bad "check-voice reads English front matter as English, and never the front matter itself" "$out" ;; *) ok ;; esac
+echo "COPY_LANG=en" >>"$p/.practices/config"
+out=$("$p/.practices/bin/check-voice" 2>&1)
+case $out in *'zasilka.md:5 [cs]'*'"doručíme"'*) ok ;; *) bad "check-voice reads a Markdown page's lang from its front matter" "$out" ;; esac
+echo "COPY_LANG=cs" >>"$p/.practices/config"
+out=$("$p/.practices/bin/check-copy" "$p/content/files.md" 2>&1) && ok || bad "check-copy reads English front matter as English" "$out"
 
 # --- claude-hook: the UI gate after any edit to a board, and before the turn ends
 ev() { printf '{"hook_event_name":"%s","tool_name":"%s","tool_input":{"command":"%s"},"stop_hook_active":%s}' "$1" "$2" "${3:-}" "${4:-false}"; }

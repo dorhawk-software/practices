@@ -11,8 +11,8 @@ web pages and design boards (.html): their text and the copy in alt,
 title, aria-label and placeholder, never a script, a style or a comment.
 Each string's language comes from its file's path (cs.json, cs.lproj,
 values-cs), from the block it sits in (`const cs = {`, `cs: '...'`,
-`"cs": {`), or in a page from the lang of its element (<html lang="cs">,
-a <span lang="en">). --lang names the language of copy that names none
+`"cs": {`), in a page from the lang of its element (<html lang="cs">,
+a <span lang="en">), or in Markdown from its front matter (`lang: cs`). --lang names the language of copy that names none
 (COPY_LANG); with none, that copy gets only the words every language
 shares.
 
@@ -192,10 +192,31 @@ def from_json(text, path):
     return [(ln, s, lang.split("-")[0].split("_")[0] if lang else None) for ln, s, lang in out]
 
 
+FRONT_LANG = re.compile(r"^lang:\s*[\"']?([A-Za-z]{2,3})(?:[-_][A-Za-z]{2,4})?[\"']?\s*$")
+
+
+def front_matter(text):
+    """A Markdown file's front matter: (the number of its lines, its lang or None).
+
+    Until 1.7.3 a Markdown page named its language only in its path: a
+    website's Czech index.md beside English ones could say neither."""
+    lines = text.split("\n")
+    if lines[0].strip() != "---":
+        return 0, None
+    for i, line in enumerate(lines[1:], 2):
+        if line.strip() == "---":
+            lang = next((m.group(1).lower() for m in map(FRONT_LANG.match, lines[1:i - 1]) if m), None)
+            return i, lang
+    return 0, None
+
+
 def from_lines(text, path):
     """.strings, .ftl, .po, strings.xml and plain text: the message part of each line."""
     out, fenced, in_comment = [], False, False
+    skip, page_lang = front_matter(text) if path.endswith(".md") else (0, None)
     for ln, line in enumerate(text.split("\n"), 1):
+        if ln <= skip:
+            continue
         s = line
         if path.endswith(".strings"):
             m = re.match(r'\s*"(?:[^"\\]|\\.)*"\s*=\s*"((?:[^"\\]|\\.)*)"', s)
@@ -220,7 +241,7 @@ def from_lines(text, path):
             if fenced:
                 continue
             s = re.sub(r"`[^`]*`|<!--.*?-->", " ", s)  # inline code and comments aren't read
-        out.append((ln, s, None))
+        out.append((ln, s, page_lang))
     return out
 
 
