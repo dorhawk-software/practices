@@ -460,10 +460,23 @@ st=$?
 [ $st = 1 ] && ok || bad "check-voice fails on we in the copy (exit $st)" "$out"
 for want in 'strings.ts:2 [cs]' '"jsme"' '"Upozorníme"' '"my"' "\"we'll\"" '"us"' '"neprodáváme"' '"Our"' \
     'Localizable.strings:1 [cs]' '"Odešleme"' 'strings.xml:3 [cs]' '"uložíme"' 'app.xcstrings:7 [cs]' '"Pošleme"' 'without its reason' \
-    '"WE"' '"We keep it for you." says' 'Notice.tsx:3' 'CHANGELOG.md:7' 'content/faq.ts:2'; do
+    '"WE"' '"We keep it for you." says' 'Notice.tsx:3' 'CHANGELOG.md:7' 'content/faq.ts:2' \
+    'page.html:4 [cs]' '"říkáme"' 'page.html:5 [en]' '"Ours"' 'page.html:6 [cs]' '"Doručíme"'; do
     case $out in *"$want"*) ok ;; *) bad "check-voice finds $want" "$out" ;; esac
 done
-case $out in *'Welcome'* | *'comments for translators'* | *'never read'*) bad "check-voice reads only strings people see" "$out" ;; *) ok ;; esac
+case $out in *'Welcome'* | *'comments for translators'* | *'never read'* | *'hold the token'*) bad "check-voice reads only strings people see" "$out" ;; *) ok ;; esac
+
+# Copy that names no language is COPY_LANG's, as check-copy reads it: a
+# Czech page with no cs in its path said "a říkáme to rovnou" (and we say
+# so plainly), and only its English twin's "we" was found (1.7.3).
+p=$(project)
+cp -R "$here/tests/voice/lang/." "$p/"
+expect 0 "check-voice gives copy that names no language only the shared words" "$p/.practices/bin/check-voice"
+echo "COPY_LANG=cs" >>"$p/.practices/config"
+out=$("$p/.practices/bin/check-voice" 2>&1)
+st=$?
+[ $st = 1 ] && case $out in *'about.md:1 [cs]'*'"odešleme"'*) true ;; *) false ;; esac && ok ||
+    bad "check-voice reads copy that names no language as COPY_LANG" "$out"
 
 # --- claude-hook: the UI gate after any edit to a board, and before the turn ends
 ev() { printf '{"hook_event_name":"%s","tool_name":"%s","tool_input":{"command":"%s"},"stop_hook_active":%s}' "$1" "$2" "${3:-}" "${4:-false}"; }

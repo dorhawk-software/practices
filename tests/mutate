@@ -154,6 +154,14 @@ voice-mention ¦ scripts/voice-audit.py ¦ if m.group(1) != "US" and not mention
 voice-square ¦ scripts/voice-audit.py ¦ and not square(said, m)] ¦ ] ¦ check-voice passes copy that speaks as the app
 voice-url ¦ scripts/voice-audit.py ¦ said = re.sub(r"\b[a-z][a-z0-9+.-]*://\S+|\bwww\.\S+", " ", said) ¦ said = said ¦ check-voice passes copy that speaks as the app
 voice-not-verb ¦ scripts/voice-audit.py ¦ and not NOT_CZECH_VERB.search(m.group(1))] ¦ ] ¦ check-voice passes copy that speaks as the app
+voice-html ¦ scripts/voice-audit.py ¦ strings = from_html(text) ¦ strings = from_lines(text, path) ¦ check-voice finds page.html:4 [cs]
+voice-html-lang ¦ scripts/voice-audit.py ¦ self.out.append((self.getpos()[0], " ".join(data.split()), self.lang())) ¦ self.out.append((self.getpos()[0], " ".join(data.split()), None)) ¦ check-voice finds page.html:4 [cs]
+voice-html-element-lang ¦ scripts/voice-audit.py ¦ return next((lang for _, lang in reversed(self.stack) if lang), None) ¦ return next((lang for _, lang in self.stack if lang), None) ¦ check-voice finds page.html:5 [en]
+voice-html-unread ¦ scripts/voice-audit.py ¦ if data.strip() and not self.unread(): ¦ if data.strip(): ¦ check-voice reads only strings people see
+voice-html-attr ¦ scripts/voice-audit.py ¦ for k in SPOKEN: ¦ for k in (): ¦ check-voice finds "Doručíme"
+voice-default-lang ¦ scripts/voice-audit.py ¦ fixed or lang or default) ¦ fixed or lang) ¦ check-voice reads copy that names no language as COPY_LANG
+voice-copy-lang ¦ scripts/check-voice ¦ --lang "$COPY_LANG" ¦ --lang "" ¦ check-voice reads copy that names no language as COPY_LANG
+voice-boards ¦ scripts/lib.sh ¦ [ -z "$UI_BOARDS" ] || ui_boards ¦ true ¦ check-voice finds page.html:4 [cs]
 voice-changelog ¦ scripts/lib.sh ¦ VOICE_FILES=':(glob)CHANGELOG*.md ¦ VOICE_FILES=' ¦ check-voice finds CHANGELOG.md:7
 voice-content ¦ scripts/lib.sh ¦ :(glob)**/content/**/*.ts :(glob)**/content/**/*.tsx ¦ :(glob)**/content/**/*.tsx ¦ check-voice finds content/faq.ts:2
 hook-voice ¦ scripts/claude-hook ¦ gate voice voice_files check-voice || failed=1 ¦ true ¦ claude-hook hands we in the copy back to the agent

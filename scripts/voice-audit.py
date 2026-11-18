@@ -6,10 +6,15 @@
 
 Reads only what people see: string literals in code (not their keys, not
 comments), values in JSON, .strings, .xcstrings and .arb files, messages
-in .ftl, .po and Android strings.xml, and plain text (store listings).
+in .ftl, .po and Android strings.xml, plain text (store listings), and
+web pages and design boards (.html): their text and the copy in alt,
+title, aria-label and placeholder, never a script, a style or a comment.
 Each string's language comes from its file's path (cs.json, cs.lproj,
-values-cs) or from the block it sits in (`const cs = {`, `cs: '...'`,
-`"cs": {`).
+values-cs), from the block it sits in (`const cs = {`, `cs: '...'`,
+`"cs": {`), or in a page from the lang of its element (<html lang="cs">,
+a <span lang="en">). --lang names the language of copy that names none
+(COPY_LANG); with none, that copy gets only the words every language
+shares.
 
 Exit 0 clean, 1 findings, 2 a file it couldn't read.
 Why: common/voice.md, "The product speaks as itself, never as "we"".
@@ -17,6 +22,7 @@ Why: common/voice.md, "The product speaks as itself, never as "we"".
 import json
 import re
 import sys
+from html.parser import HTMLParser
 
 LANGS = "cs|sk|en|de|fr|es|it|pl|pt|nl|sv|da|fi|nb|uk|ru|hu|ja|zh|ko"
 
@@ -36,6 +42,7 @@ NOT_CZECH_VERB = re.compile(r"(?:ome|ame|ime|ume|yme)$|^(?:theme|scheme|extreme|
 QUOTES_OPEN = "\"“„'‘‚«‹"
 QUOTES_CLOSE = "\"”“'’‘»›"
 
+HTML = (".html", ".htm")
 CODE = (".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".swift", ".kt", ".kts", ".java", ".rs", ".dart", ".py", ".go", ".cs")
 JSONISH = (".json", ".arb", ".xcstrings")
 
@@ -217,14 +224,72 @@ def from_lines(text, path):
     return out
 
 
+# Elements that never close, and ones whose content no one reads as text.
+VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
+UNREAD = {"script", "style", "template", "noscript", "svg", "code", "pre"}
+SPOKEN = ("alt", "title", "aria-label", "placeholder")
+
+
+class Page(HTMLParser):
+    """A page's text and spoken attributes, each with the lang of the element it sits in.
+
+    Until 1.7.3 a page was read line by line with no language: on a Czech web
+    page "a říkáme to rovnou" (and we say so plainly) passed, its English
+    twin's "we" did not."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.stack = []  # (tag, lang or None)
+        self.out = []  # (line, text, lang)
+
+    def lang(self):
+        return next((lang for _, lang in reversed(self.stack) if lang), None)
+
+    def unread(self):
+        return any(tag in UNREAD for tag, _ in self.stack)
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        lang = (a.get("lang") or "").split("-")[0].split("_")[0].lower() or None
+        if not self.unread():
+            for k in SPOKEN:
+                if a.get(k):
+                    self.out.append((self.getpos()[0], a[k], lang or self.lang()))
+        if tag not in VOID:
+            self.stack.append((tag, lang))
+
+    def handle_startendtag(self, tag, attrs):
+        self.handle_starttag(tag, attrs)
+        if tag not in VOID:
+            self.stack.pop()
+
+    def handle_endtag(self, tag):
+        if any(t == tag for t, _ in self.stack):
+            while self.stack and self.stack.pop()[0] != tag:
+                pass
+
+    def handle_data(self, data):
+        if data.strip() and not self.unread():
+            self.out.append((self.getpos()[0], " ".join(data.split()), self.lang()))
+
+
+def from_html(text):
+    page = Page()
+    page.feed(text)
+    page.close()
+    return page.out
+
+
 ALLOW = re.compile(r"practices-allow\s+voice\s*:\s*(.*)")
 COPY_ALLOW = re.compile(r"practices-allow\s+copy\s*:\s*(.*)")
 
 
-def read(path):
+def read(path, default=None):
     """The file's text, and its strings as (line, string, language or None)."""
     text = open(path, encoding="utf-8").read()
-    if path.endswith(JSONISH):
+    if path.endswith(HTML):
+        strings = from_html(text)
+    elif path.endswith(JSONISH):
         strings = from_json(text, path)
     elif path.endswith(CODE):
         strings = from_code(text, path)
@@ -233,7 +298,7 @@ def read(path):
     else:
         strings = from_lines(text, path)
     fixed = path_lang(path)
-    return text, [(ln, s, fixed or lang) for ln, s, lang in strings]
+    return text, [(ln, s, fixed or lang or default) for ln, s, lang in strings]
 
 
 def dump(argv):
@@ -257,15 +322,19 @@ def dump(argv):
 def main(argv):
     if argv[:1] == ["--strings"]:
         return dump(argv[1:])
-    extra = None
-    if argv[:1] == ["--words"]:
-        extra, argv = argv[1], argv[2:]
+    extra, default = None, None
+    while argv[:1] in (["--words"], ["--lang"]):
+        if argv[0] == "--words":
+            extra = argv[1] or None
+        else:
+            default = argv[1] or None
+        argv = argv[2:]
     everywhere = word_re(EVERYWHERE + ([extra] if extra else []))
     czech = word_re(CZECH)
     findings, broken = [], []
     for path in argv:
         try:
-            text, strings = read(path)
+            text, strings = read(path, default)
         except (OSError, UnicodeDecodeError, ValueError) as e:
             broken.append(f"{path}: {e}")
             continue

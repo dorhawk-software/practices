@@ -173,7 +173,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 
 | Rule | Status | Enforced by | Still to check |
 | --- | --- | --- | --- |
-| The product speaks as itself, never as "we" | partial | check-voice: "we" in English and Czech, in any case (pronouns, jsme/budeme, the -me verb), in string literals, ternary branches, JSX text, JSON, .strings, .xcstrings, .ftl, .po, strings.xml, store text, the changelog and content/ (claude-hook after edits and on Stop, pre-commit, lint) | "I" is review (the person's own words use it); the copy on design boards isn't read for "we" (check-copy reads them for grammar); other languages only through VOICE_WORDS. |
+| The product speaks as itself, never as "we" | partial | check-voice: "we" in English and Czech, in any case (pronouns, jsme/budeme, the -me verb), in string literals, ternary branches, JSX text, JSON, .strings, .xcstrings, .ftl, .po, strings.xml, store text, the changelog, content/, web pages and design boards, each in its language (path, block, element lang, or COPY_LANG) (claude-hook after edits and on Stop, pre-commit, lint) | "I" is review (the person's own words use it); other languages only through VOICE_WORDS. |
 | Each language's grammar is checked | partial | check-copy: each language's rules (copy-rules/<lang>.mjs: cs, en, es, and the project's own) on its own copy, by <html lang>, path or block; copy that names no language, a language without rules, and an exception without a reason are findings; boards and VOICE_FILES (claude-hook after edits and on Stop, pre-commit, lint) | Boards are read as written: text a script writes at load isn't read. Wording that is wrong but not mechanical stays with the reviewer. |
 
 ## UI design (ui/)

@@ -3,6 +3,23 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### Fixed
+
+- **`check-voice` missed a Czech "we" on a web page.** A page's language
+  now comes from `<html lang>` (and a `lang` on any element), and copy
+  that names no language takes `COPY_LANG`, as `check-copy` reads it. A
+  Czech page said "a říkáme to rovnou" (and we say so plainly): its path
+  named no language, so only the English page's "we" was found.
+
+### Changed
+
+- **`check-voice` reads web pages and design boards** (`UI_BOARDS`): their
+  text, alt, title, aria-label and placeholder, never a script, a style or
+  a comment. Before, a board was read for grammar but never for "we", and
+  a page was read line by line, markup and scripts included.
+
 ## 1.7.2 (2026-11-16)
 
 ### Fixed
