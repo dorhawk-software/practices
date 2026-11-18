@@ -141,3 +141,8 @@ sometimes edits it.
 - A window or panel that changes size lays its content out at every
   frame: never a frame of squashed words (visual-craft.md, "A resize
   never shows a squashed frame"). Record a resize and look at each frame.
+- In a GPUI app, a child that fills a rounded corner rounds that corner
+  itself, with the parent's radius minus its border: GPUI clips square,
+  and the board's CSS clips round, so only the app shows it (rust/gpui.md,
+  "Rounded corners don't clip"). `check-gpui-clip` finds an element that
+  rounds and clips.

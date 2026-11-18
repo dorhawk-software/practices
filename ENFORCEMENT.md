@@ -12,7 +12,7 @@ to the agent to fix. This is where each rule stands
 - **review**: it needs a person's judgement (taste, wording, whether
   an icon is ugly); reviewers check it.
 
-Today: 14 gate, 64 partial, 124 todo, 42 review
+Today: 14 gate, 65 partial, 124 todo, 42 review
 (audited rule by rule on 2026-11-15, each claim checked against the
 scripts, not the docs). `tests/enforcement` fails when a practice has a
 rule this file doesn't list, or lists one that's gone. The todo and
@@ -332,6 +332,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Frame timing | todo | - | Only presence is machine-checkable (grep for an `<APP>_BENCH` switch in GPUI projects) and the "faster commit quotes medians" heuristic belongs in check-commit-msg; low value. |
 | Window buttons on macOS | todo | - | A grep in lint could fail on any `TitlebarOptions` with `appears_transparent: true` that lacks `traffic_light_position: chrome::traffic_lights()`; the per-window title test is project-written. |
 | Keyboard shortcuts per system | todo | - | A grep in lint could refuse `KeyBinding::new("ctrl-` (use `secondary-`) and modifier names (Ctrl, Cmd, Alt, Option, the symbols) in locale/.ftl files; both checks in the doc are project-written tests. |
+| Rounded corners don't clip | partial | check-gpui-clip in lint, in a GPUI app (claude-hook, pre-commit, CI rust-lint): an element that rounds and clips in one builder chain, a one-parameter closure on the element included; `// practices-allow clip:` with a reason of three words or more | An element built over several statements through a variable, or rounded in a helper and clipped by its caller; whether each corner child carries the parent's radius minus its border is review (the app at 2×). |
 | CI packages for GPUI on Linux | gate | actions/rust-setup with gpui: true (rust-ci.yml, CI); a missing package fails the build | - |
 | Dependabot leaves GPUI alone | todo | - | The template's ignore list is commented out and lacks gpui-fast*; lint could fail in GPUI projects when .github/dependabot.yml's cargo entry doesn't ignore gpui-kit*, gpui-pre* and gpui-fast*. |
 | Keeping a patched GPUI current | todo | - | The Cargo.lock check is Crake's own; the kit could fail lint whenever Cargo.lock has a `[[patch.unused]]` section (an unapplied [patch]), and ship the weekly update workflow. |

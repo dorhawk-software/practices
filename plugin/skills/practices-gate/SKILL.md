@@ -30,6 +30,7 @@ machine.
 | private names | A client's name, host or address is in a file or message. Replace it with a made-up one (ACME, Globex, `*.example`, 192.0.2.x). Never quote the matched text back anywhere. |
 | file sizes | Split the file by topic: a folder module with one file per part. A file in `.practices/size-allowlist` that shrank: lower its number there. |
 | unsafe code | Move it behind a safe function in the crate the project allows it in (UNSAFE_ALLOWED in `.practices/config`). |
+| GPUI clipping (rounded corners) | Round the child that fills each corner with the parent's radius minus its border, and drop `overflow_hidden`. Only when the clip does other work and every corner child rounds itself: `// practices-allow clip: <reason, three words or more>` on the clip's line or the one above. |
 | git hooks | Run `.practices/bin/install-hooks` once in this clone. |
 | coverage under a floor | Add tests for the lines it lists. Never lower a floor. When a crate is well over its floor, raise the floor in `.practices/coverage-floors`. |
 | disk under its floor | Stop building. Tell the person what takes the room (the message lists it) and ask before going on. |

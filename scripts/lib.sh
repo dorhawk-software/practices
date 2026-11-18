@@ -89,6 +89,23 @@ fi
 has_rust() { [ -f "$ROOT/Cargo.toml" ]; }
 has_node() { [ -f "$ROOT/package.json" ]; }
 
+# A GPUI app: Cargo.lock holds a gpui crate (gpui, gpui-kit, gpui-fast,
+# gpui-pre…), or a Cargo.toml, tracked or new, names one as a dependency.
+uses_gpui() {
+    local spec manifest
+    has_rust || return 1
+    if [ -f "$ROOT/Cargo.lock" ] && grep -Eq '^name = "gpui([-_][A-Za-z0-9_-]+)?"$' "$ROOT/Cargo.lock"; then
+        return 0
+    fi
+    read -r -a spec <<<"$EXCLUDE"
+    while IFS= read -r manifest; do
+        [ -f "$manifest" ] &&
+            grep -Eq '^[[:space:]]*(gpui([-_][A-Za-z0-9_-]+)?[[:space:]]*[=.]|\[([a-z-]+\.)?(dev-|build-)?dependencies\.gpui)' "$manifest" &&
+            return 0
+    done < <(git ls-files --cached --others --exclude-standard -- 'Cargo.toml' '*/Cargo.toml' ${spec[@]+"${spec[@]}"})
+    return 1
+}
+
 # The project's Rust files, tracked or new, without the excluded ones.
 rust_files() {
     local spec

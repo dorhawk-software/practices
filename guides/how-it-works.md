@@ -109,6 +109,7 @@ also in `rules.md`.
 | `check-copy` | each language's grammar between words, by that language's rules file ([common/voice.md](../common/voice.md#each-languages-grammar-is-checked)); copy names its language, and the language ships its rules; a `data-fact` reads the same on every board; an exception is marked `data-allow="copy: reason"` or `practices-allow copy: reason` | lint, Claude hook (edits, Stop), pre-commit |
 | `check-size` | 700 lines per file, 1000 per integration test, the shrinking allowlist | lint |
 | `check-unsafe` | `unsafe` only in `UNSAFE_ALLOWED` | lint |
+| `check-gpui-clip` | in a GPUI app, no element both rounded and clipped: GPUI clips to a rectangle ([rust/gpui.md](../rust/gpui.md#rounded-corners-dont-clip)); a clip kept on purpose is marked `practices-allow clip: reason` | lint |
 | `check-coverage` | each crate at or over its floor, per OS; floors never lowered | pre-commit, CI |
 | `check-commit-msg` | no session IDs or session links; no private names | commit-msg hook |
 | `install-hooks` | points git at `.practices/hooks` (`--check` to verify) | once per clone; lint checks it |

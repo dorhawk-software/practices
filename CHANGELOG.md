@@ -3,6 +3,19 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### New
+
+- **Rounded corners don't clip** (`rust/gpui.md`): GPUI clips children
+  to a rectangle, so a child that fills a rounded element's corner rounds
+  that corner itself, with the parent's radius minus its border.
+  `check-gpui-clip`, in the lint gate of a GPUI app, finds an element
+  that rounds its corners and clips its children; a clip kept on purpose
+  says why with `// practices-allow clip: <reason>`. A GPUI app's
+  Settings pane showed a sidebar's square corners past its picture's
+  rounded ones, and the HTML board, whose CSS clips round, looked right.
+
 ## 1.8.0 (2026-11-18)
 
 ### New

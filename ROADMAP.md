@@ -27,6 +27,11 @@ is the source of everything Rust here; its commit links are in each doc.
   check-private (fails closed), check-unsafe, check-coverage (floors per
   OS, never lowered, skips counted), check-commit-msg, install-hooks,
   claude-hook, disk-guard, prune-caches, sweep-target; `bin/install`
+- [x] check-gpui-clip: in a GPUI app, no element both rounded and clipped
+  in one builder chain (Unreleased)
+- [ ] check-gpui-clip follows an element built over several statements
+  through a variable (`let mut r = div()…; r = r.overflow_hidden()`), and
+  one rounded in a helper and clipped by its caller
 - [x] Tests of the kit (`tests/run`), under bash 3.2 on macOS
 - [x] Guides: [how it works](guides/how-it-works.md),
   [adopt in a Rust project](guides/adopt-in-a-rust-project.md),

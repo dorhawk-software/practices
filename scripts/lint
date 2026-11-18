@@ -8,7 +8,9 @@
 # The checks, in a Rust project (a Cargo.toml): rustfmt; clippy on all
 # targets (Cargo.toml's [workspace.lints] make every lint an error); cargo
 # deny (advisories, licences, sources); cargo machete (unused
-# dependencies); unsafe only where allowed (check-unsafe). In a
+# dependencies); unsafe only where allowed (check-unsafe); in a GPUI app
+# (uses_gpui in lib.sh), no element both rounded and clipped
+# (check-gpui-clip). In a
 # JavaScript/TypeScript project (a package.json): `tsc --noEmit` when
 # there's a tsconfig.json, then each npm script in NPM_CHECKS (default
 # "lint"). In every project: no private names (check-private); file sizes
@@ -39,6 +41,9 @@ if has_rust; then
     step "cargo deny" cargo deny --log-level error check
     step "cargo machete" cargo machete
     step "unsafe code" "$PRACTICES_BIN/check-unsafe"
+    if uses_gpui; then
+        step "GPUI clipping (rounded corners)" "$PRACTICES_BIN/check-gpui-clip"
+    fi
 fi
 if has_node; then
     if [ -f tsconfig.json ]; then

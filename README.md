@@ -83,7 +83,7 @@ as a pull request the project's own workflow opens.
 | [Lints are errors](rust/lints.md) | Every rustc and clippy lint denied; deny, machete, size and unsafe checks; a pinned toolchain. | `.practices/bin/lint` |
 | [Coverage floors](rust/coverage.md) | A floor per crate and OS that only rises; under it, the lines no test ran. | `.practices/bin/check-coverage` |
 | [Code conventions](rust/conventions.md) | One workspace; unsafe in one crate; OS code behind small modules; errors as sentences. | review, `check-unsafe`, `check-size` |
-| [GPUI desktop apps](rust/gpui.md) | Headless window tests, a journey kit, demo switches, frame timing, macOS window buttons, a patched GPUI kept current. | tests, CI |
+| [GPUI desktop apps](rust/gpui.md) | Headless window tests, a journey kit, demo switches, frame timing, macOS window buttons, rounded corners GPUI doesn't clip, a patched GPUI kept current. | tests, CI, `check-gpui-clip` |
 
 ### TypeScript ([typescript/](typescript))
 
@@ -161,6 +161,8 @@ own extra checks in `.practices/lint.d/`.
 | `shots-diff.mjs` | check-shots' measuring half (Node, no packages) |
 | `check-size` | 700 lines per Rust, TS or JS file, 1000 per test file, a shrinking allowlist |
 | `check-unsafe` | `unsafe` only where the project allows it |
+| `check-gpui-clip` | in a GPUI app, no element that both rounds its corners and clips its children (GPUI clips square); `// practices-allow clip: <reason>` for a clip kept on purpose |
+| `gpui-clip-audit.py` | check-gpui-clip's reading half (python3, no packages): Rust read as builder chains, comments and strings skipped |
 | `check-coverage` | tests, measured, against per-crate per-OS floors; never lowered |
 | `check-commit-msg` | no session IDs or session links in commit messages; a commit that changes a design board names its before/after page; a commit that changes a check says how it was proven (`check-proven`) |
 | `check-proven` | a commit that adds or changes one of the project's checks (`CHECK_FILES`) has a `Proven:` line: the check broken once, its case seen failing |

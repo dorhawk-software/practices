@@ -113,6 +113,42 @@ expect 0 "unsafe in the allowed crate passes" "$p/.practices/bin/check-unsafe"
 echo "#![forbid(unsafe_code)]" >"$p/crates/app/src/main.rs"
 expect 0 "forbid(unsafe_code) isn't unsafe code" "$p/.practices/bin/check-unsafe"
 
+# --- check-gpui-clip: rounding and clipping on one GPUI element, whose
+# clip is square (a Settings pane's pictures showed their sidebar's square
+# corners past the picture's rounded ones, 2026-11-18)
+p=$(project)
+cp -R "$here/tests/gpui-clip/clean/." "$p/"
+out=$("$p/.practices/bin/check-gpui-clip" 2>&1)
+st=$?
+[ $st = 0 ] && [ -z "$out" ] && ok ||
+    bad "check-gpui-clip passes, quietly, rounding and clipping on separate elements, in comments and strings, marked or vendored (exit $st)" "$out"
+p=$(project)
+cp -R "$here/tests/gpui-clip/bad/." "$p/"
+out=$("$p/.practices/bin/check-gpui-clip" 2>&1)
+st=$?
+[ $st = 1 ] && ok || bad "check-gpui-clip fails on rounding and clipping on one element (exit $st)" "$out"
+for want in '[gpui-clip] 5 findings' 'picture.rs:9 ' 'picture.rs:23 ' 'picture.rs:29 ' 'picture.rs:34 ' \
+    'picture.rs:44 ' 'without its reason' "the parent's radius minus its border" '// practices-allow clip: <reason'; do
+    case $out in *"$want"*) ok ;; *) bad "check-gpui-clip says $want" "$out" ;; esac
+done
+# The lint gate runs it in a project that uses GPUI, and only there (a
+# stand-in cargo passes the Rust steps).
+mkdir -p "$work/okcargo"
+printf '#!/bin/sh\nexit 0\n' >"$work/okcargo/cargo"
+chmod +x "$work/okcargo/cargo"
+"$p/.practices/bin/install-hooks" >/dev/null
+printf '[workspace]\nmembers = ["crates/*"]\n' >"$p/Cargo.toml"
+printf '[package]\nname = "app"\n' >"$p/crates/app/Cargo.toml"
+expect 0 "lint leaves a Rust project without GPUI alone" env PATH="$work/okcargo:$PATH" "$p/.practices/bin/lint"
+printf '[dependencies]\ngpui-kit.workspace = true\n' >>"$p/crates/app/Cargo.toml"
+out=$(PATH="$work/okcargo:$PATH" "$p/.practices/bin/lint" 2>&1)
+st=$?
+[ $st != 0 ] && case $out in *'GPUI clipping'*'picture.rs:9 '*) true ;; *) false ;; esac && ok ||
+    bad "lint runs check-gpui-clip where a Cargo.toml names a gpui crate" "$out"
+printf '[package]\nname = "app"\n' >"$p/crates/app/Cargo.toml"
+printf '[[package]]\nname = "gpui"\nversion = "0.2.0"\n' >"$p/Cargo.lock"
+expect 1 "lint runs check-gpui-clip where Cargo.lock holds a gpui crate" env PATH="$work/okcargo:$PATH" "$p/.practices/bin/lint"
+
 # --- check-private
 p=$(project)
 : >"$p/.practices/config"

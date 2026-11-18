@@ -365,6 +365,9 @@ but no script measured it.
 3. A badge or tooltip that hangs over an edge on purpose, or a list
    drawn mid-scroll, is marked in the board with its reason:
    `data-allow="contain: the count badge sits over the corner it numbers"`.
+4. A board's CSS clips to rounded corners; GPUI clips to a rectangle. In
+   a GPUI app, a child in a rounded corner rounds that corner itself
+   ([rust/gpui.md](../rust/gpui.md#rounded-corners-dont-clip)).
 
 **Check.** `.practices/bin/check-ui` measures every element against the
 surface it is drawn on, and every clipping box against its content, at
