@@ -31,6 +31,7 @@ export const RULE = {
   busy: ["A press answers at once: a busy control takes no more presses and says what is happening", "Disable it (disabled, or aria-disabled=\"true\"), its shortcut and menu item too; drop the pointer cursor; name the work in progress form, ending in … (U+2026): \"Opening Enterprise Architect…\".", "A control whose press stops the work (Stop)", "ui/feedback.md"],
   working: ["Work shows it's happening: a busy control moves while it works", "Play the work's own motion inside the control (the product's mark, not a generic spinner), from the press until the result shows.", "A control the board draws busy, whose motion is drawn elsewhere on the screen", "ui/feedback.md"],
   motion: ["Motion with a reason: with reduced motion, nothing loops", "Stop the loop under @media (prefers-reduced-motion: reduce) and rest on a still frame that still makes sense; words in progress form (\"Installing…\") say it's working.", "A loop that is the content itself (a video the person started)"],
+  squash: ["A resize never shows a squashed frame", "Animate the size and let the content lay out at every frame (or resize without the animation, or crossfade); never scale content to a size it wasn't laid out for.", "A drawing whose squash is its idea (a bouncing ball), with no words in it"],
   allow: ["Every exception has a written reason", "Write data-allow=\"rule: a reason of at least three words\".", "-"],
 };
 

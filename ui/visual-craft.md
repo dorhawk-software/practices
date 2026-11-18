@@ -984,9 +984,48 @@ have said nothing.
 3. Give every motion a still frame for reduced motion that still makes
    sense.
 
+A resize is motion too: its frames never show squashed words
+([below](#a-resize-never-shows-a-squashed-frame)).
+
 **Check.** `check-ui` (motion) renders every board with reduced motion,
 and flags any animation that still loops there. A loop that is the
 content itself is marked `data-allow="motion: …"`. Every other check
 measures the same reduced-motion render. Whether every screen still
 reads correctly with reduced motion, and whether a motion tells the
 product's story, is review.
+
+## A resize never shows a squashed frame
+
+**What.** When a window or a panel changes size, its content is laid out
+at the new size for every frame it shows. No frame shows content scaled
+to a size it wasn't laid out for: words never stretch or squash, even
+for a tenth of a second.
+
+**Why.** Gentes' Settings window shrinks to fit each tab. The owner,
+2026-11-18: "I noticed i opened Gerntes settings and went to the Privacy
+tab (which is not as tall as the first tab), and the contents were
+squashed before they re-rendered and text was looking good again, as if
+something was rendered first at 150 px (an exampple), the squashed to
+like 80 px and then re-rendered at 80 px to be nice". Then: "make this
+last re-rendering issue another rule and check pls". The window animated
+its frame, and its content stayed the old frame's picture, scaled to fit
+until the next layout.
+
+**Apply.**
+1. Resize without the system's frame animation, or lay the content out
+   at every frame of it.
+2. Follow what the platform does with tabs. macOS Settings windows
+   animate their height between tabs, with the content laid out at every
+   frame; a fixed-size window is the other way.
+3. Animate a panel's size (its height, a clip, a crossfade), never a
+   scale of its content. A scale that keeps the shape (a popover
+   appearing) is fine.
+4. Record the resize frame by frame (a screen recording, or animations
+   slowed down) and look at each frame. The words keep one size
+   throughout.
+
+**Check.** `check-ui` (squash) flags an element holding words that is
+drawn scaled out of its shape (`scaleY(.7)`), and one that plays a
+`@keyframes` rule that would scale it so, under any media. A drawing
+whose squash is its idea, with no words in it, isn't measured. The app's
+own resize is review: record it and look at every frame.

@@ -27,6 +27,12 @@ newest first, in the kinds common/changelog.md describes.
   which case failed (`common/gates.md`, "A new check is broken once,
   then trusted"). `check-commit-msg` runs it, so the commit-msg hook
   does.
+- **A resize never shows a squashed frame** (`ui/visual-craft.md`):
+  when a window or panel changes size, its content is laid out at every
+  frame. `check-ui` (squash) finds words drawn scaled out of their shape
+  on a board, now or by a `@keyframes` rule. The Windows-app runner's
+  Settings window showed the Privacy tab's words squashed for a moment
+  while it shrank to fit.
 
 ### Changed
 

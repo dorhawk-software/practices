@@ -138,3 +138,6 @@ sometimes edits it.
   presses (shortcut and menu item off) until the outcome shows, and a
   journey test that presses twice (ui/feedback.md). On a board it is
   `aria-busy="true"` and `disabled`; `check-ui` measures it.
+- A window or panel that changes size lays its content out at every
+  frame: never a frame of squashed words (visual-craft.md, "A resize
+  never shows a squashed frame"). Record a resize and look at each frame.

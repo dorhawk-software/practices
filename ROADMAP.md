@@ -164,6 +164,9 @@ is the source of everything Rust here; its commit links are in each doc.
     without a pointer cursor, its words ending in "…"; working, something
     in it moving with motion allowed; motion, nothing looping with
     reduced motion (Unreleased).
+  - [x] A resize never shows a squashed frame: squash, words drawn
+    scaled out of their shape, now or by a `@keyframes` rule
+    (Unreleased). A transition to a scaled state isn't read yet.
   - [ ] Motion with reduced motion, the rest: finite animations and
     transitions that still play, SVG `<animate>` loops, generic spinners.
   - [ ] `check-copy` reads a board as written: text a script writes at

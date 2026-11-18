@@ -12,7 +12,7 @@ to the agent to fix. This is where each rule stands
 - **review**: it needs a person's judgement (taste, wording, whether
   an icon is ugly); reviewers check it.
 
-Today: 14 gate, 63 partial, 124 todo, 42 review
+Today: 14 gate, 64 partial, 124 todo, 42 review
 (audited rule by rule on 2026-11-15, each claim checked against the
 scripts, not the docs). `tests/enforcement` fails when a practice has a
 rule this file doesn't list, or lists one that's gone. The todo and
@@ -282,6 +282,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Words in the product's voice | partial | check-ui outcome: no button labelled only OK, Yes, No or another word with no outcome; check-copy: each language's mechanical grammar (claude-hook, Stop, pre-commit, lint) | check-ui: dialog body <=2 line boxes; boards mentioning a person present each gender variant; tone and jokes stay human (review). |
 | Answer the next question where it arises | review | - | What the user will ask next is semantic; only 'every failed/error state has a next-action button' is a structure check. |
 | Motion with a reason | partial | check-ui motion: every board is rendered with reduced motion (every check measures that render), and an infinite animation still running there is a finding unless marked data-allow (claude-hook, Stop, pre-commit) | Finite animations and transitions that still play with reduced motion, SVG <animate> loops, and generic spinners (known spinner classes, a rotating circle); whether a motion tells the product's story is review. |
+| A resize never shows a squashed frame | partial | check-ui squash: an element holding words drawn scaled out of its shape, or playing a @keyframes rule (under any media) that scales it so; data-allow for a deliberate one (claude-hook, Stop, pre-commit) | A uniform scale (a popover's scale-in), transitions to a scaled state, and the native app's own window resize: review, by recording the resize frame by frame. |
 | Nothing runs past its surface | gate | check-ui contain and clip, at every width and theme (claude-hook, Stop, pre-commit) | - |
 | A button label stays on one line | gate | check-ui wrap: the text of a button, tab, radio, switch or menu item never runs onto a second line, unless it sits in a flex column inside the target (claude-hook, Stop, pre-commit) | - |
 | Buttons follow the column | partial | check-ui align: a row of buttons starts at its column's leading edge, fills it, or is centred in a centred column; a lone button may sit at the trailing edge; a lone button never stretches across a surface wider than 480 px (claude-hook, Stop, pre-commit) | Whether a lone trailing button moves on (its wording) is review; equal widths in a full-width row aren't checked. |
