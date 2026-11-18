@@ -103,8 +103,12 @@ EOF
     if [ -f "$project/package.json" ]; then
         digest typescript/conventions.md typescript/lints.md typescript/testing.md
     fi
-    if [ -d "$project/ios" ] || [ -d "$project/android" ]; then
-        digest mobile/releases.md mobile/devices.md mobile/ci.md mobile/lifecycle.md
+    # A React Native app (ios/, android/), or a native one: an XcodeGen spec
+    # or an Xcode project at the root. Until 2026-11-18 a native iOS app got no
+    # mobile rules.
+    if [ -d "$project/ios" ] || [ -d "$project/android" ] || [ -f "$project/project.yml" ] ||
+        ls -d "$project"/*.xcodeproj >/dev/null 2>&1; then
+        digest mobile/releases.md mobile/devices.md mobile/ci.md mobile/lifecycle.md mobile/app-review.md
     fi
 } >"$kit/rules.md"
 

@@ -52,3 +52,22 @@
 # The project's own copy-rules/<lang>.mjs files: a language the kit has
 # no rules for (it has cs, en and es), or more rules for one it has.
 #COPY_RULES='.practices/copy-rules'
+
+# The code files check-permission-words reads besides the copy files
+# (git pathspecs; the default reads Swift, Kotlin, Java, TS/JS and Dart,
+# tests left out), and more grant verbs and permission nouns, as regex
+# alternations, for a language it doesn't know (en, cs, es, vi):
+#PERMISSION_FILES=':(glob)App/**/*.swift'
+#PERMISSION_VERBS='erlauben|aktivieren'
+#PERMISSION_NOUNS='Mitteilungen|Standort'
+
+# The device families the iOS app ships for (1 iPhone, 2 iPad, "1,2"
+# both), for check-xcode and check-ios-artefact; empty: the Xcode
+# project's own project-level setting.
+#DEVICE_FAMILY='1'
+# More frameworks that need an entitlement, as Framework=entitlement pairs.
+#ENTITLED_FRAMEWORKS='WeatherKit=com.apple.developer.weatherkit'
+
+# The launch arguments that pin the app's language in UI tests (a regex,
+# for check-ui-tests); add the app's own switch.
+#UITEST_LANGUAGE='-AppleLanguages|-AppleLocale|-AcmeLanguage'

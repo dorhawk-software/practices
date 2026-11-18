@@ -1,0 +1,208 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B000000000000000000000A1 /* AcmeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000A1 /* AcmeApp.swift */; };
+		B000000000000000000000A2 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000S1 /* Engine.swift */; };
+		B000000000000000000000W1 /* Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000W1 /* Widget.swift */; };
+		B000000000000000000000W2 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000S1 /* Engine.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		F000000000000000000000A1 /* AcmeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AcmeApp.swift; sourceTree = "<group>"; };
+		F000000000000000000000A2 /* Acme.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Acme.entitlements; sourceTree = "<group>"; };
+		F000000000000000000000S1 /* Engine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engine.swift; sourceTree = "<group>"; };
+		F000000000000000000000W1 /* Widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget.swift; sourceTree = "<group>"; };
+		F000000000000000000000W2 /* Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Widget.entitlements; sourceTree = "<group>"; };
+		P000000000000000000000A1 /* Acme.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Acme.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		P000000000000000000000W1 /* Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Widget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		G0000000000000000000MAIN = {
+			isa = PBXGroup;
+			children = (
+				G00000000000000000000APP /* App */,
+				G0000000000000000000SHRD /* Shared */,
+				G0000000000000000000WDGT /* Widget */,
+			);
+			sourceTree = "<group>";
+		};
+		G00000000000000000000APP /* App */ = {
+			isa = PBXGroup;
+			children = (
+				F000000000000000000000A1 /* AcmeApp.swift */,
+				F000000000000000000000A2 /* Acme.entitlements */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		G0000000000000000000SHRD /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				F000000000000000000000S1 /* Engine.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		G0000000000000000000WDGT /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				F000000000000000000000W1 /* Widget.swift */,
+				F000000000000000000000W2 /* Widget.entitlements */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		T00000000000000000000APP /* Acme */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = L00000000000000000000APP /* Build configuration list for PBXNativeTarget "Acme" */;
+			buildPhases = (
+				S00000000000000000000APP /* Sources */,
+			);
+			name = Acme;
+			productName = Acme;
+			productReference = P000000000000000000000A1 /* Acme.app */;
+			productType = "com.apple.product-type.application";
+		};
+		T0000000000000000000WDGT /* Widget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = L0000000000000000000WDGT /* Build configuration list for PBXNativeTarget "Widget" */;
+			buildPhases = (
+				S0000000000000000000WDGT /* Sources */,
+			);
+			name = Widget;
+			productName = Widget;
+			productReference = P000000000000000000000W1 /* Widget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		R0000000000000000000ROOT /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = L0000000000000000000PROJ /* Build configuration list for PBXProject "Acme" */;
+			compatibilityVersion = "Xcode 14.0";
+			mainGroup = G0000000000000000000MAIN;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				T00000000000000000000APP /* Acme */,
+				T0000000000000000000WDGT /* Widget */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		S00000000000000000000APP /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				B000000000000000000000A1 /* AcmeApp.swift in Sources */,
+				B000000000000000000000A2 /* Engine.swift in Sources */,
+			);
+		};
+		S0000000000000000000WDGT /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				B000000000000000000000W1 /* Widget.swift in Sources */,
+				B000000000000000000000W2 /* Engine.swift in Sources */,
+			);
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		C0000000000000000PROJDBG /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		C0000000000000000PROJREL /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		C00000000000000000APPDBG /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = App/Acme.entitlements;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.acme;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		C00000000000000000APPREL /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = App/Acme.entitlements;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.acme;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		C0000000000000000WDGTDBG /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Widget/Widget.entitlements;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.acme.widget;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		C0000000000000000WDGTREL /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Widget/Widget.entitlements;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.acme.widget;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		L0000000000000000000PROJ /* Build configuration list for PBXProject "Acme" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0000000000000000PROJDBG /* Debug */,
+				C0000000000000000PROJREL /* Release */,
+			);
+			defaultConfigurationName = Release;
+		};
+		L00000000000000000000APP /* Build configuration list for PBXNativeTarget "Acme" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C00000000000000000APPDBG /* Debug */,
+				C00000000000000000APPREL /* Release */,
+			);
+			defaultConfigurationName = Release;
+		};
+		L0000000000000000000WDGT /* Build configuration list for PBXNativeTarget "Widget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0000000000000000WDGTDBG /* Debug */,
+				C0000000000000000WDGTREL /* Release */,
+			);
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = R0000000000000000000ROOT /* Project object */;
+}

@@ -1,0 +1,23 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Allow notifications" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Povolit oznámení" } }
+      }
+    },
+    "Continue" : {
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Pokračovat" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Continuar" } }
+      }
+    },
+    "Turn on Ask to Buy" : {
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zapněte Žádat o koupi" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

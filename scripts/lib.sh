@@ -80,6 +80,22 @@ COPY_RULES='.practices/copy-rules'
 # common/gates.md). Empty: off. The environment may set it, as the
 # practices repository's own commit-msg hook does.
 CHECK_FILES=${CHECK_FILES-}
+# The permission-button gate (check-permission-words): the code files it
+# reads besides the copy files (VOICE_FILES), tests left out, and more
+# verbs and permission nouns as regex alternations (a language it doesn't
+# know: it knows English, Czech, Spanish and Vietnamese).
+PERMISSION_FILES=':(glob)**/*.swift :(glob)**/*.kt :(glob)**/*.java :(glob)**/*.ts :(glob)**/*.tsx :(glob)**/*.js :(glob)**/*.jsx :(glob)**/*.dart :(exclude,glob)**/*Tests/** :(exclude,glob)**/*Tests.swift :(exclude,glob)**/__tests__/** :(exclude,glob)**/*.test.* :(exclude,glob)**/*.spec.* :(exclude,glob)**/tests/** :(exclude,glob)**/test/** :(exclude,glob)**/androidTest/** :(exclude,glob)**/e2e/**'
+PERMISSION_VERBS=''
+PERMISSION_NOUNS=''
+# The Xcode gate (check-xcode, check-ios-artefact): the device families
+# the app ships for (TARGETED_DEVICE_FAMILY's form: 1 iPhone, 2 iPad,
+# "1,2" both; empty: the project-level setting in the .xcodeproj), and
+# more frameworks that need an entitlement, as Framework=entitlement pairs.
+DEVICE_FAMILY=''
+ENTITLED_FRAMEWORKS=''
+# The UI-test gate (check-ui-tests): the launch arguments that pin the
+# app's language (a regex; add the app's own switch, "-AcmeLanguage").
+UITEST_LANGUAGE='-AppleLanguages|-AppleLocale'
 
 if [ -f .practices/config ]; then
     # shellcheck source=/dev/null
@@ -147,6 +163,42 @@ copy_files() {
     fi
     read -r -a spec <<<"$COPY_FILES $EXCLUDE"
     git ls-files --cached --others --exclude-standard -- "${spec[@]}"
+}
+
+# The files check-permission-words reads: the copy files (VOICE_FILES,
+# without the boards) and the code files in PERMISSION_FILES. Prose (a
+# changelog, a FAQ page, store notes) holds no buttons and is left out.
+permission_files() {
+    local spec
+    {
+        if [ -n "$VOICE_FILES" ]; then
+            read -r -a spec <<<"$VOICE_FILES $EXCLUDE"
+            git ls-files --cached --others --exclude-standard -- "${spec[@]}"
+        fi
+        if [ -n "$PERMISSION_FILES" ]; then
+            read -r -a spec <<<"$PERMISSION_FILES $EXCLUDE"
+            git ls-files --cached --others --exclude-standard -- "${spec[@]}"
+        fi
+    } | grep -vE '\.(md|txt|html?)$' | awk '!seen[$0]++'
+}
+
+# The files whose change can change what check-xcode and check-ui-tests
+# find: Xcode projects, XcodeGen specs, entitlements, Info.plists, Swift
+# and Objective-C sources, test plans, scripts and workflows.
+xcode_files() {
+    local spec
+    read -r -a spec <<<"$EXCLUDE"
+    git ls-files --cached --others --exclude-standard -- '*.pbxproj' 'project.yml' '*/project.yml' \
+        '*.entitlements' '*Info.plist' '*.swift' '*.m' '*.mm' '*.xctestplan' '*.xcconfig' \
+        '*.sh' '.github/workflows/*' 'Makefile' 'fastlane/Fastfile' ${spec[@]+"${spec[@]}"} | awk '!seen[$0]++'
+}
+
+# The Xcode projects: each tracked or new .xcodeproj, without CocoaPods'.
+xcode_projects() {
+    local spec
+    read -r -a spec <<<"$EXCLUDE"
+    git ls-files --cached --others --exclude-standard -- '*.xcodeproj/project.pbxproj' ':!Pods/**' ':!**/Pods/**' \
+        ':!**/node_modules/**' ${spec[@]+"${spec[@]}"} | sed 's|/project\.pbxproj$||'
 }
 
 # The design boards check-ui renders: tracked or new, matching UI_BOARDS.

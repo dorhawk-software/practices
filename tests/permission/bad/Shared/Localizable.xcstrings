@@ -1,0 +1,12 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Allow Screen Time access" : {
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Povolit Čas u obrazovky" } },
+        "es-MX" : { "stringUnit" : { "state" : "translated", "value" : "Permitir Tiempo en pantalla" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

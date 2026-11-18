@@ -273,6 +273,20 @@ rows are this list's source; the most valuable first.
     not applied).
   - [ ] A case-clash check for every project (`git ls-files` folded to
     lower case has no duplicates).
+- **Mobile, from App Review** ([mobile/app-review.md](mobile/app-review.md),
+  three rejections of an iPhone app in November 2026):
+  - [x] `check-permission-words`, `check-xcode`, `check-ios-artefact`
+    and `check-ui-tests`, in lint, claude-hook and pre-commit, each with
+    its planted faults in `tests/run` (Unreleased).
+  - [ ] check-ios-artefact before every upload: phase 2's release script
+    and the reusable mobile release workflow run it, not only the agent's
+    archive.
+  - [ ] check-ui-tests reads Espresso, Detox and Maestro tests, and a
+    dark-mode run.
+  - [ ] Every screen audited and its main button asserted on screen: a
+    list of the app's screens checked against the UI tests.
+  - [ ] check-permission-words follows a view to the file that asks for
+    the permission, so a bare "Allow" there is found too.
 - **TypeScript:**
   - [ ] A shared ESLint flat config (`curly: all`, `no-console`, comments
     that disable a rule say why, `--max-warnings 0`) and a reusable Node

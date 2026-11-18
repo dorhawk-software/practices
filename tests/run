@@ -574,6 +574,234 @@ case $out in *'zasilka.md:5 [cs]'*'"doručíme"'*) ok ;; *) bad "check-voice rea
 echo "COPY_LANG=cs" >>"$p/.practices/config"
 out=$("$p/.practices/bin/check-copy" "$p/content/files.md" 2>&1) && ok || bad "check-copy reads English front matter as English" "$out"
 
+# --- check-permission-words: "Continue", never "Allow", before a permission
+# prompt (mobile/app-review.md); stale catalog entries skipped, exceptions
+# with their reason.
+ev() { printf '{"hook_event_name":"%s","tool_name":"%s","tool_input":{"command":"%s"},"stop_hook_active":%s}' "$1" "$2" "${3:-}" "${4:-false}"; }
+p=$(project)
+expect 0 "check-permission-words with no copy or code passes, saying so" "$p/.practices/bin/check-permission-words"
+cp -R "$here/tests/permission/clean/." "$p/"
+expect 0 "check-permission-words passes Continue, a guide's marked step and a stale entry" "$p/.practices/bin/check-permission-words"
+cp -R "$here/tests/permission/bad/." "$p/"
+out=$("$p/.practices/bin/check-permission-words" 2>&1)
+st=$?
+[ $st = 1 ] && ok || bad "check-permission-words fails on Allow before a prompt (exit $st)" "$out"
+for want in 'Localizable.xcstrings:4 [en] "Allow Screen Time access"' '[cs] "Povolit Čas u obrazovky"' '[es] "Permitir Tiempo en pantalla"' \
+    'values-cs/strings.xml:2 [cs] "Povolit oznámení"' 'Primer.swift:6 "Allow" is a grant verb in a file that asks' \
+    'strings.ts:2 [en] "Enable camera access"' 'strings.ts:3 [en] "Allow access to your photos"' 'strings.ts:6 [es] "Permitir acceso a tus fotos"' \
+    '"practices-allow permission: guide"'; do
+    case $out in *"$want"*) ok ;; *) bad "check-permission-words finds $want" "$out" ;; esac
+done
+case $out in *Lists.swift* | *Onboarding.swift* | *'Turn on a Screen Time'* | *'Ask to Buy'*) bad "check-permission-words leaves alone what asks for no permission" "$out" ;; *) ok ;; esac
+echo "PERMISSION_VERBS='erlauben'" >>"$p/.practices/config"
+echo "PERMISSION_NOUNS='Mitteilungen'" >>"$p/.practices/config"
+printf "export const de = {\n  a: 'Erlauben Mitteilungen',\n};\n" >"$p/src/i18n/de.ts"
+out=$("$p/.practices/bin/check-permission-words" "$p/src/i18n/de.ts" 2>&1)
+case $out in *'"Erlauben Mitteilungen"'*) ok ;; *) bad "PERMISSION_VERBS and PERMISSION_NOUNS add a language's words" "$out" ;; esac
+printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
+# The gate runs where the others do: after an edit, before a commit, in lint.
+p=$(project)
+"$p/.practices/bin/install-hooks" >/dev/null
+mkdir -p "$p/App"
+cp "$here/tests/permission/clean/App/Onboarding.swift" "$p/App/Page.swift"
+ev PostToolUse Edit | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok || bad "claude-hook passes a Continue button"
+cp "$here/tests/permission/bad/App/Primer.swift" "$p/App/Page.swift"
+out=$(ev PostToolUse Edit | "$p/.practices/bin/claude-hook" 2>&1)
+st=$?
+[ $st = 2 ] && case $out in *'[permission]'*'"Allow"'*) true ;; *) false ;; esac && ok ||
+    bad "claude-hook hands an Allow button back to the agent" "$out"
+out=$("$p/.practices/bin/lint" 2>&1)
+st=$?
+[ $st != 0 ] && case $out in *"permission buttons failed"*) true ;; *) false ;; esac && ok ||
+    bad "lint fails while a button before a prompt says Allow" "$out"
+git -C "$p" add App/Page.swift
+git -C "$p" commit -qm "Primer" >/dev/null 2>&1 && bad "pre-commit refuses an Allow button before a prompt" || ok
+cp "$here/tests/permission/clean/App/Onboarding.swift" "$p/App/Page.swift"
+git -C "$p" add App/Page.swift
+git -C "$p" commit -qm "Primer" >/dev/null 2>&1 && ok || bad "pre-commit lets a Continue button through"
+
+# --- check-xcode: each shipped target built for the declared devices, with
+# the entitlement each gated framework it compiles needs (mobile/app-review.md)
+ev() { printf '{"hook_event_name":"%s","tool_name":"%s","tool_input":{"command":"%s"},"stop_hook_active":%s}' "$1" "$2" "${3:-}" "${4:-false}"; }
+p=$(project)
+expect 0 "check-xcode with no Xcode project passes, saying so" "$p/.practices/bin/check-xcode"
+printf 'name: Acme\n' >"$p/project.yml"
+out=$("$p/.practices/bin/check-xcode" 2>&1)
+[ $? = 2 ] && case $out in *'xcodegen generate'*) true ;; *) false ;; esac && ok ||
+    bad "check-xcode fails on an XcodeGen spec with no project generated" "$out"
+cp -R "$here/tests/xcode/." "$p/"
+expect 0 "check-xcode passes targets built for iPhone, each with its entitlement" "$p/.practices/bin/check-xcode"
+pbx=$p/Acme.xcodeproj/project.pbxproj
+cp "$pbx" "$work/pbx"
+sed '/C0000000000000000WDGTREL/,/name = Release/ s/TARGETED_DEVICE_FAMILY = 1;/TARGETED_DEVICE_FAMILY = "1,2";/' "$work/pbx" >"$pbx"
+out=$("$p/.practices/bin/check-xcode" 2>&1)
+[ $? = 1 ] && case $out in *'target Widget (Release) builds for 1,2 (iPhone, iPad), and the app is for 1 (iPhone)'*) true ;; *) false ;; esac && ok ||
+    bad "check-xcode finds a target built for iPad too (XcodeGen's preset)" "$out"
+cp "$work/pbx" "$pbx"
+echo "DEVICE_FAMILY='1,2'" >>"$p/.practices/config"
+out=$("$p/.practices/bin/check-xcode" 2>&1)
+case $out in *'target Acme (Debug, Release) builds for 1 (iPhone), and the app is for 1,2 (iPhone, iPad)'*) ok ;; *) bad "check-xcode holds the targets to DEVICE_FAMILY" "$out" ;; esac
+printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
+sed '/C0000000000000000PROJ/,/name = / s/TARGETED_DEVICE_FAMILY = 1;//' "$work/pbx" >"$pbx"
+out=$("$p/.practices/bin/check-xcode" 2>&1)
+[ $? = 1 ] && case $out in *"doesn't say which devices the app is for"*) true ;; *) false ;; esac && ok ||
+    bad "check-xcode asks for the declared family when neither the project nor DEVICE_FAMILY says it" "$out"
+cp "$work/pbx" "$pbx"
+cp "$p/Widget/Widget.entitlements" "$work/ents"
+printf '<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0">\n<dict>\n</dict>\n</plist>\n' >"$p/Widget/Widget.entitlements"
+out=$("$p/.practices/bin/check-xcode" 2>&1)
+[ $? = 1 ] && case $out in *'target Widget (Debug, Release) uses ManagedSettings (Shared/Engine.swift), and Widget/Widget.entitlements lacks com.apple.developer.family-controls'*) true ;; *) false ;; esac && ok ||
+    bad "check-xcode finds a widget that compiles ManagedSettings without Family Controls" "$out"
+case $out in *'target Acme'*) bad "check-xcode leaves the target that has the entitlement alone" "$out" ;; *) ok ;; esac
+cp "$work/ents" "$p/Widget/Widget.entitlements"
+echo "ENTITLED_FRAMEWORKS='WidgetKit=com.example.widgets'" >>"$p/.practices/config"
+out=$("$p/.practices/bin/check-xcode" 2>&1)
+case $out in *'uses WidgetKit (Widget/Widget.swift)'*'lacks com.example.widgets'*) ok ;; *) bad "ENTITLED_FRAMEWORKS adds a framework and its entitlement" "$out" ;; esac
+printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
+# The gate runs after an edit, before a commit, in lint.
+"$p/.practices/bin/install-hooks" >/dev/null
+git -C "$p" add -A && git -C "$p" commit -qm "Acme" >/dev/null 2>&1 && ok || bad "pre-commit lets a clean Xcode project through"
+ev PostToolUse Edit | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok || bad "claude-hook passes a clean Xcode project"
+printf '<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0">\n<dict>\n</dict>\n</plist>\n' >"$p/Widget/Widget.entitlements"
+out=$(ev PostToolUse Edit | "$p/.practices/bin/claude-hook" 2>&1)
+st=$?
+[ $st = 2 ] && case $out in *'check-xcode failed'*'[app-review]'*) true ;; *) false ;; esac && ok ||
+    bad "claude-hook hands a missing entitlement back to the agent" "$out"
+out=$("$p/.practices/bin/lint" 2>&1)
+st=$?
+[ $st != 0 ] && case $out in *"Xcode targets failed"*) true ;; *) false ;; esac && ok || bad "lint fails while a target lacks its entitlement" "$out"
+git -C "$p" add Widget/Widget.entitlements
+git -C "$p" commit -qm "Widget" >/dev/null 2>&1 && bad "pre-commit refuses a target without its entitlement" || ok
+
+# --- check-ios-artefact: the built archive's bundles, their device family and
+# the entitlements their linked frameworks need. otool and codesign are
+# stand-ins here that read what the test wrote beside each binary.
+apple=$work/apple
+mkdir -p "$apple"
+# shellcheck disable=SC2016 # the stand-ins' own variables
+printf '#!/bin/sh\n[ "$1" = -L ] || exit 1\necho "$2:"\ncat "$2.links" 2>/dev/null\n' >"$apple/otool"
+# shellcheck disable=SC2016
+printf '#!/bin/sh\nfor a; do b=$a; done\n[ -f "$b/entitlements.xml" ] || { echo "$b: code object is not signed at all" >&2; exit 1; }\ncat "$b/entitlements.xml"\n' >"$apple/codesign"
+chmod +x "$apple/otool" "$apple/codesign"
+artefact() { OTOOL=$apple/otool CODESIGN=$apple/codesign "$@"; }
+bundle() { # bundle DIR EXECUTABLE FAMILIES ENTITLED FRAMEWORK...: an app or extension the stand-ins read
+    local dir=$1 exe=$2 fams=$3 ent=$4 f
+    shift 4
+    mkdir -p "$dir"
+    {
+        printf '<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0">\n<dict>\n<key>CFBundleExecutable</key><string>%s</string>\n<key>UIDeviceFamily</key><array>' "$exe"
+        for f in $fams; do printf '<integer>%s</integer>' "$f"; done
+        printf '</array>\n</dict>\n</plist>\n'
+    } >"$dir/Info.plist"
+    : >"$dir/$exe"
+    : >"$dir/$exe.links"
+    for f in "$@"; do printf '\t%s (compatibility version 1.0.0, current version 1.0.0)\n' "$f" >>"$dir/$exe.links"; done
+    {
+        printf '<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0">\n<dict>\n'
+        [ "$ent" = yes ] && printf '<key>com.apple.developer.family-controls</key><true/>\n'
+        printf '</dict>\n</plist>\n'
+    } >"$dir/entitlements.xml"
+}
+p=$(project)
+arc=$p/build/Acme.xcarchive
+app=$arc/Products/Applications/Acme.app
+bundle "$app" Acme "1" yes /System/Library/Frameworks/FamilyControls.framework/FamilyControls @rpath/Engine.framework/Engine
+bundle "$app/PlugIns/Widget.appex" Widget "1" yes /System/Library/Frameworks/ManagedSettings.framework/ManagedSettings
+mkdir -p "$app/Frameworks/Engine.framework"
+: >"$app/Frameworks/Engine.framework/Engine"
+printf '\t/System/Library/Frameworks/DeviceActivity.framework/DeviceActivity (compatibility version 1.0.0)\n' >"$app/Frameworks/Engine.framework/Engine.links"
+expect 0 "check-ios-artefact passes an archive whose binaries carry their entitlements" artefact "$p/.practices/bin/check-ios-artefact" "$arc"
+bundle "$app/PlugIns/Widget.appex" Widget "1" no /System/Library/Frameworks/ManagedSettings.framework/ManagedSettings
+out=$(artefact "$p/.practices/bin/check-ios-artefact" "$arc" 2>&1)
+[ $? = 1 ] && case $out in *'Widget.appex: links ManagedSettings, and its signature lacks com.apple.developer.family-controls'*) true ;; *) false ;; esac && ok ||
+    bad "check-ios-artefact finds a widget that links ManagedSettings without Family Controls" "$out"
+bundle "$app/PlugIns/Widget.appex" Widget "1" no @rpath/Engine.framework/Engine
+out=$(artefact "$p/.practices/bin/check-ios-artefact" "$arc" 2>&1)
+case $out in *'Widget.appex: links DeviceActivity'*) ok ;; *) bad "check-ios-artefact follows an embedded framework to what it links" "$out" ;; esac
+bundle "$app/PlugIns/Widget.appex" Widget "1 2" yes /System/Library/Frameworks/ManagedSettings.framework/ManagedSettings
+out=$(artefact "$p/.practices/bin/check-ios-artefact" "$arc" 2>&1)
+[ $? = 1 ] && case $out in *'Widget.appex: UIDeviceFamily is 1,2 (iPhone, iPad), and the app is for 1 (iPhone)'*) true ;; *) false ;; esac && ok ||
+    bad "check-ios-artefact finds an extension built for iPad too" "$out"
+bundle "$app" Acme "1 2" yes /System/Library/Frameworks/FamilyControls.framework/FamilyControls
+echo "DEVICE_FAMILY=1" >>"$p/.practices/config"
+out=$(artefact "$p/.practices/bin/check-ios-artefact" "$arc" 2>&1)
+case $out in *'Acme.app: UIDeviceFamily is 1,2 (iPhone, iPad), and the app is for 1 (iPhone)'*) ok ;; *) bad "check-ios-artefact holds the app to DEVICE_FAMILY" "$out" ;; esac
+python3 -c 'import os, sys, zipfile
+with zipfile.ZipFile(sys.argv[2], "w") as z:
+    for d, _, names in os.walk(sys.argv[1]):
+        for n in names:
+            f = os.path.join(d, n); z.write(f, "Payload/" + os.path.relpath(f, os.path.dirname(sys.argv[1])))' "$app" "$p/build/Acme.ipa"
+out=$(cd "$p/build" && artefact "$p/.practices/bin/check-ios-artefact" Acme.ipa 2>&1)
+case $out in *'Acme.app: UIDeviceFamily is 1,2'*) ok ;; *) bad "check-ios-artefact reads an .ipa, by a path relative to the caller" "$out" ;; esac
+out=$(OTOOL=$work/no-otool "$p/.practices/bin/check-ios-artefact" "$arc" 2>&1)
+[ $? = 2 ] && case $out in *"can't say the app is clean"*'no-otool'*) true ;; *) false ;; esac && ok ||
+    bad "check-ios-artefact fails without otool, never passes" "$out"
+rm "$app/PlugIns/Widget.appex/entitlements.xml"
+out=$(artefact "$p/.practices/bin/check-ios-artefact" "$arc" 2>&1)
+[ $? = 2 ] && ok || bad "check-ios-artefact fails on a bundle it can't read the signature of" "$out"
+printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
+bundle "$app" Acme "1" yes /System/Library/Frameworks/FamilyControls.framework/FamilyControls
+bundle "$app/PlugIns/Widget.appex" Widget "1" no /System/Library/Frameworks/ManagedSettings.framework/ManagedSettings
+# claude-hook reads the archive after the agent's xcodebuild archive or -exportArchive.
+xev() { printf '{"hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"%s"},"cwd":"%s"}' "$1" "$p"; }
+out=$(xev "xcodebuild archive -scheme Acme -archivePath build/Acme" | artefact "$p/.practices/bin/claude-hook" 2>&1)
+st=$?
+[ $st = 2 ] && case $out in *'check-ios-artefact failed on'*'Acme.xcarchive'*'Widget.appex: links ManagedSettings'*) true ;; *) false ;; esac && ok ||
+    bad "claude-hook checks the archive after xcodebuild archive" "$out"
+rm "$p/build/Acme.ipa"
+mkdir -p "$p/build/export"
+python3 -c 'import os, sys, zipfile
+with zipfile.ZipFile(sys.argv[2], "w") as z:
+    for d, _, names in os.walk(sys.argv[1]):
+        for n in names:
+            f = os.path.join(d, n); z.write(f, "Payload/" + os.path.relpath(f, os.path.dirname(sys.argv[1])))' "$app" "$p/build/export/Acme.ipa"
+out=$(xev "nice -n 19 xcodebuild -exportArchive -archivePath build/Acme.xcarchive -exportPath 'build/export' -exportOptionsPlist x.plist" | artefact "$p/.practices/bin/claude-hook" 2>&1)
+[ $? = 2 ] && case $out in *'Acme.ipa'*) true ;; *) false ;; esac && ok || bad "claude-hook checks the .ipa after xcodebuild -exportArchive" "$out"
+xev "xcodebuild build -scheme Acme" | artefact "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok ||
+    bad "claude-hook leaves the archive alone after a plain build"
+
+# --- check-ui-tests: XCUITests pin the language, run the accessibility audit,
+# and run on an iPhone SE at a large text size (mobile/app-review.md)
+p=$(project)
+expect 0 "check-ui-tests with no UI tests passes, saying so" "$p/.practices/bin/check-ui-tests"
+mkdir -p "$p/UITests" "$p/scripts"
+uitest() { # uitest ARGUMENTS AUDIT: a UI test file
+    printf 'import XCTest\n\nfinal class FlowTests: XCTestCase {\n    func testOnboarding() throws {\n        let app = XCUIApplication()\n        app.launchArguments = [%s]\n        app.launch()\n        %s\n        XCTAssertTrue(app.buttons["Continue"].isHittable)\n    }\n}\n' "$1" "$2" >"$p/UITests/FlowTests.swift"
+}
+uitest '"-AppleLanguages", "(en)", "-AppleLocale", "en_US"' 'try app.performAccessibilityAudit()'
+# shellcheck disable=SC2016 # the script's own variable
+printf '#!/bin/sh\nxcrun simctl ui "$SIM" content_size extra-extra-large\nxcodebuild test -scheme Acme -destination "platform=iOS Simulator,name=iPhone SE (3rd generation)"\n' >"$p/scripts/ui-tests.sh"
+expect 0 "check-ui-tests passes tests in a pinned language, audited, on an iPhone SE at a large size" "$p/.practices/bin/check-ui-tests"
+uitest '"-AcmeDemo"' 'try app.performAccessibilityAudit()'
+out=$("$p/.practices/bin/check-ui-tests" 2>&1)
+[ $? = 1 ] && case $out in *'launch the app without pinning its language'*'UITests/FlowTests.swift'*) true ;; *) false ;; esac && ok ||
+    bad "check-ui-tests finds a test that launches the app in the simulator's language" "$out"
+uitest '"-AcmeLanguage", "en"' 'try app.performAccessibilityAudit()'
+echo "UITEST_LANGUAGE='-AcmeLanguage'" >>"$p/.practices/config"
+expect 0 "UITEST_LANGUAGE names the app's own language switch" "$p/.practices/bin/check-ui-tests"
+uitest '"-AcmeLanguage", "en"' ''
+out=$("$p/.practices/bin/check-ui-tests" 2>&1)
+case $out in *"no UI test runs Xcode's accessibility audit"*) ok ;; *) bad "check-ui-tests finds UI tests without the accessibility audit" "$out" ;; esac
+rm "$p/scripts/ui-tests.sh"
+out=$("$p/.practices/bin/check-ui-tests" 2>&1)
+case $out in *'no test run names an iPhone SE simulator'*'no test run sets a large text size'*) ok ;; *) bad "check-ui-tests finds no iPhone SE run and no large text size" "$out" ;; esac
+uitest '"-AcmeLanguage", "en", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryXXL"' 'try app.performAccessibilityAudit() // on an iPhone SE (3rd generation)'
+out=$("$p/.practices/bin/check-ui-tests" 2>&1)
+case $out in *'no test run names an iPhone SE'*) ok ;; *) bad "check-ui-tests doesn't take a Swift comment for an iPhone SE run" "$out" ;; esac
+printf 'xcodebuild test -scheme Acme -destination "platform=iOS Simulator,name=iPhone SE (3rd generation)"\n' >"$p/scripts/ui-tests.sh"
+expect 0 "check-ui-tests reads the large size from the launch arguments" "$p/.practices/bin/check-ui-tests"
+uitest '"-AcmeDemo"' 'try app.performAccessibilityAudit()'
+out=$("$p/.practices/bin/lint" 2>&1)
+st=$?
+[ $st != 0 ] && case $out in *"UI tests failed"*) true ;; *) false ;; esac && ok || bad "lint fails while a UI test doesn't pin the language" "$out"
+
+# --- bin/install gives a native iOS project the mobile rules
+p=$(project)
+printf 'name: Acme\n' >"$p/project.yml"
+"$here/bin/install" "$p" >/dev/null
+grep -q 'mobile/app-review.md' "$p/.practices/rules.md" && grep -q 'mobile/lifecycle.md' "$p/.practices/rules.md" && ok ||
+    bad "rules.md has the mobile rules in a project with an XcodeGen spec"
+
 # --- claude-hook: the UI gate after any edit to a board, and before the turn ends
 ev() { printf '{"hook_event_name":"%s","tool_name":"%s","tool_input":{"command":"%s"},"stop_hook_active":%s}' "$1" "$2" "${3:-}" "${4:-false}"; }
 p=$(project)

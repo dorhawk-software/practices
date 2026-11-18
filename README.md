@@ -100,6 +100,7 @@ as a pull request the project's own workflow opens.
 | [Releases and the stores](mobile/releases.md) | Version from the tag, build number from the run; a throwaway signing keychain; the artefact checked; promotion by hand. |
 | [CI for iOS and Android](mobile/ci.md) | Every platform built before every release; Xcode and toolchains pinned from the project's own files. |
 | [Devices and walks](mobile/devices.md) | Never test on a device with real data; done means walked on each platform; field crashes become tests. |
+| [App Review](mobile/app-review.md) | Each rejection becomes a rule and a check before resubmitting; every binary carries the entitlements its frameworks need; one device family; "Continue", never "Allow", before a permission prompt; every screen fits an iPhone SE at large text; UI tests audited and in a pinned language. |
 | [Lifecycle and screens](mobile/lifecycle.md) | Modals close on background; single-flight actions; explain before a permission; no layout jumps; text takes its container's width; every string names its face; a control fades as one piece. |
 
 Coming: `web/` (from the dorhawk.software website). The roadmap lists it.
@@ -157,6 +158,12 @@ own extra checks in `.practices/lint.d/`.
 | `check-copy` | each language's grammar in the copy (boards and `VOICE_FILES`): "V 10:20", "ve středu", "al", "an hour"; copy that names no language, or a language with no rules file, fails; a fact (`data-fact`) reads the same on every board |
 | `copy-audit.mjs` | check-copy's reading half (Node, no packages) |
 | `copy-rules` | the rules per language, `<lang>.mjs` (cs, en, es): checks of the grammar between words, and the words no button may say alone; a project adds its own in `.practices/copy-rules/` |
+| `check-permission-words` | no "Allow", "Enable" or "Turn on" on a button before a permission prompt, in the copy and the code (English, Czech, Spanish, Vietnamese); a string catalog's stale entries skipped |
+| `permission-audit.py` | check-permission-words' reading half (python3, no packages; reads strings with voice-audit.py) |
+| `check-xcode` | each Xcode target that ships: built for the declared device family, and the entitlement for every gated framework its sources import (Family Controls, HealthKit, HomeKit); reads `project.pbxproj`, no Xcode needed |
+| `check-ios-artefact` | a built `.ipa`, `.app` or `.xcarchive`: each bundle's `UIDeviceFamily`, and each binary's linked frameworks (`otool -L`) against its signed entitlements (macOS) |
+| `xcode-audit.py` | check-xcode's and check-ios-artefact's reading half (python3, no packages) |
+| `check-ui-tests` | XCUITests that pin the app's language, run Xcode's accessibility audit, and run on an iPhone SE simulator at a large text size |
 | `check-shots` | a screen shot after a live switch (theme, language, text size) against the same screen after a fresh start: every region that differs, with `--skip-top` for the status bar; `shots-diff.mjs` measures |
 | `shots-diff.mjs` | check-shots' measuring half (Node, no packages) |
 | `check-size` | 700 lines per Rust, TS or JS file, 1000 per test file, a shrinking allowlist |
@@ -175,7 +182,7 @@ own extra checks in `.practices/lint.d/`.
 | `ui-motion.mjs` | check-ui's motion check: busy controls, with reduced motion and again with motion allowed, loops that don't stop for reduced motion, and words scaled out of their shape |
 | `check-hooks` | `.claude/settings.json` still runs `claude-hook` after edits and when a turn ends |
 | `disk-guard` | cargo's build disk keeps a free-space floor |
-| `claude-hook` | Claude Code's hooks. After Bash, Edit and Write: disk-guard; the lint gate after cargo builds and tests, and after npm or npx tests, tsc and ESLint; check-ui on any board that changed, check-voice and check-copy on any copy that changed. On Stop: the turn can't end while a changed file fails a gate |
+| `claude-hook` | Claude Code's hooks. After Bash, Edit and Write: disk-guard; the lint gate after cargo builds and tests, and after npm or npx tests, tsc and ESLint; check-ui on any board that changed, check-voice and check-copy on any copy that changed, check-permission-words on copy or code, check-xcode and check-ui-tests on an Xcode project, entitlements or Swift; check-ios-artefact after `xcodebuild archive` or `-exportArchive`. On Stop: the turn can't end while a changed file fails a gate |
 | `install-hooks` | points git at `.practices/hooks` (pre-commit, commit-msg) |
 | `prune-caches`, `sweep-target` | keep GitHub's 10 GB cache budget for what jobs restore |
 

@@ -12,7 +12,7 @@ to the agent to fix. This is where each rule stands
 - **review**: it needs a person's judgement (taste, wording, whether
   an icon is ugly); reviewers check it.
 
-Today: 14 gate, 65 partial, 124 todo, 42 review
+Today: 15 gate, 73 partial, 122 todo, 42 review
 (audited rule by rule on 2026-11-15, each claim checked against the
 scripts, not the docs). `tests/enforcement` fails when a practice has a
 rule this file doesn't list, or lists one that's gone. The todo and
@@ -390,6 +390,18 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 
 ## Mobile apps (mobile/)
 
+### [mobile/app-review.md](mobile/app-review.md)
+
+| Rule | Status | Enforced by | Still to check |
+| --- | --- | --- | --- |
+| Every rejection becomes a practice and a check before the resubmission | review | - | Whether a rejection's fix came with its rule and its check needs a person reading the resubmission's commits. |
+| Every binary carries the entitlements its frameworks need | partial | check-xcode (lint, claude-hook after edits and on Stop, pre-commit): each shipped target's imports and linked frameworks against its entitlements file; check-ios-artefact (claude-hook after the agent's `xcodebuild archive` or `-exportArchive`): each bundle's `otool -L`, through embedded frameworks, against its signature | No kit release script runs check-ios-artefact before an upload made by hand or by CI (phase 2's release script); the table knows five frameworks for certain, the rest need ENTITLED_FRAMEWORKS. |
+| The app is built for the devices it declares | gate | check-xcode: TARGETED_DEVICE_FAMILY of each shipped target, per configuration, against DEVICE_FAMILY or the project level (lint, claude-hook, pre-commit); check-ios-artefact: UIDeviceFamily of each bundle | - |
+| A button that leads to a permission prompt says Continue | partial | check-permission-words (lint, claude-hook after edits and on Stop, pre-commit): a grant verb and a permission as a whole string, anywhere; a bare grant verb in a file that asks the OS for a permission | A bare "Allow" in a view whose permission request is in another file isn't found; languages past en, cs, es and vi need PERMISSION_VERBS and PERMISSION_NOUNS; whether other words lead to a prompt is review. |
+| Every screen fits a small iPhone at a large text size | partial | check-ui-tests (lint, claude-hook, pre-commit): a test run names an iPhone SE simulator and sets a large text size | That the run happens (no kit iOS CI), that every screen is reached with its main button asserted on screen, and dark mode, aren't checked. |
+| Xcode's accessibility audit runs on every screen, the first-run ones too | partial | check-ui-tests: some UI test calls performAccessibilityAudit | Which screens are audited: a list of the app's screens checked against the audited ones would close it. |
+| UI tests pin the app's language | partial | check-ui-tests: each Swift file that launches XCUIApplication() names a UITEST_LANGUAGE argument | Espresso, Detox and Maestro tests aren't read. |
+
 ### [mobile/ci.md](mobile/ci.md)
 
 | Rule | Status | Enforced by | Still to check |
@@ -420,10 +432,10 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Modals close when the app goes to the background | todo | - | An eslint rule or lint.d grep requiring every Modal/Sheet/Dialog to use useCloseOnBackground; the app-switcher look stays a walk. |
 | The privacy cover lives where the OS calls it | todo | - | A lint.d check that the SceneDelegate implements sceneWillResignActive and sceneDidBecomeActive when Info.plist declares a scene manifest; the walk after Xcode upgrades stays human. |
 | An action with no idempotency key runs once | review | - | Which actions the server can't de-duplicate is domain knowledge; the double-call test is project-written. |
-| Explain before the permission prompt, and ask once | review | - | Whether the explanation is clear and asked at the right moment needs a person (only "no prompt at launch" is mechanical). |
+| Explain before the permission prompt, and ask once | partial | check-permission-words: the button before the prompt says Continue, never "Turn on" or "Allow" (lint, claude-hook, pre-commit) | Whether the explanation is clear and asked at the right moment needs a person; "no prompt at launch" is mechanical and unchecked. |
 | A cold-start tap is queued, not lost | todo | - | A device e2e flow (kill the app, open a notification/link, assert the screen) run before releases; nothing in the kit. |
 | No layout jumps | review | - | Seeing that nothing moves while a screen loads needs a person watching it. |
-| The largest text size and Reduce Motion | todo | - | Partly mechanical: render tests at the largest font scale, a lint for fixed height on text containers and for animations not reading useReducedMotion, and a 44 pt touch-target check; the walk stays human. |
+| The largest text size and Reduce Motion | partial | check-ui-tests: an iOS project's UI test run sets a large text size on an iPhone SE simulator | Still mechanical and unchecked: render tests at the largest font scale, a lint for fixed height on text containers and for animations not reading useReducedMotion, and a 44 pt touch-target check; the walk stays human. |
 | Text takes its container's width | review | - | The doc says only an Android walk proves it; a clipped last word needs a person reading the device screen. |
 | Every string names its face, checked on Android | todo | - | An eslint no-restricted-imports rule could refuse the UI kit's Button/Input/Text outside the theme module; the Android letter-shape comparison stays review. |
 | A control fades as one piece | todo | - | A lint could flag opacity on a container with children lacking needsOffscreenAlphaCompositing; the colour match on Android stays review. |
@@ -438,7 +450,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Release uploads are never cancelled | todo | - | A workflow lint should refuse cancel-in-progress: true in the release workflow (one grep). |
 | A store whose secrets are missing is skipped, by name | todo | - | A workflow lint should require `if: steps.ready.outputs.ready == 'true'` on every upload step of each store job. |
 | Signing in a throwaway keychain | todo | - | A workflow lint should require an if: always() cleanup step deleting the keychain/keystore whenever security create-keychain or a keystore decode appears. |
-| Check the artefact before the store sees it | todo | - | The kit could ship a check-artefact script (per-architecture native symbols, otool -l \| grep __LLVM for bitcode) that the release workflow runs before upload. |
+| Check the artefact before the store sees it | partial | check-ios-artefact: an .ipa or .xcarchive's device families and each binary's entitlements (claude-hook after the agent archives) | Bitcode (otool -l \| grep __LLVM), per-architecture native symbols, Android .aab files, and a release workflow that runs it before upload. |
 | Store notes come from the changelog, limits checked after folding | todo | - | The release script should count each language's final notes (Play 500, Apple 4,000) after folding and stop before tagging. |
 | Every release goes to TestFlight testers; promotion is by hand | todo | - | A workflow lint should refuse any step that submits for App Review or promotes on Play; the owner's phone use stays human. |
 | Google Play: the first release is manual | review | - | The Play listing's state is a fact a person records from the Play Console. |

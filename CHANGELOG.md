@@ -15,6 +15,41 @@ newest first, in the kinds common/changelog.md describes.
   says why with `// practices-allow clip: <reason>`. A GPUI app's
   Settings pane showed a sidebar's square corners past its picture's
   rounded ones, and the HTML board, whose CSS clips round, looked right.
+- **App Review** (`mobile/app-review.md`): three rejections of an iPhone
+  app in a week, each now a rule with a check. Every rejection becomes a
+  rule and a check before the build goes back to review.
+- **`check-permission-words`: "Continue", never "Allow", before a
+  permission prompt.** It reads the copy and the code, in English,
+  Czech, Spanish and Vietnamese. App Review refused an "ALLOW SCREEN
+  TIME ACCESS" button (Guideline 5.1.1(iv)). A string catalog's stale
+  entries are skipped; the rest count, used or not.
+- **`check-xcode`: each Xcode target that ships is built for the
+  declared devices, with the entitlements its frameworks need.** It
+  reads `project.pbxproj`, so it runs on Linux too. A widget that linked
+  ManagedSettings without Family Controls was stopped by App Review's
+  automated check; an earlier build shipped for iPad because XcodeGen
+  set "1,2" on each target. Set `DEVICE_FAMILY` when the project level
+  doesn't say it.
+- **`check-ios-artefact`: the archive as App Store Connect sees it.**
+  Each bundle's `UIDeviceFamily`, and each binary's linked frameworks
+  against its signed entitlements (`otool -L`, `codesign`, macOS).
+  claude-hook runs it after the agent's `xcodebuild archive` or
+  `-exportArchive`. Run on the app's archives, it finds both faults in
+  the builds App Review saw and none in the fixed one.
+- **`check-ui-tests`: UI tests that run where the reviewer looks.** A
+  file that launches the app pins its language (`UITEST_LANGUAGE`), the
+  accessibility audit runs, and a test run uses an iPhone SE simulator
+  at a large text size. An iPhone app on an iPad gets a 375 × 667 window;
+  the onboarding's Continue fell off it.
+
+### Changed
+
+- **The button before a permission prompt says "Continue"**
+  (`mobile/lifecycle.md`). The rule had asked for a button that names
+  the action ("Turn on reminders"); App Review refuses that.
+- **A native iOS project gets the mobile rules.** `bin/install` digests
+  `mobile/` into `rules.md` for a `project.yml` or an `.xcodeproj` at the
+  root, not only for `ios/` and `android/` folders.
 
 ## 1.8.0 (2026-11-18)
 

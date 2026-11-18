@@ -1,0 +1,4 @@
+<resources>
+    <string name="next">Next</string>
+    <string name="why_location">Acme uses your location to find the nearest branch.</string>
+</resources>
