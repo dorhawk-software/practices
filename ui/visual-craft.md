@@ -1007,9 +1007,11 @@ tab (which is not as tall as the first tab), and the contents were
 squashed before they re-rendered and text was looking good again, as if
 something was rendered first at 150 px (an exampple), the squashed to
 like 80 px and then re-rendered at 80 px to be nice". Then: "make this
-last re-rendering issue another rule and check pls". The window animated
-its frame, and its content stayed the old frame's picture, scaled to fit
-until the next layout.
+last re-rendering issue another rule and check pls". The window changed
+size in code, and macOS scaled the last picture it had into the new
+bounds until the app drew again, a frame or two later. Gentes f5c8854
+pins that picture to the window's top left while it resizes: cropped,
+never scaled.
 
 **Apply.**
 1. Resize without the system's frame animation, or lay the content out

@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
 # This repository's pre-commit hook: its own gate (tests/check), at the
 # lowest CPU priority.
-exec nice -n 19 "$(git rev-parse --show-toplevel)/tests/check"
+#
+# Git hands a hook its own GIT_* variables (with `git commit -a`, a
+# temporary GIT_INDEX_FILE). tests/run builds throwaway repositories, and
+# with those variables still set, their git commands used this commit's
+# index: ten cases failed with "invalid object … Error building trees"
+# on 2026-11-18, only under `commit -a`. The gate starts without them.
+top=$(git rev-parse --show-toplevel)
+unset GIT_INDEX_FILE GIT_DIR GIT_WORK_TREE GIT_PREFIX GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES
+cd "$top" || exit 1
+exec nice -n 19 ./tests/check
