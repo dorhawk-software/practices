@@ -28,6 +28,9 @@ export const RULE = {
   contrast: ["Text passes contrast: 4.5:1, or 3:1 for large text", "Darken (or, in the dark theme, lighten) the text or its ground.", "A disabled control, which also says it is disabled"],
   mark: ["A mark holds at its smallest size", "Measure it where it ships smallest: every stroke 1 px or more, no leftover piece of a cut, the brand element 10 px or taller, and the brand touching the letters or a quarter of a stroke clear of them.", "A mark only ever shown large, a poster or a splash", "ui/identity-pass.md"],
   ink: ["A glyph keeps one ink", "Print the plane or fill as a faint tint of the stroke's colour, or a neutral (white or black at low alpha, the paper).", "A glyph meant to carry two colours (a flag)"],
+  busy: ["A press answers at once: a busy control takes no more presses and says what is happening", "Disable it (disabled, or aria-disabled=\"true\"), its shortcut and menu item too; drop the pointer cursor; name the work in progress form, ending in … (U+2026): \"Opening Enterprise Architect…\".", "A control whose press stops the work (Stop)", "ui/feedback.md"],
+  working: ["Work shows it's happening: a busy control moves while it works", "Play the work's own motion inside the control (the product's mark, not a generic spinner), from the press until the result shows.", "A control the board draws busy, whose motion is drawn elsewhere on the screen", "ui/feedback.md"],
+  motion: ["Motion with a reason: with reduced motion, nothing loops", "Stop the loop under @media (prefers-reduced-motion: reduce) and rest on a still frame that still makes sense; words in progress form (\"Installing…\") say it's working.", "A loop that is the content itself (a video the person started)"],
   allow: ["Every exception has a written reason", "Write data-allow=\"rule: a reason of at least three words\".", "-"],
 };
 

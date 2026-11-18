@@ -4,7 +4,8 @@ The rules for drawing an interface that looks made, not generated. They
 apply to any product and any toolkit. The process that uses them is in
 [identity-pass.md](identity-pass.md). Entering dates, times and numbers
 is in [pickers.md](pickers.md); asking for consent is in
-[consent.md](consent.md).
+[consent.md](consent.md); showing work under way and answering a press
+is in [feedback.md](feedback.md).
 
 Many of these rules are geometry: a gap, a distance from an edge, an
 axis. A person reviewing a scaled-down board cannot see a 2 px gap, and
@@ -976,10 +977,16 @@ have said nothing.
 
 **Apply.**
 1. Use the product's own mark or objects instead of a generic spinner
-   wherever it waits.
+   wherever it waits. Every wait over about a second shows it, and a
+   pressed control shows it too ([feedback.md](feedback.md)).
 2. Play one-off moments once. Loop only while work is actually
    happening.
 3. Give every motion a still frame for reduced motion that still makes
    sense.
 
-**Check.** Turn on reduced motion. Every screen still reads correctly.
+**Check.** `check-ui` (motion) renders every board with reduced motion,
+and flags any animation that still loops there. A loop that is the
+content itself is marked `data-allow="motion: …"`. Every other check
+measures the same reduced-motion render. Whether every screen still
+reads correctly with reduced motion, and whether a motion tells the
+product's story, is review.

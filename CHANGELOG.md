@@ -3,6 +3,25 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### New
+
+- **Feedback while it works** (`ui/feedback.md`): work that takes over a
+  second shows the product's own motion until its result shows, and a
+  pressed control says what is happening ("Opening Enterprise
+  Architect…"), shows that motion and takes no more presses until the
+  outcome shows. `check-ui` measures it on the boards: a control marked
+  `aria-busy="true"` must be disabled, show no pointer cursor, end its
+  words in "…" and have something moving in it. The Windows-app runner
+  showed a still egg for minutes of work, and its Open button gave no
+  sign for the 10 to 30 s an app took to show, so it could be pressed
+  again and again.
+- **`check-ui` finds a loop that doesn't stop for reduced motion**
+  (motion, `ui/visual-craft.md`, "Motion with a reason"): every board is
+  measured with reduced motion on, and an animation still looping there
+  is a finding, unless the loop is the content and is marked.
+
 ## 1.7.3 (2026-11-18)
 
 ### Fixed

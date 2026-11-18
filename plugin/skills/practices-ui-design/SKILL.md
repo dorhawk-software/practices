@@ -16,6 +16,7 @@ The practices are in `.practices/docs/`, this project's copy, pinned to its kit 
    picks, build one to one, keep canvas and code in sync.
 4. When they apply: `ui/keyboard-shortcuts.md`, `ui/window-buttons.md`,
    `ui/drag-and-drop.md`, `ui/pickers.md`, `ui/consent.md`,
+   `ui/feedback.md`,
    and for GPUI apps `rust/gpui.md`.
 
 Also read the project's own design source (its CLAUDE.md names it: a
@@ -130,3 +131,10 @@ sometimes edits it.
   fixed across every board in one pass.
 - Consent is never pre-selected; both answers equal, "no" without guilt
   (ui/consent.md).
+- Work over about a second shows the product's own motion where the
+  person looks, from its start until its result shows, and rests on a
+  still frame with reduced motion. A pressed control answers in the same
+  frame: "Opening Enterprise Architect…", the work's motion, no more
+  presses (shortcut and menu item off) until the outcome shows, and a
+  journey test that presses twice (ui/feedback.md). On a board it is
+  `aria-busy="true"` and `disabled`; `check-ui` measures it.

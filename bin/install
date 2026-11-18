@@ -95,7 +95,7 @@ EOF
         common/voice.md
     digest ui/design-before-build.md ui/identity-pass.md ui/visual-craft.md \
         ui/keyboard-shortcuts.md ui/window-buttons.md ui/drag-and-drop.md \
-        ui/pickers.md ui/consent.md
+        ui/pickers.md ui/consent.md ui/feedback.md
     if [ -f "$project/Cargo.toml" ]; then
         digest rust/conventions.md rust/lints.md rust/coverage.md
         if grep -rqs 'gpui' "$project/Cargo.toml"; then digest rust/gpui.md; fi

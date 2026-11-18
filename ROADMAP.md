@@ -17,7 +17,8 @@ is the source of everything Rust here; its commit links are in each doc.
   [window buttons](ui/window-buttons.md),
   [keyboard shortcuts](ui/keyboard-shortcuts.md),
   [an identity pass](ui/identity-pass.md), [visual craft](ui/visual-craft.md),
-  [dates, times and numbers](ui/pickers.md), [consent](ui/consent.md)
+  [dates, times and numbers](ui/pickers.md), [consent](ui/consent.md),
+  [feedback while it works](ui/feedback.md)
 - [x] Rust docs: [conventions](rust/conventions.md), [lints](rust/lints.md),
   [coverage](rust/coverage.md), [GPUI](rust/gpui.md)
 - [x] Templates: lints, clippy, deny (GPL and closed-source lists), toolchain,
@@ -156,6 +157,14 @@ is the source of everything Rust here; its commit links are in each doc.
     language without rules as findings, one wording per `data-fact`
     across the boards; the button words `outcome` refuses moved into the
     same files (1.7.0).
+  - [x] Feedback while it works, from the Windows-app runner (2026-11-18:
+    a still egg for minutes of work, and an Open button that gave no sign
+    for 10 to 30 s): busy, a control marked `aria-busy="true"` disabled,
+    without a pointer cursor, its words ending in "…"; working, something
+    in it moving with motion allowed; motion, nothing looping with
+    reduced motion (Unreleased).
+  - [ ] Motion with reduced motion, the rest: finite animations and
+    transitions that still play, SVG `<animate>` loops, generic spinners.
   - [ ] `check-copy` reads a board as written: text a script writes at
     load isn't read. Read the rendered DOM where `check-ui` renders.
   - [ ] A click-through test of a prototype: each `data-fact` first shown
@@ -167,7 +176,7 @@ is the source of everything Rust here; its commit links are in each doc.
     a checkbox, nested cards); leftover text (TODO, lorem, "Option A");
     the face that actually renders (CDP `CSS.getPlatformFontsForNode`);
     one shadow recipe per elevation and a declared light direction;
-    nothing still animating under reduced motion; a row partly covered
+    a row partly covered
     by a drawing; one stroke cap and width per icon family; grain where
     the identity declares texture.
   - [ ] `actions/check-ui`: the gate in a project's CI, on macOS (boards

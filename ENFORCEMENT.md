@@ -12,7 +12,7 @@ to the agent to fix. This is where each rule stands
 - **review**: it needs a person's judgement (taste, wording, whether
   an icon is ugly); reviewers check it.
 
-Today: 14 gate, 60 partial, 125 todo, 42 review
+Today: 14 gate, 63 partial, 124 todo, 42 review
 (audited rule by rule on 2026-11-15, each claim checked against the
 scripts, not the docs). `tests/enforcement` fails when a practice has a
 rule this file doesn't list, or lists one that's gone. The todo and
@@ -212,6 +212,13 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | --- | --- | --- | --- |
 | One calm panel says what will happen | partial | check-ui contrast, clip, contain (claude-hook, Stop, pre-commit) | One target per kind of drop; the panel covers the window's content. |
 
+### [ui/feedback.md](ui/feedback.md)
+
+| Rule | Status | Enforced by | Still to check |
+| --- | --- | --- | --- |
+| Work shows it's happening | partial | check-ui working: with motion allowed, something inside each element marked aria-busy="true" is animating; check-ui motion: with reduced motion, nothing loops (claude-hook, Stop, pre-commit) | The app's own code is review: whether each wait over a second has its motion, starts and stops with the work, and is the product's own (one motion per screen; a generic spinner isn't detected). A busy state a board draws without aria-busy isn't seen. |
+| A press answers at once | partial | check-ui busy: each element marked aria-busy="true" (or the control inside it) is disabled or aria-disabled="true", shows no pointer cursor, and its words end in … (three dots are a finding); check-ui working (claude-hook, Stop, pre-commit) | The app's own code is review: whether each press that starts slow work has its busy state, its shortcut and menu item off, a time limit from the slowest real case, and a journey test that holds the work open, presses again and sees the control return. |
+
 ### [ui/identity-pass.md](ui/identity-pass.md)
 
 | Rule | Status | Enforced by | Still to check |
@@ -274,7 +281,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | A sheet's page is inert, and the board says so | gate | check-ui sheet: an open dialog (role=dialog/alertdialog, dialog[open]) while a target drawn before it in its screen is live; aria-hidden and inert pages are skipped by every check (claude-hook, Stop, pre-commit) | - |
 | Words in the product's voice | partial | check-ui outcome: no button labelled only OK, Yes, No or another word with no outcome; check-copy: each language's mechanical grammar (claude-hook, Stop, pre-commit, lint) | check-ui: dialog body <=2 line boxes; boards mentioning a person present each gender variant; tone and jokes stay human (review). |
 | Answer the next question where it arises | review | - | What the user will ask next is semantic; only 'every failed/error state has a next-action button' is a structure check. |
-| Motion with a reason | todo | - | check-ui: render with emulated prefers-reduced-motion and assert no running animations/transitions and that all checks still pass; infinite animations need data-allow; generic spinners (known spinner classes, rotating circle) are flagged. |
+| Motion with a reason | partial | check-ui motion: every board is rendered with reduced motion (every check measures that render), and an infinite animation still running there is a finding unless marked data-allow (claude-hook, Stop, pre-commit) | Finite animations and transitions that still play with reduced motion, SVG <animate> loops, and generic spinners (known spinner classes, a rotating circle); whether a motion tells the product's story is review. |
 | Nothing runs past its surface | gate | check-ui contain and clip, at every width and theme (claude-hook, Stop, pre-commit) | - |
 | A button label stays on one line | gate | check-ui wrap: the text of a button, tab, radio, switch or menu item never runs onto a second line, unless it sits in a flex column inside the target (claude-hook, Stop, pre-commit) | - |
 | Buttons follow the column | partial | check-ui align: a row of buttons starts at its column's leading edge, fills it, or is centred in a centred column; a lone button may sit at the trailing edge; a lone button never stretches across a surface wider than 480 px (claude-hook, Stop, pre-commit) | Whether a lone trailing button moves on (its wording) is review; equal widths in a full-width row aren't checked. |

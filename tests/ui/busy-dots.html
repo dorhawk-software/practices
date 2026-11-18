@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>busy-dots</title>
+<style>
+body{font:14px/1.4 Helvetica,Arial,sans-serif;background:#fff;color:#222;margin:24px}
+.card{background:#f2f2f2;padding:16px;width:360px;border-radius:8px}
+.row{display:flex;gap:8px;margin-top:16px}
+button{white-space:nowrap;font:inherit;color:#222;background:#e2e2e2;border:0;border-radius:6px;padding:6px 12px;display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+button svg{width:12px;height:12px}
+button:disabled,[aria-disabled=true]{cursor:default}
+@keyframes form{from{opacity:.4}to{opacity:1}}
+.forming{animation:form 1.4s ease-in-out infinite alternate}
+@media (prefers-reduced-motion: reduce){.forming{animation:none}}
+</style></head>
+<body>
+<div class="card"><p>Pressed and disabled, its words ending in three dots.</p><div class="row"><button disabled aria-busy="true"><svg class="forming" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#222"/></svg> Opening Enterprise Architect...</button></div></div>
+</body></html>

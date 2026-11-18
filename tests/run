@@ -362,11 +362,11 @@ for f in "$here"/tests/ui/*.html; do
     out=$("$p/.practices/bin/check-ui" "design/$name.html" 2>&1)
     status=$?
     case $name in
-    clean | allowed | covered | covered-wide | align-forward | mark-ok | skips | skips-* | rounded | ink-ok | inset-ok | inset-under | inset-drawing | halo-ink)
+    clean | allowed | covered | covered-wide | align-forward | mark-ok | skips | skips-* | rounded | ink-ok | inset-ok | inset-under | inset-drawing | halo-ink | busy-ok)
         [ $status = 0 ] && ok || bad "check-ui passes tests/ui/$name.html" "$out" ;;
     *)
         rule=$name
-        case $name in contrast-*) rule=contrast ;; text-size-*) rule=text-size ;; outcome-*) rule=outcome ;; allow-unreasoned) rule=allow ;; align-stretched) rule=align ;; mark-*) rule=mark ;; safe-*) rule=safe ;; width-own) rule=contain ;; same-look-*) rule=same-look ;; esac
+        case $name in contrast-*) rule=contrast ;; text-size-*) rule=text-size ;; outcome-*) rule=outcome ;; allow-unreasoned) rule=allow ;; align-stretched) rule=align ;; mark-*) rule=mark ;; safe-*) rule=safe ;; width-own) rule=contain ;; same-look-*) rule=same-look ;; busy-*) rule=busy ;; esac
         # A here-string, not a pipe: under pipefail, grep -q leaving at the first match broke
         # printf's pipe and failed a passing case (1.6.5's pre-commit run on contain).
         [ $status = 1 ] && grep -q "^\[$rule\]" <<<"$out" && ok ||
@@ -380,6 +380,9 @@ case $out in *'"Choose a Folder…" runs'*'past the right of div.card'*) ok ;; *
 cp "$here/tests/ui/same-look-unnamed.html" "$p/design/board.html"
 out=$("$p/.practices/bin/check-ui" 2>&1)
 case $out in *'These have no class: name each component'*) ok ;; *) bad "check-ui's same-look asks unclassed buttons to name their component" "$out" ;; esac
+cp "$here/tests/ui/busy-dots.html" "$p/design/board.html"
+out=$("$p/.practices/bin/check-ui" 2>&1)
+case $out in *'ends in three dots: use … (U+2026)'*) ok ;; *) bad "check-ui's busy asks for … in place of three dots" "$out" ;; esac
 # A board with no dark rules renders in one theme; one with them, in both (Scops: 348 renders where 87 would do).
 cp "$here/tests/ui/clean.html" "$p/design/board.html"
 out=$("$p/.practices/bin/check-ui" 2>&1)
