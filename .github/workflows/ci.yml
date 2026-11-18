@@ -37,20 +37,22 @@ jobs:
   # breaking the check"). macOS: bash 3.2 and BSD tools, the strictest.
   # Shards: 44 mutants, each a full tests/run, didn't finish in one job's
   # 40 minutes (2026-11-15), and 115 didn't in four: two shards were
-  # cancelled at 40 minutes (2026-11-16). Eight run about 20 each.
+  # cancelled at 40 minutes (2026-11-16). Eight ran 12 to 34 minutes for
+  # 1.7.1, and for 1.7.2 one was cancelled at 40 (the others 14 to 38).
+  # Twelve, for about 145 mutants, put a shard near 12 of them.
   mutate:
     runs-on: macos-latest
     timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Every mutant killed by its own case
         env:
           JOBS: "3"
-          SHARD: ${{ matrix.shard }}/8
+          SHARD: ${{ matrix.shard }}/12
         run: tests/mutate
 
   static:
