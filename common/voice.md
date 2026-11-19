@@ -18,9 +18,16 @@ between its words.
 - nobody, impersonally ("Kód vám přišel v SMS", "Nic odpovídajícího se
   nenašlo", "Nothing matched").
 
-Never "we", "us" or "our", and never "I". In languages that carry the
-person in the verb, that includes the verb alone: Czech "upozorníme",
-"odešleme", "jsme poslali" all say "we".
+Never an exclusive "we", "us" or "our": the app, the company or a server
+acting. Never "I". In languages that carry the person in the verb, that
+includes the verb alone: Czech "upozorníme", "odešleme", "jsme poslali"
+all say "we".
+
+One "we" may stay: the inclusive one, in a product built as a companion.
+A companion goes through something hard with the person. Its "we" means
+the two of them together, never the app acting. Scops, a sleep-training
+companion, has its owl say "Pojďme na to" (let's do this) to a tired
+parent.
 
 **Why.** A data-box app (2026-11-15) said "Kód jsme vám poslali v SMS"
 (we sent you the code by SMS). The state's system sent it, not the app:
@@ -31,22 +38,49 @@ phone, or people with a server? For a promise about data, that question
 is the whole promise. One voice says it plainly, and a reader never has to
 guess who is acting.
 
+`check-voice` flagged 35 Czech lines on the Scops boards (Scops,
+2026-11-19). Most were right. "Přečteme jen čas a název akcí…" (we read
+only the events' times and names) hid who acts in a promise about data.
+It became "Aplikace přečte jen…" (the app reads only…). "Pojďme na to"
+on the welcome screen is the opposite case. Výreček, the owl, goes
+through hard nights with the parent: you aren't alone in this. Naming
+one actor removes what the line is for. The product's owner, translated:
+"let's go, because you're not alone in this; I, the owl, am here with
+you, and together we'll manage."
+
 **Apply.**
 1. Ask who really acts: the app on this device, the developers, an
    outside service, or the person. Name that one.
 2. When nobody needs naming, say it impersonally: what happened, not who
    did it.
 3. A promise about data names the people it is about ("the developers
-   never see it"), never "we" and "us".
+   never see it"), never "we" and "us". No exception, not even in a
+   companion's voice.
 4. Words the person says themselves (a checkbox "Save my work first", a
    consent "I agree") are their voice, not the product's: those keep "my"
-   and "I".
-5. A real quote of someone speaking keeps its words. Mark it, with its
+   and "I". A button keeps the person's "we" too: "Jdeme si hrát" (we're
+   going to play), "Teď nic pevného nemáme" (we have nothing fixed now).
+   The gate flags a Czech one, so mark it: `practices-allow voice: the
+   parent's own words on a button`.
+5. In a product built as a companion, its inclusive "we" stays. Ask
+   first: does "we" mean the companion and the person, doing it together?
+   If it could be read as the app acting, it is exclusive: name who acts.
+   Mark each inclusive line, on its line or the line above:
+   `practices-allow voice: inclusive we, <who> together`. Scops marks
+   the owl's lines with the parent:
+   - "Pojďme na to" (let's do this);
+   - "Dnes zkusíme oba spánky…" (today we'll try both naps…);
+   - "Zítra pokračujeme podle plánu" (tomorrow we keep to the plan).
+6. A real quote of someone speaking keeps its words. Mark it, with its
    reason, in a comment on the same line or the line above:
    `practices-allow voice: a quote from the statute`. In an Xcode string
    catalog (`.xcstrings`) the mark goes in the entry's comment, which
    Xcode keeps: "Quote by Seneca. practices-allow voice: a real quote,
    attributed on screen".
+
+> Open (2026-11-19): may a named companion say "I" as itself (the owl's
+> "já")? Undecided. Scops avoids it for now: "ukážu vám" (I'll show you)
+> became "uvidíte" (you'll see).
 
 **Check.** `check-voice` reads every string people see (`VOICE_FILES`:
 the project's strings files, and the code files that hold its copy) and
@@ -74,6 +108,13 @@ claude-hook runs it after each edit on the files that changed and
 holds the agent's turn while it fails; pre-commit runs it on what is
 staged, and lint on everything. "I" stays with the reviewer, because the
 person's own words use it too.
+
+An inclusive "we" is flagged like any other; its mark lets it pass. On a
+board the mark is an HTML comment, `<!-- practices-allow voice: … -->`,
+on the line or the line above. Its reason ("inclusive we, the owl and the
+parent together") tells the reviewer which case it claims. Whether a "we"
+really is inclusive, and whether the product is a companion, is
+judgement: the reviewer decides.
 
 ## Each language's grammar is checked
 

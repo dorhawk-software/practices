@@ -3,6 +3,18 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### Changed
+
+- **A companion may say an inclusive "we"** (`common/voice.md`). When
+  the product is a companion and "we" means it and the person together,
+  the line stays, marked `practices-allow voice: inclusive we, <who>
+  together`. The app, the company or a server still never says "we", and
+  a promise about data still names who acts. `check-voice` flagged
+  "Pojďme na to" (let's do this), a sleep-training owl's word to a tired
+  parent; naming one actor would remove what the line is for.
+
 ## 1.9.1 (2026-11-18)
 
 ### Fixed

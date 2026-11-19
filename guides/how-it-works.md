@@ -105,7 +105,7 @@ also in `rules.md`.
 | --- | --- | --- |
 | `lint` | rustfmt, clippy, cargo deny, cargo machete, then the checks below and `lint.d/*` | Claude hook, pre-commit, CI |
 | `check-private` | no name from `dev/private-terms` in files or the message; fails closed | lint, both git hooks |
-| `check-voice` | no "we" in the copy people see ([common/voice.md](../common/voice.md)); a quote is marked `practices-allow voice: reason` | lint, Claude hook (edits, Stop), pre-commit |
+| `check-voice` | no "we" in the copy people see ([common/voice.md](../common/voice.md)); a quote or a companion's inclusive "we" is marked `practices-allow voice: reason` | lint, Claude hook (edits, Stop), pre-commit |
 | `check-copy` | each language's grammar between words, by that language's rules file ([common/voice.md](../common/voice.md#each-languages-grammar-is-checked)); copy names its language, and the language ships its rules; a `data-fact` reads the same on every board; an exception is marked `data-allow="copy: reason"` or `practices-allow copy: reason` | lint, Claude hook (edits, Stop), pre-commit |
 | `check-permission-words` | no "Allow" on a button before a permission prompt ([mobile/app-review.md](../mobile/app-review.md#a-button-that-leads-to-a-permission-prompt-says-continue)); stale catalog entries skipped; an exception is marked `practices-allow permission: reason` | lint, Claude hook (edits, Stop), pre-commit |
 | `check-xcode` | each shipped Xcode target built for `DEVICE_FAMILY`, with the entitlement each gated framework it imports needs ([mobile/app-review.md](../mobile/app-review.md)) | lint, Claude hook (edits, Stop), pre-commit |

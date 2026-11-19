@@ -560,6 +560,17 @@ case $out in *'app.xcstrings:11 [en] "We saved your plan."'*) ok ;; *) bad "chec
 case $out in *'postponing'* | *'otálíme'*) bad "check-voice takes a mark in a catalog entry's comment" "$out" ;; *) ok ;; esac
 case $out in *'Our old banner'* | *'Náš starý'*) bad "check-voice skips a stale catalog entry" "$out" ;; *) ok ;; esac
 case $out in *'nevezme'* | *'Přijme'*) bad "check-voice reads -vezme and -jme as he, not we" "$out" ;; *) ok ;; esac
+# A companion's inclusive "we" passes on its mark, an HTML comment on the
+# line above in a board; the same line unmarked is a finding. Scops' owl
+# says "Pojďme na to" (let's do this) to a tired parent (1.9.2).
+p=$(project)
+cp -R "$here/tests/voice/companion/." "$p/"
+out=$("$p/.practices/bin/check-voice" 2>&1)
+st=$?
+[ $st = 1 ] && case $out in *'welcome.dc.html:8 [cs] "Pojďme na to" says "Pojďme"'*) true ;; *) false ;; esac && ok ||
+    bad "check-voice flags an unmarked \"Pojďme na to\" on a Czech board" "$out"
+case $out in *'welcome.dc.html:7'*) bad "check-voice takes an inclusive-we mark in a board's HTML comment" "$out" ;; *) ok ;; esac
+case $out in *'1 finding.'*) ok ;; *) bad "check-voice finds only the unmarked line on the companion's board" "$out" ;; esac
 
 # Copy that names no language is COPY_LANG's, as check-copy reads it: a
 # Czech page with no cs in its path said "a říkáme to rovnou" (and we say

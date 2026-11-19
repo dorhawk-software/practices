@@ -118,6 +118,8 @@ sometimes edits it.
   screens show (visual-craft.md, design-before-build.md).
 - The product speaks as itself or names who acts, never "we" (and in
   Czech, never the -me verb): common/voice.md, checked by `check-voice`.
+  A companion's inclusive "we" (it and the person together) stays,
+  marked `practices-allow voice: inclusive we, <who> together`.
   Each language's grammar between words ("V 10:20", "ve středu") is
   checked by its own rules file, `check-copy`; a new language ships with
   its rules (common/voice.md).

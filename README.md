@@ -52,7 +52,7 @@ as a pull request the project's own workflow opens.
 | [Commits](common/commits.md) | The subject is the outcome; the body says why, with numbers and proof; never a session ID. |
 | [Changelog](common/changelog.md) | Written by hand for users, in five kinds, in the same commit as the change. |
 | [Releases](common/releases.md) | Only a green main is released, by one command; a rehearsal publishes nothing. |
-| [The product's voice](common/voice.md) | The product speaks as itself or names who acts, never "we"; each language's grammar checked by its own rules (`check-voice`, `check-copy`). |
+| [The product's voice](common/voice.md) | The product speaks as itself or names who acts, never "we" (a companion's inclusive "we" is marked); each language's grammar checked by its own rules (`check-voice`, `check-copy`). |
 | [Not now](common/not-now.md) | Whatever is deferred is written down in the same commit; stubs fail loudly. |
 | [Testing](common/testing.md) | Nothing touches your machine; a journey suite is the regression suite; red before green. |
 | [CI and caching](common/ci-caching.md) | GitHub's 10 GB cache and private repos' minutes are budgets, spent on purpose. |

@@ -912,8 +912,8 @@ and text of an `aria-hidden` or `inert` page aren't measured.
 
 **What.** Screens speak in the product's own voice. Dialogs use little
 text and a button that names and does the action. Serious moments get
-calm words, not jokes. Who speaks (the app, never "we") is in
-[common/voice.md](../common/voice.md).
+calm words, not jokes. Who speaks (the app, never "we", except a
+companion's inclusive "we") is in [common/voice.md](../common/voice.md).
 
 **Why.** Tern's first-run lines carry its idea ("Bring your mail home.",
 "Only you hold the key."). Its inbox zero carried a meme, which a review
