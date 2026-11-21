@@ -3,6 +3,39 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### New
+
+- **The owner answers one question at a time** (`ui/design-before-build.md`):
+  open questions go in the agent's dialog, a few per round, each step
+  with the page's link, the board's name and the recommendation first.
+  The page with the boards is for looking.
+- **Cross each new event with each state before asking**
+  (`ui/design-before-build.md`): every pair the spec leaves undefined is a
+  question in the same round, not the next one. One audit's 22 answers
+  led to 8, 4 and then 3 more questions.
+- **Every control records an event or only navigates**
+  (`ui/design-before-build.md`): a choice that changes what happens next
+  and records nothing is forgotten on restart and never synced.
+- **Long gates run in the main session** and **Only the lock's own script
+  waits for the lock** (`common/agent-working-rules.md`): a sub-agent
+  waiting on a simulator suite is stopped as stalled, an orphan agent
+  holds the shared lock, and a hand-written wait loop never takes over a
+  stale lock.
+
+### Better
+
+- **Pixel by pixel** measures text line by line, and tuned type takes
+  each line's tracking from that line's browser width: a per-style
+  average left one line 1.3 pt short, and a paragraph's box hid another.
+- **Review a proposal in its place** reads every option against the
+  spec's text; an option that contradicts the spec says how the spec
+  changes.
+- **A rule a machine can check runs where the agent can't skip it**: a
+  slow gate on Stop skips while its lock is held, and when nothing it
+  checks changed since its last clean run.
+
 ## 1.9.2 (2026-11-19)
 
 ### Changed

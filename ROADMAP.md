@@ -256,6 +256,11 @@ rows are this list's source; the most valuable first.
     wiping a simulator or emulator that isn't on the demo list.
   - [ ] Releases (common/releases.md, mobile/releases.md) and mobile CI
     have no script in the kit yet: phase 2's release script carries them.
+  - [ ] The PreToolUse claude-hook also refuses a command that polls a
+    `*.lock` path in a loop ("Only the lock's own script waits for the
+    lock").
+  - [ ] A Stop hook's slow gate skips while its lock is held, and when
+    nothing it checks changed since its last clean run (common/gates.md).
   - [x] check-voice reads JSX text between tags (1.6.1).
   - [x] check-voice reads the copy on design boards and web pages, in
     each element's lang, and takes COPY_LANG for copy that names none
@@ -297,3 +302,10 @@ rows are this list's source; the most valuable first.
   - [ ] A `before-after` script: renders a board's object (a selector) at
     HEAD and in the working tree, both themes, at the device's pixel
     ratio, and writes the page the trailer names.
+  - [ ] Every control on a board records an event or only navigates: a
+    check matches each button's label to the spec's event table or a
+    `data-nav` mark.
+  - [ ] A pixel match measures each line of text, not only the
+    paragraph's box.
+  - [ ] State × event: a test pattern for a project's reference engine
+    that fails on a pair the engine doesn't define.

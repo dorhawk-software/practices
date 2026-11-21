@@ -55,6 +55,14 @@ varies from run to run; a hook doesn't.
    - `claude-hook` on Stop and SubagentStop, so the agent can't end its
      turn, or tell the person it's done, while a check fails;
    - `hooks/pre-commit`, and CI for what got past both.
+
+   A slow gate on Stop (minutes of simulator work) skips while its own
+   lock is held, since a run is already under way. It also skips when
+   nothing it checks changed since its last clean run. On 2026-11-21
+   Scops' Stop hook ran its five-minute pixel match at every turn's end,
+   while a sub-agent was still building the same screens. It repeated a
+   finding already being fixed, and queued simulator runs behind the
+   sub-agent's.
 3. Wire the hooks in `.claude/settings.json` from the kit's template.
    `check-hooks` fails a commit whose settings drop them.
 4. A deliberate exception is written where it applies, with its reason

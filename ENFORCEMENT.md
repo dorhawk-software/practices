@@ -12,7 +12,7 @@ to the agent to fix. This is where each rule stands
 - **review**: it needs a person's judgement (taste, wording, whether
   an icon is ugly); reviewers check it.
 
-Today: 15 gate, 73 partial, 122 todo, 42 review
+Today: 15 gate, 73 partial, 125 todo, 44 review
 (audited rule by rule on 2026-11-15, each claim checked against the
 scripts, not the docs). `tests/enforcement` fails when a practice has a
 rule this file doesn't list, or lists one that's gone. The todo and
@@ -35,6 +35,8 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Quote measured CI timings | review | - | A duration quoted in a chat message and its source are only visible to a reader of the conversation. |
 | Keep going on an agreed plan | review | - | Whether a stop was for a question only the developer could answer is judgement. |
 | Screenshots don't flash the screen | todo | - | A PreToolUse Bash hook could count desktop-portal/full-screen capture commands (gnome-screenshot, screencapture without -l/-R, portal calls) and refuse past two per session; low value. |
+| Long gates run in the main session | review | - | Which agents run, and whether a sub-agent waited on a long gate, is visible only to the session that started them. |
+| Only the lock's own script waits for the lock | todo | - | A PreToolUse claude-hook could refuse a Bash command that polls a `*.lock` path in a loop (`until [ ! -d …lock ]`, `while [ -e …lock ]`). |
 | Write down what is deferred | review | - | Deciding what was deferred is judgement; the mechanical parts are the not-now.md rules. |
 
 ### [common/changelog.md](common/changelog.md)
@@ -195,16 +197,19 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Rule | Status | Enforced by | Still to check |
 | --- | --- | --- | --- |
 | Proposals with options, then build "as chosen" | todo | - | check-commit-msg/pre-commit: a commit touching UI source must name a proposal path or canvas link ('as chosen'), and the proposal page must contain >=2 labelled options and one 'Recommended' marker, with the design doc's Rejected section touched in the same commit. |
+| The owner answers one question at a time | review | - | The questions are asked in the agent's dialog, which no script sees; a proposal page's numbered questions could be counted by the proposal-structure check. |
 | The design holds only agreed designs | todo | - | check-ui on boards outside proposals/: flag any element with data-variant or text matching 'Option [A-Z]'/'Variant'/'Recommended' unless the page is marked rejected. |
 | Keep the design in sync with the code | todo | - | pre-commit: staged UI source with no staged design/board file fails unless the message carries a 'Design: unchanged, <reason>' trailer. |
 | A touch-up gets its own before and after | partial | check-commit-msg (commit-msg hook): a commit that changes an existing board (UI_BOARDS) needs a Before-after: trailer naming a page in the repository or an https link, or 'none, <reason>' | A design kept outside the repository (a canvas) isn't seen; a `before-after` script could render the board's crop at HEAD and in the working tree and write the page; whether the page shows one change only is judgement. |
 | Read the design's source, never a picture | todo | - | Diff check: every new colour, px/pt length, radius and string literal added to UI source must occur in the design's tokens or board source; unknown literals are listed for the agent. |
 | When the agent can't edit the design: a prompt and a sync-back list | todo | - | Markdown lint: every open item in design-sync-back.md references an entry in design-prompts.md whose status is 'sent' or 'returned <date>'. |
 | Match one to one, verified by screenshot | todo | - | Render the board and the demo-mode app (for web/RN-web in the same Chrome) at device DPR, crop each data-object, and diff row/column pixel profiles to report line weight, inset and height deltas over 0.5 px. |
-| Pixel by pixel: the owner's eye is the bar | partial | check-ui contain, clip (claude-hook, Stop, pre-commit) | Lines, glyphs, the face that renders and the words: compare the built screen's DOM and captures with the board's (fonts via CDP CSS.getPlatformFontsForNode). |
+| Pixel by pixel: the owner's eye is the bar | partial | check-ui contain, clip (claude-hook, Stop, pre-commit) | Lines, glyphs, the face that renders and the words: compare the built screen's DOM and captures with the board's (fonts via CDP CSS.getPlatformFontsForNode), and each line of text's ink width and left edge, not only the paragraph's box. |
 | A value the scale doesn't have is a question for the owner | todo | - | check-ui loads the project's scale tokens and flags every computed margin, padding, gap, radius and font-size not on the scale unless data-allow names it as the object's own geometry; a lint.d grep does the same in lint-exempt theme folders. |
-| Review a proposal in its place, with fresh eyes | todo | - | Structure check on proposal pages: a section answering the six questions (six non-empty items), a before/after pair, and a linked critique record; the critique's quality stays human. |
+| Review a proposal in its place, with fresh eyes | todo | - | Structure check on proposal pages: a section answering the six questions (six non-empty items), a before/after pair, a quoted spec line for each option that changes the spec, and a linked critique record; the critique's quality stays human. |
 | Every fact a screen uses was entered earlier | partial | check-copy fact: every element marked data-fact="KEY" reads the same on every board, per language; a board changed alone is compared with all (claude-hook, Stop, pre-commit, lint) | Whether an earlier step supplies each fact: a click-through test of the prototype could list each data-fact's first screen in flow order and fail when a screen uses one before the step that collects it. |
+| Every control records an event or only navigates | todo | - | A check reads every button on the boards (class b-main, b-sub, b-ghost, a sheet's rows) and matches its label to the spec's event table or a `data-nav` mark; a button left over is a finding. |
+| Cross each new event with each state before asking | todo | - | In a project with a reference engine, a test enumerates every state and event pair and fails on one the engine doesn't define; whether a round's questions cover the table stays review. |
 
 ### [ui/drag-and-drop.md](ui/drag-and-drop.md)
 

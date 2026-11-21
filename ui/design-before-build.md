@@ -32,6 +32,35 @@ choice happens before the code.
 **Check.** A UI commit points at its proposal or canvas page. The design
 doc lists what was rejected.
 
+## The owner answers one question at a time
+
+**What.** Open questions go to the owner in the agent's question dialog,
+a few per round, one per step. Each step stands alone: the page's link,
+the board's name, the options in plain words, the recommendation first.
+The page with the boards is for looking; the answers come from the dialog.
+
+**Why.** On 2026-11-21 two Scops proposal pages held 22 numbered
+questions. The owner asked: "can we do a questionnaire of the gazzilions
+questinons and we will do them one by one?" In the dialog all 22 were
+answered in six short rounds. Later a step named its board but not the
+page's link. The dialog covers the chat that held the link, and the owner
+wrote: "where is the link to the design? i cannot find it anywhere".
+
+**Apply.**
+1. Number the questions on the page, so each step can name its place.
+2. Ask in the dialog, up to four steps a round, grouped by topic.
+3. Each step carries the page's link and the board's name, two to four
+   options, and "(Recommended)" on the first.
+4. A question with one proposal ("OK as proposed?") still offers two
+   answers: as proposed, or what should differ.
+5. Save each answer to a file as it arrives, so a restart loses nothing.
+   Quote the owner's free-text answers word for word in the decision
+   record.
+
+**Check.** Review: the questions live in the agent's dialog, which no
+script sees. The proposal page's numbered questions are what a script
+could count.
+
 ## The design holds only agreed designs
 
 **What.** After a pick, the losing variants and their labels come off the
@@ -208,6 +237,19 @@ where the fault was found.
 6. Each fault the owner finds becomes a test that fails without the fix
    ([testing.md](../common/testing.md), "A guard test per incident,
    proven able to fail"). A new kind of fault becomes an item in step 3.
+7. Measure text line by line: each line's ink width and left edge, not
+   only the paragraph's box. Type tuned to the design's ink (a weight
+   and a tracking per style) sets each line's tracking from the width
+   the browser gives that line.
+
+A paragraph's box hides a line. Scops' pixel match measured each text's
+box. A note's first line came out 1.0 pt narrower than the board's and
+passed, because its second line was the widest. On 2026-11-21 a new
+board's sentence had its narrow line widest: 1.3 pt short, a finding.
+The cause was the type tuning: one tracking per text style, fitted over
+all its strings. A line with another mix of letters missed by up to a
+point. Tracking set per line, from the line's own browser width, made
+all 29 boards match.
 
 **Check.** The handoff names each object checked at 1:1 against its
 design crop. The commit counts the owner's catches. The goal is zero.
@@ -251,16 +293,28 @@ live:
 6. What personal data could it carry? Say plainly what is in it, and let
    the user read it first.
 
+Every option, the recommended one above all, is also read against the
+spec's text. An option that contradicts the spec says so, and says how
+the spec would change.
+
 **Why.** The assessments checked proposals against the design rules, not
 against their surroundings. The product owner then had to point out each
 of these six for one feature (2026-10-19). The critique also caught real
 faults before they reached anyone: a clipped mark, and type too small to
 read.
 
-**Apply.** Put the six questions into every review prompt, and answer
-them yourself first. Show before and after side by side.
+On 2026-11-21 a Scops review page recommended a restart button where the
+spec puts the restart in settings. Another board drew it at 12:10; the
+spec allows it "in the evening only". The agent's own pass missed both.
+The independent reviewer, given the spec's sections, quoted the lines.
 
-**Check.** The proposal page or message answers the six questions.
+**Apply.** Put the six questions into every review prompt, and answer
+them yourself first. Give the reviewer the spec's sections the proposal
+touches, and ask it to quote the line each option follows or changes.
+Show before and after side by side.
+
+**Check.** The proposal page or message answers the six questions, and
+quotes the spec line any option changes.
 
 ## Every fact a screen uses was entered earlier
 
@@ -296,3 +350,51 @@ wording. A board changed alone is still compared with all the others.
 Whether a step supplies each fact is the click-through walk: for each
 screen that recommends something, the reviewer asks "where did this come
 from?" and points to the step.
+
+## Every control records an event or only navigates
+
+**What.** Each button or choice on a board either records an event the
+spec's event table lists, or only moves to another screen. A choice that
+changes what happens next and records nothing is a finding.
+
+**Why.** An event-sourced app rebuilds its state from what was recorded,
+and only recorded events reach a second device. Scops' audit of
+2026-11-21 found choices that recorded nothing: keeping the evening at
+20:50, declining a phase offer, adding a waking nobody tapped. Each was
+forgotten on restart, and the other parent's phone never learned it.
+
+**Apply.**
+1. Give each control on a board its event, or mark it as navigation.
+2. A choice with no event in the spec is a question for the owner:
+   which event records it.
+3. The spec's event table names the buttons that write each event.
+
+**Check.** todo: a check reads every button on the boards and matches its
+label to the spec's event table or a navigation mark; a button left over
+fails.
+
+## Cross each new event with each state before asking
+
+**What.** Before the first question of a round, cross each new event or
+control with each state it can happen in. Every pair the spec doesn't
+answer is a question in that same round.
+
+**Why.** Scops' audit of 2026-11-21 asked the owner 22 questions. Writing
+the answers into the spec found 8 more, those answers found 4, and those
+found 3. Each was a pair nobody had crossed: undoing a pause during a
+wait, then during a visit, then during an extra visit. Four rounds of the
+owner's time went on what one table would have shown.
+
+**Apply.**
+1. List the states (screens or engine modes) and the new events, as a
+   table.
+2. In each cell write what the spec says happens, or "undefined".
+3. Ask about every undefined cell in the round, grouped by event.
+   Recommend the answer of the nearest decided cell.
+4. A reference engine fails loudly on an undefined pair, naming it,
+   instead of guessing ([not-now.md](../common/not-now.md), "Fail loudly
+   instead of a silent stub").
+
+**Check.** todo: in a project with a reference engine, a test enumerates
+every state and event pair and fails on one the engine doesn't define.
+Whether the questions cover the table is review.

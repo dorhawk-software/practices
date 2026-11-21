@@ -124,6 +124,29 @@ Never work around the failure with `CARGO_BUILD_BUILD_DIR`, `CARGO_TARGET_DIR` o
 
 **Check.** No more than one or two portal captures in a session.
 
+## Long gates run in the main session
+
+**What.** A gate that takes minutes (a simulator suite, a pixel match) runs in the agent's main session, one at a time. A sub-agent writes code and runs the quick checks; it hands the long gate back. An agent's work is done only once it has stopped: before a gate starts, no other agent still runs one.
+
+**Why.** On 2026-11-21 a Scops sub-agent waited for its UI suite in the background and was stopped as stalled, twice, with its work uncommitted. An agent from that morning, whose work had been committed hours before, still ran its own suite under the shared lock.
+
+**Apply.**
+1. A sub-agent's brief names the long gates it leaves to the main session.
+2. Before a long gate, list the running agents and test processes, and stop the orphans.
+3. Run a gate in the foreground with a timeout, or in the background with its notification awaited; never in a sleep loop.
+
+**Check.** Review: which agents run is visible only to the session that started them.
+
+## Only the lock's own script waits for the lock
+
+**What.** A shared lock is taken and waited for only by the script that owns it. That script can take over a lock whose holder is gone; a loop written around it can't.
+
+**Why.** Scops' pixel match keeps a lock folder with the holder's process ID, and takes it over when that process is gone. On 2026-11-21 an agent waited for it in its own `until [ ! -d lock ]; do sleep 5; done`. A killed run left the lock behind, twice, and the loop waited for hours on a lock nobody held.
+
+**Apply.** Call the gate's script and let it wait. To run two gates in turn, run them one after the other; never poll another gate's lock.
+
+**Check.** todo: a PreToolUse claude-hook could refuse a command that polls a `*.lock` path in a loop.
+
 ## Write down what is deferred
 
 See [not-now.md](not-now.md). Whatever is decided "not now" is written in the repo, in the same commit.
