@@ -170,6 +170,15 @@ echo "Initrode" >"$p/README"
 expect 1 "and is searched with" env CI=true PRACTICES_PRIVATE_TERMS=Initrode "$p/.practices/bin/check-private"
 rm "$p/README"
 printf 'GlobexCorp\n' >"$p/dev/private-terms"
+# A commit from a linked worktree: the hook runs there, and the git-ignored terms are only in the main
+# worktree (Scops, 2026-11-22: every worktree commit refused with "no dev/private-terms").
+git -C "$p" add -A && git -C "$p" commit -q -m base
+wt=$work/wt$RANDOM$RANDOM
+git -C "$p" worktree add -q "$wt" -b wt
+expect 0 "a linked worktree uses the main worktree's terms" env -C "$wt" GIT_DIR="$(git -C "$wt" rev-parse --absolute-git-dir)" "$p/.practices/bin/check-private"
+echo 'GlobexCorp' >"$wt/leak.txt"
+git -C "$wt" add leak.txt
+expect 1 "and still finds a client named in it" env -C "$wt" GIT_DIR="$(git -C "$wt" rev-parse --absolute-git-dir)" "$p/.practices/bin/check-private"
 
 # --- check-commit-msg
 p=$(project) # its own: the client below is a private term (tests/run check-commit-msg runs it alone)

@@ -12,8 +12,14 @@ set -uo pipefail
 
 PRACTICES_BIN=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # The project is the repository this kit sits in (.practices/bin), not
-# the one the caller happens to be in.
-if ! ROOT=$(git -C "$PRACTICES_BIN" rev-parse --show-toplevel 2>/dev/null); then
+# the one the caller happens to be in. In a git hook, git sets GIT_DIR and
+# runs the hook at the top of the tree being committed, which may be a
+# linked worktree whose hooks are the main tree's (core.hooksPath): there,
+# `git -C .practices/bin rev-parse --show-toplevel` answers .practices/bin
+# itself, and every check ran from the wrong folder (Scops, 2026-11-22).
+if [ -n "${GIT_DIR:-}" ]; then
+    ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "practices: run this inside the project's git repository" >&2; exit 2; }
+elif ! ROOT=$(git -C "$PRACTICES_BIN" rev-parse --show-toplevel 2>/dev/null); then
     echo "practices: run this inside the project's git repository" >&2
     exit 2
 fi

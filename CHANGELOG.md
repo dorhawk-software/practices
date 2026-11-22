@@ -33,6 +33,10 @@ newest first, in the kinds common/changelog.md describes.
   where the copy is written (a generator or the strings catalog), not
   one by one.
 
+### Fixed
+
+- **Commits from a linked worktree** (`git worktree add`) were refused: in a hook git sets GIT_DIR, the kit took its own bin folder for the project's root, and check-private looked for the git-ignored terms in the worktree, which never has them. The hooks now check the tree being committed, with the main worktree's terms.
+
 ## 1.10.0 (2026-11-21)
 
 ### New
