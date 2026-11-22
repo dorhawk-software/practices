@@ -12,7 +12,7 @@ to the agent to fix. This is where each rule stands
 - **review**: it needs a person's judgement (taste, wording, whether
   an icon is ugly); reviewers check it.
 
-Today: 15 gate, 73 partial, 125 todo, 44 review
+Today: 15 gate, 75 partial, 126 todo, 45 review
 (audited rule by rule on 2026-11-15, each claim checked against the
 scripts, not the docs). `tests/enforcement` fails when a practice has a
 rule this file doesn't list, or lists one that's gone. The todo and
@@ -232,6 +232,10 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Get the facts right | review | - | Whether a drawing keeps the real thing's identifying features at 16 px is a recognition judgement; at most a script can confirm the mark is shown at its smallest size on a board. |
 | The name and the mark read clean (a hard stop) | todo | - | Script generates every cut of the name (prefixes, suffixes, capital/hyphen/line-break splits, truncations, one-letter swaps) and fails unless the brief lists each with a verdict, sources and date; the reading itself stays human. |
 | A mark holds at its smallest size | partial | check-ui mark: at the smallest size a board shows each svg[data-mark], from its pixels: strokes 1 px or more, no leftover piece of a cut, the [data-mark-brand] element 10 px or taller, brand touching the letters or a quarter of a stroke clear; a mark never shown at 24 px or less (claude-hook, Stop, pre-commit) | A mark without data-mark isn't measured: nothing yet finds a wordmark that isn't declared. Whether the mark is good is review. |
+| The type is chosen for the product, never a tool's default | review | - | Whether a face fits the product is taste; the proposal's blind page and costs are review. The checks below catch what a machine can. |
+| Roles by meaning | partial | check-ui tabular: each time (21:05) and each [data-number] element, its figures measured in its own font and settings (ten 0s against ten 1s), after edits, on Stop and in pre-commit | Which face takes which role: a page could declare its roles (meta type-roles, data-role) and check-ui compare; not built. |
+| A face change keeps the ink | todo | - | check-ui could compare small text's ink between a board and the board it was derived from (a proposal against the agreed board), within 5 %; nothing does yet. |
+| Every face draws the product's own language | partial | check-ui fallback: Chrome's own report of the fonts it drew each element's text in (CSS.getPlatformFontsForNode); a system font under text that asks for a loaded face is a finding, after edits, on Stop and in pre-commit | The spacing around marks (ď, ť) is review. |
 | Iteration 1: establish the identity | review | - | The physical idea, its objects' jobs, the trust test and the worst-moment test are judgements; only the presence of a rating and a per-screen verdict list is checkable. |
 | Iteration 2: a few parts, shown, iterated, agreed | todo | - | check-ui: one design left per choice (no variant labels on agreed boards), every icon from the family sprite, every third-party asset carries data-source and the board a credit line, embedded SVGs have no script/external href; critique report file exists. |
 | Iteration 3: the whole app, re-audited and polished | todo | - | Checklist lint: every inventory line is graded matches/fixed/drifts/not seen, and every 'matches' links an existing capture or board file. |

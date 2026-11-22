@@ -3,6 +3,36 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### New
+
+- **The type is chosen for the product, never a tool's default**
+  (`ui/identity-pass.md`): three or four faces and the current one made
+  lighter, on the same screens with only the type changed, shown blind to
+  real people, each with its cost. A rounded heavy face read as
+  "AI-made"; the owner chose after a blind page.
+- **Roles by meaning** (`ui/identity-pass.md`): the voice face takes what
+  the product says, the interface face what you tap or scan and every time
+  and number, in tabular figures; never by size. check-ui's new `tabular`
+  rule measures each time's figures in its own font.
+- **A face change keeps the ink** (`ui/identity-pass.md`): small text
+  within 5 % of the agreed face's ink, measured.
+- **Every face draws the product's own language** (`ui/identity-pass.md`):
+  check-ui's new `fallback` rule asks Chrome which fonts it really drew
+  each text in, and finds letters a face lacks drawn by a system font.
+  Projects that let the system draw a sign on purpose (an arrow) mark it
+  `data-allow="fallback: <reason>"`.
+
+### Better
+
+- **Czech copy ties one-letter words to the next** (`common/voice.md`):
+  check-copy's new `one-letter-end` rule asks for a no-break space after
+  k, s, v, z, o, u, a and i, so no line ends on one ("…často s /
+  plačícím"). Existing Czech copy will have many findings: tie them
+  where the copy is written (a generator or the strings catalog), not
+  one by one.
+
 ## 1.10.0 (2026-11-21)
 
 ### New

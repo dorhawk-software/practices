@@ -179,6 +179,7 @@ own extra checks in `.practices/lint.d/`.
 | `ui-board.mjs` | check-ui's tables: each rule's doc and fix, a board's own width, whether it has dark rules |
 | `ui-pixels.mjs` | check-ui's pixels: Chrome's screenshots decoded, contrast measured on gradients and drawings |
 | `ui-mark.mjs` | check-ui's mark check: each `svg[data-mark]` drawn alone and large, measured from its pixels at the smallest size the board shows |
+| `ui-type.mjs` | check-ui's type checks: each text drawn in the face it asks for, never a fallback (Chrome's own report of the fonts it used), and times and counts in tabular figures |
 | `ui-motion.mjs` | check-ui's motion check: busy controls, with reduced motion and again with motion allowed, loops that don't stop for reduced motion, and words scaled out of their shape |
 | `check-hooks` | `.claude/settings.json` still runs `claude-hook` after edits and when a turn ends |
 | `disk-guard` | cargo's build disk keeps a free-space floor |

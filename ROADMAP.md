@@ -309,3 +309,9 @@ rows are this list's source; the most valuable first.
     paragraph's box.
   - [ ] State × event: a test pattern for a project's reference engine
     that fails on a pair the engine doesn't define.
+  - [x] Type: text drawn in a system fallback (`fallback`) and times in
+    proportional figures (`tabular`), in check-ui (Unreleased).
+  - [ ] Type roles: a page declares its faces' roles (`meta type-roles`,
+    `data-role`) and check-ui compares each element's face with its role.
+  - [ ] A face change keeps the ink: small text's ink on a derived board
+    against the board it came from, within 5 %.

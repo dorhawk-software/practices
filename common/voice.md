@@ -160,7 +160,12 @@ The kit ships three languages:
 - **cs**: `v-ve-time` ("ve" before 2, 3, 4, 12, 13, 14 and 20 to 23
   o'clock, "v" before the rest), `v-ve-day` (ve středu, ve čtvrtek, v
   pondělí), `v-before-v` (ve vaně, ve fázi), `s-z-before-sibilant` (se
-  sestrou, ze školy), `k-before-k` (ke kočárku).
+  sestrou, ze školy), `k-before-k` (ke kočárku), `one-letter-end` (a
+  one-letter preposition or conjunction, k, s, v, z, o, u, a, i, is tied
+  to the next word with a no-break space, so no line ends on it: a
+  review's crop of a Scops page caught "…často s / plačícím dítětem",
+  2026-11-22. Copy checked by eye at one width breaks at another, so the
+  copy carries the tie).
 - **es**: `al-del` ("a el" is "al", "de el" is "del"), `y-e` (padres e
   hijos), `o-u` (siete u ocho).
 - **en**: `a-an` (an hour, an SMS, a user, a one-off).

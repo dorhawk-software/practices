@@ -24,6 +24,7 @@ import { pathToFileURL } from "node:url";
 import { startChrome } from "./ui-chrome.mjs";
 import { markAudit } from "./ui-mark.mjs";
 import { motionAudit } from "./ui-motion.mjs";
+import { typeAudit } from "./ui-type.mjs";
 import { decodePng, pixelContrast } from "./ui-pixels.mjs";
 import { RULE, fixedWidth, THEMED } from "./ui-board.mjs";
 import { loadRules } from "./copy-audit.mjs";
@@ -49,7 +50,7 @@ function audit(cfg) {
   const out = [];
   const measured = { contrastMeasured: 0, contrastSkipped: 0, pending: [] };
   const RULES = ["contain", "align", "gap", "clip", "text-size", "ring", "shadow", "halo", "inset", "centre", "state", "icon", "outcome", "same-look", "contrast", "mark", "ink", "safe", "wrap", "sheet",
-    "busy", "working", "motion", "squash", "copy", "fact"]; // copy and fact are check-copy's, marked on the same boards
+    "busy", "working", "motion", "squash", "fallback", "tabular", "copy", "fact"]; // copy and fact are check-copy's, marked on the same boards
   // A page behind an open sheet is inert in the product and aria-hidden on a board: nobody reads or taps
   // it. elementFromPoint skips inert elements, so a scrim inside one no longer covered its text, and
   // Scops' boards had false contrast findings under the scrim (2026-11-16).
@@ -608,7 +609,7 @@ function audit(cfg) {
 }
 
 // --- Run every board at every width and theme.
-const runs = [], marks = new Map(), motions = new Map(), rendersOf = new Map();
+const runs = [], marks = new Map(), types = new Map(), motions = new Map(), rendersOf = new Map();
 const { vague } = await loadRules(opts["copy-rules"]);
 try {
   const sessionId = await openPage();
@@ -640,6 +641,9 @@ try {
       // The marks once per board, on the first render, before contrast hides the text's colour.
       if (!marks.has(file)) marks.set(file, await markAudit(s, width, opts, decodePng));
       result.findings.push(...marks.get(file));
+      // The faces once per board: what Chrome really drew each text in, and the figures of times.
+      if (!types.has(file)) types.set(file, await typeAudit(s));
+      result.findings.push(...types.get(file));
       if (result.measured.pending.length) await pixelContrast(s, result, width);
       // Busy controls and loops once per board, last: it may load the board again with motion allowed.
       if (!motions.has(file)) motions.set(file, await motionAudit(s, { targets: opts.targets }, () => load(sessionId, url, { "prefers-color-scheme": theme, "prefers-reduced-motion": "no-preference" }, file)));
