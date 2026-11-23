@@ -51,6 +51,13 @@ README.md is the map; read it first.
   actions or workflows is a new major version.
 - **A release moves the plugin's version too**: plugin.json and
   marketplace.json say the release's version, in the release commit.
+- **A release, in order** (the owner, 2026-11-23: "v1 of practices is not
+  updated to 1.12.1, this is wrong"): push the release commit; wait until
+  its own CI run passes, every job; tag that commit `v1.x.y`; move `v1` to
+  it (`git tag -fa v1 -m "Practices 1.x.y" v1.x.y^{}`, then
+  `git push -f origin v1 v1.x.y`). `v1` stayed at 1.9.2 through four
+  releases, and 1.12.0 was tagged before its CI failed. tests/versions
+  fails while `v1` isn't on the newest 1.x tag.
 - Commits: the subject is the outcome; the body says why. Co-Authored-By
   is fine; never a session ID or session link (CI refuses them).
 
