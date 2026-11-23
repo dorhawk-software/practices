@@ -3,6 +3,16 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## 1.12.1 (2026-11-23)
+
+### Underneath
+
+- **1.12.0, released from a green main.** CI on 1.12.0's release commit
+  hung on macOS and was cancelled after 15 minutes with no log; the same
+  rules and checks had passed one commit earlier. The kit's own tests now
+  print each section's start and stop a section that runs over 4
+  minutes, naming it. Projects get exactly 1.12.0's rules and checks.
+
 ## 1.12.0 (2026-11-23)
 
 ### New
