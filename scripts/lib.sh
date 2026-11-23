@@ -64,6 +64,12 @@ UI_THEMES='light dark'
 UI_TARGETS='button, a[href], [role=button], input, select, textarea, summary'
 UI_STATES='focus hover active pressed'
 UI_CHROME=''
+# The page gate (check-page): the proposal and review pages the owner
+# reads on a phone (git pathspecs; empty: none), and the widths (px) each
+# is read at. Crake keeps its proposals in design/proposals/, Scops its
+# in design/changes/.
+UI_PAGES=':(glob)design/proposals/**/*.html :(glob)design/changes/**/*.html'
+PAGE_WIDTHS='375 390'
 # The voice gate (check-voice): the files that hold the copy people see
 # (git pathspecs; tests and generated files left out), and more first-person plural words to flag, as a regex
 # alternation (a language the check doesn't know). The changelog is What's new
@@ -205,6 +211,15 @@ xcode_projects() {
     read -r -a spec <<<"$EXCLUDE"
     git ls-files --cached --others --exclude-standard -- '*.xcodeproj/project.pbxproj' ':!Pods/**' ':!**/Pods/**' \
         ':!**/node_modules/**' ${spec[@]+"${spec[@]}"} | sed 's|/project\.pbxproj$||'
+}
+
+# The proposal and review pages check-page reads: tracked or new,
+# matching UI_PAGES.
+ui_pages() {
+    local spec
+    [ -n "$UI_PAGES" ] || return 0
+    read -r -a spec <<<"$UI_PAGES $EXCLUDE"
+    git ls-files --cached --others --exclude-standard -- "${spec[@]}"
 }
 
 # The design boards check-ui renders: tracked or new, matching UI_BOARDS.

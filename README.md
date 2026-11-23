@@ -54,19 +54,19 @@ as a pull request the project's own workflow opens.
 | [Releases](common/releases.md) | Only a green main is released, by one command; a rehearsal publishes nothing. |
 | [The product's voice](common/voice.md) | The product speaks as itself or names who acts, never "we" (a companion's inclusive "we" is marked); each language's grammar checked by its own rules (`check-voice`, `check-copy`). |
 | [Not now](common/not-now.md) | Whatever is deferred is written down in the same commit; stubs fail loudly. |
-| [Testing](common/testing.md) | Nothing touches your machine; a journey suite is the regression suite; red before green. |
+| [Testing](common/testing.md) | Nothing touches your machine; a journey suite is the regression suite; red before green; no retries, except a renderer that gave no answer, asked once more. |
 | [CI and caching](common/ci-caching.md) | GitHub's 10 GB cache and private repos' minutes are budgets, spent on purpose. |
 | [CLAUDE.md and docs](common/claude-md.md) | Rules and pointers in CLAUDE.md, detail in docs/engineering, every rule dated. |
 | [Privacy in public repos](common/privacy-public-repos.md) | Made-up names, documentation addresses, and a denylist the hooks refuse. |
-| [Working rules for coding agents](common/agent-working-rules.md) | Low CPU priority, a disk floor, rebuild before "restart", keep going on a plan. |
-| [Gates that can fail](common/gates.md) | A canary proves each check works; findings say how to fix them; a size limit is met by splitting; audit and list licences from what ships. |
+| [Working rules for coding agents](common/agent-working-rules.md) | Low CPU priority, a disk floor, rebuild before "restart", keep going on a plan; one simulator at a time until the machine is measured; no edits to a script while it runs. |
+| [Gates that can fail](common/gates.md) | A canary proves each check works; findings say how to fix them; a subset iterates and only the full run gates; caches keyed by content; each phase timed; a size limit is met by splitting; audit and list licences from what ships. |
 | [Crash reports and logs](common/crash-reports.md) | Consent before the SDK starts; every hook checked in the vendor's code; an allow-list scrubber; expected refusals unreported. |
 
 ### UI design ([ui/](ui))
 
 | Practice | In one line |
 | --- | --- |
-| [Design before build](ui/design-before-build.md) | Proposals with options first; build what was chosen, one to one, measured and checked pixel by pixel; off-scale values go to the owner; every fact a screen uses was entered earlier. |
+| [Design before build](ui/design-before-build.md) | Proposals with options first, each page through a checklist before review (`check-page`); build what was chosen, one to one, measured and checked pixel by pixel, shot in one launch; off-scale values go to the owner; every fact a screen uses was entered earlier. |
 | [Window buttons](ui/window-buttons.md) | macOS draws its own on the left and the header makes room; the app's own on the right elsewhere. |
 | [Drag and drop](ui/drag-and-drop.md) | One calm panel over the target says what dropping does; the resting hint fades; nothing glows. |
 | [Feedback while it works](ui/feedback.md) | Work over a second shows the product's own motion until its result shows, and rests with reduced motion; a pressed control says what is happening ("Opening…"), shows the motion and takes no more presses until the outcome shows. |
@@ -174,6 +174,8 @@ own extra checks in `.practices/lint.d/`.
 | `check-commit-msg` | no session IDs or session links in commit messages; a commit that changes a design board names its before/after page; a commit that changes a check says how it was proven (`check-proven`) |
 | `check-proven` | a commit that adds or changes one of the project's checks (`CHECK_FILES`) has a `Proven:` line: the check broken once, its case seen failing |
 | `check-ui` | design boards (`design/**/*.html`), rendered in headless Chrome at each width, light and dark: nothing past its surface or cut off, buttons that follow their column and name their outcome, 8 px between targets, 11 px text, rings drawn with outline, shadows away from the light, 16 px from a ring to text's ink, centring, states that don't move content, icons on buttons, like controls alike, labels on one line, both safe areas of a phone frame, a page behind an open sheet marked inert, contrast against the pixels behind the text, and each mark (`data-mark`) at its smallest size: no stroke under 1 px, no leftover piece of a cut, the brand element 10 px or taller; a busy control (`aria-busy="true"`) disabled, without a pointer cursor, its words ending in "…" and something in it moving; nothing still looping with reduced motion; no words scaled out of their shape, now or by a `@keyframes` rule |
+| `check-page` | proposal and review pages (`design/proposals/`, `design/changes/`), read at 375 and 390 px as the owner reads them on a phone: nothing scrolls sideways, no one-letter word ends a line where its language ties it (an option's letter too), no image past the screen or drawn wider than its pixels at 2x, the doctype, the charset and the language there |
+| `page-audit.mjs` | check-page's measuring half (Node, no packages; drives Chrome with ui-chrome.mjs) |
 | `ui-audit.mjs` | check-ui's measuring half (Node, no packages; drives Chrome over a pipe) |
 | `ui-chrome.mjs` | check-ui's Chrome: started headless, spoken to over a pipe, its first page opened or retried, each board loaded under the media features asked for |
 | `ui-board.mjs` | check-ui's tables: each rule's doc and fix, a board's own width, whether it has dark rules |
@@ -183,7 +185,7 @@ own extra checks in `.practices/lint.d/`.
 | `ui-motion.mjs` | check-ui's motion check: busy controls, with reduced motion and again with motion allowed, loops that don't stop for reduced motion, and words scaled out of their shape |
 | `check-hooks` | `.claude/settings.json` still runs `claude-hook` after edits and when a turn ends |
 | `disk-guard` | cargo's build disk keeps a free-space floor |
-| `claude-hook` | Claude Code's hooks. After Bash, Edit and Write: disk-guard; the lint gate after cargo builds and tests, and after npm or npx tests, tsc and ESLint; check-ui on any board that changed, check-voice and check-copy on any copy that changed, check-permission-words on copy or code, check-xcode and check-ui-tests on an Xcode project, entitlements or Swift; check-ios-artefact after `xcodebuild archive` or `-exportArchive`. On Stop: the turn can't end while a changed file fails a gate |
+| `claude-hook` | Claude Code's hooks. After Bash, Edit and Write: disk-guard; the lint gate after cargo builds and tests, and after npm or npx tests, tsc and ESLint; check-ui on any board that changed, check-page on any proposal page that changed, check-voice and check-copy on any copy that changed, check-permission-words on copy or code, check-xcode and check-ui-tests on an Xcode project, entitlements or Swift; check-ios-artefact after `xcodebuild archive` or `-exportArchive`. On Stop: the turn can't end while a changed file fails a gate |
 | `install-hooks` | points git at `.practices/hooks` (pre-commit, commit-msg) |
 | `prune-caches`, `sweep-target` | keep GitHub's 10 GB cache budget for what jobs restore |
 

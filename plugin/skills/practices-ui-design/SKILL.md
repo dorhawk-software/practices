@@ -126,6 +126,14 @@ sometimes edits it.
 - Every fact a screen uses was entered earlier in the flow; walk the
   prototype as a new user and point to the step for each
   (design-before-build.md).
+- A proposal page passes its checklist before anyone reviews it: each
+  question beside its own images, before/after pairs within one phone
+  screen, every option drawn at its best, every sentence true on its
+  screen (design-before-build.md, "Proposal pages pass a checklist
+  before review"). `check-page` reads it at 375 and 390 px after each
+  edit and before each commit.
+- A screenshot gate is iterated on a subset (`--only`); only a full run
+  counts before a merge (common/gates.md).
 - One reading only: every number and limit names its subject and what
   happens when it runs out (visual-craft.md).
 - Dates, times and counts are picked, never typed; derived text

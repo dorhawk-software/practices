@@ -261,6 +261,13 @@ rows are this list's source; the most valuable first.
     lock").
   - [ ] A Stop hook's slow gate skips while its lock is held, and when
     nothing it checks changed since its last clean run (common/gates.md).
+  - [ ] The PreToolUse claude-hook also refuses booting a second
+    simulator while one is booted ("Simulators run one at a time until
+    the machine is measured"), and an edit to a shell script a running
+    process executes ("Don't edit a script while it runs").
+  - [ ] The kit's slow gates (check-ui, check-ui-tests) print each
+    phase's time and the total (common/gates.md, "A slow gate prints each
+    phase's time").
   - [x] check-voice reads JSX text between tags (1.6.1).
   - [x] check-voice reads the copy on design boards and web pages, in
     each element's lang, and takes COPY_LANG for copy that names none
@@ -315,3 +322,17 @@ rows are this list's source; the most valuable first.
     `data-role`) and check-ui compares each element's face with its role.
   - [ ] A face change keeps the ink: small text's ink on a derived board
     against the board it came from, within 5 %.
+  - [x] `check-page`: a proposal page read at 375 and 390 px, as the
+    owner reads it on a phone: sideways scroll, a one-letter word at a
+    line's end where its language ties it, images past the screen or
+    blurred past 2x, the doctype, charset and language (Unreleased).
+  - [ ] check-page measures the rest a script can: a before/after pair
+    taller than one 812 px screen at 375 px, and a page's weight (about
+    1 MB).
+  - [ ] Scops' screenshot match as a kit script: boards rendered in one
+    Chrome and app shots, each kept under a key of what it is made of,
+    `--only` for iterating, each phase timed (common/gates.md,
+    ui/design-before-build.md). Until then it lives in that project.
+  - [ ] check-shots takes a dither tolerance (`--dither 2`), so it can
+    serve as a screenshot gate's switch guard (ui/design-before-build.md,
+    "A screenshot gate launches the app once").

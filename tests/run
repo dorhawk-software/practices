@@ -496,6 +496,40 @@ st=$?
     bad "check-ui with a Chrome that opens no page fails (exit 2), saying so (exit $st)" "$out"
 printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
 
+# --- check-page: a proposal page as its reader opens it on a phone; each
+# fault caught on its own rule, and only the clean page passes
+# (ui/design-before-build.md, "Proposal pages pass a checklist before
+# review"). Needs Node and Chrome, as check-ui does.
+p=$(project)
+mkdir -p "$p/design/changes"
+expect 0 "check-page with no pages passes, saying so" "$p/.practices/bin/check-page"
+for f in "$here"/tests/page/*.html; do
+    name=$(basename "$f" .html)
+    cp "$f" "$p/design/changes/$name.html"
+    out=$("$p/.practices/bin/check-page" "design/changes/$name.html" 2>&1)
+    status=$?
+    case $name in
+    clean)
+        [ $status = 0 ] && ok || bad "check-page passes tests/page/clean.html (a tied Czech word, an English a at a line's end, a wide table in its own scroll box)" "$out" ;;
+    *)
+        [ $status = 1 ] && grep -q "^\[$name\]" <<<"$out" && [ "$(grep -c '^\[' <<<"$out")" = 1 ] && ok ||
+            bad "check-page catches tests/page/$name.html as [$name], and on no other rule (exit $status)" "$out" ;;
+    esac
+    rm "$p/design/changes/$name.html"
+done
+cp "$here/tests/page/one-letter-end.html" "$p/design/changes/page.html"
+out=$("$p/.practices/bin/check-page" 2>&1)
+case $out in *'"C / rozhodne." (cs) [375, 390 px]'*) ok ;; *) bad "check-page finds the pages by UI_PAGES and quotes the line's end, with the widths" "$out" ;; esac
+cp "$here/tests/page/lang.html" "$p/design/changes/page.html"
+printf 'PRIVATE_TERMS=none\nCOPY_LANG=cs\n' >"$p/.practices/config"
+out=$("$p/.practices/bin/check-page" 2>&1)
+[ $? = 1 ] && case $out in *'[one-letter-end]'*'"v / knihovně." (cs)'*) true ;; *) false ;; esac && ok ||
+    bad "check-page reads text that names no language in COPY_LANG's" "$out"
+echo "UI_CHROME=$work/no-chrome" >>"$p/.practices/config"
+"$p/.practices/bin/check-page" >/dev/null 2>&1
+[ $? = 2 ] && ok || bad "check-page without Chrome fails (exit 2), never passes"
+printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
+
 # --- check-copy: each language's rules on its own copy, the language always
 # named, a fact read the same on every board, exceptions with their reason.
 p=$(project)
@@ -861,6 +895,17 @@ printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
 cp "$here/tests/ui/clean.html" "$p/design/board.html"
 ev PostToolUse Edit | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ev Stop "" "" false | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok ||
     bad "once the board is fixed, edits and the turn's end pass"
+# A proposal page, read by check-page (UI_PAGES), not only by check-ui.
+mkdir -p "$p/design/changes"
+printf 'PRIVATE_TERMS=none\nUI_BOARDS=design/board.html\n' >"$p/.practices/config"
+cp "$here/tests/page/one-letter-end.html" "$p/design/changes/page.html"
+out=$(ev PostToolUse Write | "$p/.practices/bin/claude-hook" 2>&1)
+st=$?
+[ $st = 2 ] && case $out in *'check-page failed'*'[one-letter-end]'*) true ;; *) false ;; esac && ok ||
+    bad "claude-hook hands a proposal page's findings back (exit 2)" "$out"
+cp "$here/tests/page/clean.html" "$p/design/changes/page.html"
+ev PostToolUse Edit | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok || bad "claude-hook passes the page once it is fixed"
+printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
 
 # The voice gate: after an edit, before the turn ends, before a commit, in lint.
 p=$(project)
@@ -897,6 +942,15 @@ git -C "$p" commit -qm "Add a board" >/dev/null 2>&1 && bad "pre-commit refuses 
 cp "$here/tests/ui/clean.html" "$p/design/board.html"
 git -C "$p" add design/board.html
 git -C "$p" commit -qm "Add a board" >/dev/null 2>&1 && ok || bad "pre-commit lets a clean board through"
+mkdir -p "$p/design/changes"
+printf 'PRIVATE_TERMS=none\nUI_BOARDS=design/board.html\n' >"$p/.practices/config"
+cp "$here/tests/page/sideways.html" "$p/design/changes/page.html"
+git -C "$p" add design/changes/page.html
+git -C "$p" commit -qm "Add a proposal page" >/dev/null 2>&1 && bad "pre-commit refuses a proposal page that fails check-page" || ok
+cp "$here/tests/page/clean.html" "$p/design/changes/page.html"
+git -C "$p" add design/changes/page.html
+git -C "$p" commit -qm "Add a proposal page" >/dev/null 2>&1 && ok || bad "pre-commit lets a clean proposal page through"
+printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
 mkdir -p "$p/.claude"
 cp "$here/templates/claude-settings.json" "$p/.claude/settings.json"
 expect 0 "check-hooks passes the template" "$p/.practices/bin/check-hooks"

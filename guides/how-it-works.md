@@ -118,8 +118,9 @@ also in `rules.md`.
 | `check-commit-msg` | no session IDs or session links; no private names | commit-msg hook |
 | `install-hooks` | points git at `.practices/hooks` (`--check` to verify) | once per clone; lint checks it |
 | `check-ui` | design boards rendered in headless Chrome at each width and theme: nothing past its surface, buttons follow their column and name their outcome, 8 px between targets, 11 px text, contrast and the rest of [ui/visual-craft.md](../ui/visual-craft.md)'s measurable rules, and each mark at its smallest size ([ui/identity-pass.md](../ui/identity-pass.md)); `data-allow="rule: reason"` marks a deliberate exception | Claude hook (edits, Stop), pre-commit |
+| `check-page` | proposal and review pages (`UI_PAGES`) at 375 and 390 px, as the owner reads them on a phone: nothing scrolls sideways, no one-letter word ends a line where its language ties it, no image past the screen or blurred past 2x, the doctype, charset and language there ([ui/design-before-build.md](../ui/design-before-build.md#proposal-pages-pass-a-checklist-before-review)) | Claude hook (edits, Stop), pre-commit |
 | `check-hooks` | `.claude/settings.json` still runs `claude-hook` after edits and on Stop | pre-commit |
-| `claude-hook` | disk floor after every command; lint after cargo builds; check-ui on a board that changed, check-voice and check-copy on copy that changed, check-permission-words on copy or code, check-xcode and check-ui-tests on Xcode files; check-ios-artefact after an archive; on Stop, the turn can't end while a changed file fails a gate | Claude Code |
+| `claude-hook` | disk floor after every command; lint after cargo builds; check-ui on a board that changed, check-page on a proposal page that changed, check-voice and check-copy on copy that changed, check-permission-words on copy or code, check-xcode and check-ui-tests on Xcode files; check-ios-artefact after an archive; on Stop, the turn can't end while a changed file fails a gate | Claude Code |
 | `disk-guard` | keeps `DISK_FLOOR_GB` free where cargo builds | Claude hook |
 | `prune-caches` | deletes GitHub caches a newer one of the same kind replaced | CI on main |
 | `sweep-target` | keeps only the build units cargo used, before caching by hand | CI, packaging |
@@ -297,7 +298,8 @@ by `bin/install --templates`:
 After each shell command an agent runs, `claude-hook` checks the disk floor,
 and after a cargo build, test, check, clippy, run or nextest it runs the lint
 gate. After any edit, it runs `check-ui` on each design board whose content
-changed, `check-voice` on each copy file that changed, and `check-copy` on
+changed, `check-page` on each proposal page that changed, `check-voice` on
+each copy file that changed, and `check-copy` on
 each board or copy file that changed, and on any that failed before. A
 change to copy or code runs `check-permission-words`; one to an Xcode
 project, an entitlements file, Swift or a test script runs `check-xcode`

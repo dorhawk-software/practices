@@ -3,6 +3,48 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### New
+
+- **Proposal pages pass a checklist before review**
+  (`ui/design-before-build.md`): each question beside its own images,
+  before/after pairs within one phone screen, every option drawn at its
+  best, every sentence true on its screen, each language's rules. One
+  project's pages went through three review rounds that found what the
+  list now catches first.
+- **`check-page`** reads each proposal page (`UI_PAGES`:
+  `design/proposals/` and `design/changes/`) at 375 and 390 px, as the
+  owner reads it on a phone: sideways scroll, a one-letter word at a
+  line's end where its language ties it (an option's "C" too), images
+  past the screen or drawn wider than their pixels at 2x, the doctype,
+  the charset and the language. It runs after edits, on Stop and before
+  each commit. Pages read on a desktop set `PAGE_WIDTHS` or `UI_PAGES`
+  in `.practices/config`.
+- **A subset iterates; only the full run gates** (`common/gates.md`): a
+  slow gate may run a few screens by name while you work, and says it
+  was partial; the hooks run the full set. A shared view changed for one
+  screen moved another, and only the full run saw it.
+- **Cache by content, never by time** (`common/gates.md`): a render or a
+  shot is reused only under a hash of everything it is made of, the app
+  as built included. A screenshot match with the app unchanged fell from
+  8.8 min to 35 s and boots no simulator. The commit proves the cache
+  three ways before it is trusted.
+- **A slow gate prints each phase's time** (`common/gates.md`), so a
+  claim about its speed is measured.
+- **A screenshot gate launches the app once** (`ui/design-before-build.md`):
+  later screens are switched in place under a debug-only flag, each shot
+  waits for the app's ready mark, and a guard compares a switched screen
+  with a launched one, within 2 levels of dither. A shot fell from 7.47 s
+  to 1.26 s.
+- **A stuck renderer is asked once more; a failed comparison never is**
+  (`common/testing.md`): a capture that never answers is rendered again,
+  said, and a second miss fails naming the input.
+- **Simulators run one at a time until the machine is measured** and
+  **Don't edit a script while it runs** (`common/agent-working-rules.md`):
+  three simulators at once drove a 64 GB laptop to a load average of 387
+  and 103 °C; a script edited mid-run died after minutes of work.
+
 ## 1.11.0 (2026-11-22)
 
 ### New

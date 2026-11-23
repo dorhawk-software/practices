@@ -34,6 +34,11 @@
 # Chrome or Chromium to render with; empty: found on its own.
 #UI_CHROME=''
 
+# The proposal and review pages check-page reads as the owner does, on a
+# phone (git pathspecs; empty: none), and the widths in px it reads them at.
+#UI_PAGES=':(glob)design/proposals/**/*.html :(glob)design/changes/**/*.html'
+#PAGE_WIDTHS='375 390'
+
 # The files that hold the copy people see, for check-voice (git pathspecs);
 # the defaults cover common strings files, the changelog and a content/
 # folder. Add the code files that hold copy too, and leave out quoted

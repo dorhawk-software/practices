@@ -175,6 +175,87 @@ Count the files it reports checking against `git ls-files`.
 
 **Check.** The gate's file count matches the repository's.
 
+## A subset iterates; only the full run gates
+
+**What.** While working on a few screens, a slow gate may run on just
+those (`--only A,B`). Its result says it was partial. Only a full run
+counts before a merge, and the hooks always run the full set.
+
+**Why.** In Scops, an iOS app, a change to a column view every screen
+shares was meant for one screen (2026-11-22). It made another screen
+fade its text at the standard size. Only the full screenshot match
+caught it: 9 findings, a lead 5 pt off. A run of the screen being worked
+on would have passed.
+
+**Apply.**
+1. Give a slow gate a way to run a few of its items by name. An unknown
+   name fails, listing the names it knows.
+2. A partial run says so in its result: "Only 3 of 51 boards: only a
+   full run counts before a merge".
+3. The commit hook and the Stop hook run the full set. Nothing is merged,
+   or called matching, on a partial run.
+
+**Check.** Review: a claim that rests on a partial run is in the
+conversation. The hooks' full run is the gate.
+
+## Cache by content, never by time
+
+**What.** A slow gate reuses an earlier result only under a key made from
+everything that result is made of. Never by a file's age or a timestamp.
+A changed input gives a new key, and the work is done again.
+
+**Why.** Scops' screenshot match took 8.8 min, 71 % of it shooting the
+app on a simulator. The owner asked: "Is it necessary to shoot 51
+screens when only like 2 change?" (2026-11-23). Keyed by content, a run
+with the app unchanged takes 35 s and boots no simulator. A change to a
+board's text alone is caught in 37 s.
+
+**Apply.**
+1. A design render's key: a hash of the board, every file it loaded (as
+   the browser's network log records them; a web font by its versioned
+   URL), the rendering script, and the browser's and system's versions.
+   A web font that doesn't load fails the render, so a fallback face is
+   never kept.
+2. An app shot's key: a hash of the app as built and its test runner,
+   every file, with code signatures and the linker's per-build UUID
+   (`LC_UUID`) left out. Add the scenario, the device type, the runtime
+   and its build, the text size, the appearance and the shooting code.
+3. Hash what was built, not the sources. A comment or a touched file
+   then costs nothing, and a changed resource can't be missed.
+4. While no key changed, nothing boots: no simulator, no browser.
+5. The cache lives outside the repository, on the build disk. An entry
+   no run used for 14 days goes; `--fresh` redoes everything.
+
+**Check.** Before the cache is trusted, prove it and say so in the commit:
+- a design-only change is caught without the simulator (a board's word
+  changed: 5 findings, no simulator booted);
+- a one-line code change forces every shot again, and fails (a 1 pt
+  padding: 51 screens shot, 2 findings);
+- a kept file is byte-identical to the run it came from;
+- two builds of the same tree give the same app hash (every source
+  touched in between).
+
+A hash that differs when nothing changed costs a reshoot, never a wrong
+reuse. It happened once there, after a rebase.
+
+## A slow gate prints each phase's time
+
+**What.** A gate that takes minutes prints how long each phase took, and
+the total. A claim about its speed quotes those lines.
+
+**Why.** "Please time it, i would like to see some optimizations of the
+process" (the owner, 2026-11-23). The phases showed where Scops' 8.8 min
+went: shots 71 %, renders 16 %. Each change after that was measured, not
+guessed: a render pass from 86 s to 10 s, a shot from 7.47 s to 1.26 s.
+
+**Apply.** Print a line per phase (render, lock wait, build, shots,
+match) and a total. The wait for a shared lock gets its own line: it is
+another run's time. Quote a duration with where it was measured, as for
+CI ([agent-working-rules.md](agent-working-rules.md#quote-measured-ci-timings)).
+
+**Check.** todo: the kit's own slow gates (check-ui, check-ui-tests)
+don't print their phases yet.
+
 ## A ratchet for a rule you can't meet yet
 
 **What.** When a new rule has many findings, commit a baseline of counts.

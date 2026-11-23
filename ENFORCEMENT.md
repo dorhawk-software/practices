@@ -12,7 +12,7 @@ to the agent to fix. This is where each rule stands
 - **review**: it needs a person's judgement (taste, wording, whether
   an icon is ugly); reviewers check it.
 
-Today: 15 gate, 75 partial, 126 todo, 45 review
+Today: 15 gate, 76 partial, 130 todo, 48 review
 (audited rule by rule on 2026-11-15, each claim checked against the
 scripts, not the docs). `tests/enforcement` fails when a practice has a
 rule this file doesn't list, or lists one that's gone. The todo and
@@ -38,6 +38,8 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Long gates run in the main session | review | - | Which agents run, and whether a sub-agent waited on a long gate, is visible only to the session that started them. |
 | Only the lock's own script waits for the lock | todo | - | A PreToolUse claude-hook could refuse a Bash command that polls a `*.lock` path in a loop (`until [ ! -d …lock ]`, `while [ -e …lock ]`). |
 | Write down what is deferred | review | - | Deciding what was deferred is judgement; the mechanical parts are the not-now.md rules. |
+| Simulators run one at a time until the machine is measured | todo | - | A PreToolUse claude-hook could refuse `xcrun simctl boot` (or a second emulator) while another device is booted (`xcrun simctl list devices booted`), unless the project's config names a measured limit. |
+| Don't edit a script while it runs | todo | - | A PreToolUse claude-hook could refuse an Edit or Write to a shell script that a running process executes (`pgrep -f <path>`). |
 
 ### [common/changelog.md](common/changelog.md)
 
@@ -112,6 +114,9 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | A new check is broken once, then trusted | partial | check-proven, run by check-commit-msg (the commit-msg hook): a commit that adds or changes a file in CHECK_FILES carries a Proven: line of three words or more; this repository's own commit-msg hook sets CHECK_FILES to the kit's scripts and hooks | Whether the break was really tried and failed on the check's own case is review. CI's pushed-commit check doesn't know a commit's files, so a commit made with --no-verify isn't asked. A lint for a stored mutation suite (a mutants list, a SHARD) was left out: once the kit's list was gone it would match only unrelated words. |
 | A rule is an error, or it's off with a reason | partial | rust/templates/Cargo-lints.toml makes all clippy lints and warnings deny | lint never verifies Cargo.toml has [workspace.lints] with warnings=deny and every crate `[lints] workspace = true` (install only prints it), so clippy warnings pass; no check for warn levels in eslint configs or reasons on #[allow]/eslint-disable. |
 | The gate visits every file | partial | check-size and check-private walk git ls-files; clippy --all-targets and cargo fmt --all | No check that tsc/eslint's file list matches git ls-files for JS/TS; .rs files outside any module tree aren't seen by fmt/clippy; shell scripts in projects aren't linted at all. |
+| A subset iterates; only the full run gates | review | - | Whether a claim or a merge rested on a partial run is in the conversation; the project's own hooks run the full set. |
+| Cache by content, never by time | review | - | What a cached result is made of is each gate's own; the proofs (a design-only change caught without the simulator, a code change reshot, kept files byte-identical) are read in the commit. |
+| A slow gate prints each phase's time | todo | - | check-ui and check-ui-tests could print each phase's time and the total, and tests/run assert the lines. |
 | A ratchet for a rule you can't meet yet | partial | check-size's .practices/size-allowlist ratchet (lint: claude-hook, pre-commit, CI) | No generic baseline-of-counts helper for other countable rules (lint findings, skips, todo! counts). |
 | A size limit is met by splitting, never by trimming | review | - | Whether user text was shortened or a plural dropped to fit needs reading the diff. |
 | Audit only what ships; re-check every accepted advisory | partial | cargo deny advisories in lint (claude-hook, pre-commit, CI) and daily rust-advisories.yml | deny.toml ignore entries need no reason or expiry check, dev-dependencies aren't excluded, and there is no shipped-bundle audit for npm. |
@@ -164,6 +169,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | A step for every IPC call | todo | - | A project guard could list IPC methods from the interface definition (D-Bus XML, proto, enum) and require each to appear in the contract test. |
 | Red before green | todo | - | CI could run a PR's added/changed tests against the base commit's non-test code and require them to fail; nothing checks the commit-body line either. |
 | No retries for flaky tests | todo | - | A lint.d grep should refuse retry options in workflows and test config (nextest retries, --retries, jest retryTimes, retry actions, rerun-failed). |
+| A stuck renderer is asked once more; a failed comparison never is | review | - | Telling a renderer that gave no answer from a comparison that failed needs reading the gate's code; the forced-hang proof is read in the commit. |
 | Real-machine bugs become tests | review | - | Linking a person's bug report to its test needs judgement. |
 | Fakes refuse what they weren't told | review | - | Whether a fake is permissive is shown by mutating a project's tests; the kit can't detect fakes generically. |
 | A guard test per incident, proven able to fail | review | - | Which incidents need a guard is judgement; the self-test is the project's own. |
@@ -205,8 +211,10 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | When the agent can't edit the design: a prompt and a sync-back list | todo | - | Markdown lint: every open item in design-sync-back.md references an entry in design-prompts.md whose status is 'sent' or 'returned <date>'. |
 | Match one to one, verified by screenshot | todo | - | Render the board and the demo-mode app (for web/RN-web in the same Chrome) at device DPR, crop each data-object, and diff row/column pixel profiles to report line weight, inset and height deltas over 0.5 px. |
 | Pixel by pixel: the owner's eye is the bar | partial | check-ui contain, clip (claude-hook, Stop, pre-commit) | Lines, glyphs, the face that renders and the words: compare the built screen's DOM and captures with the board's (fonts via CDP CSS.getPlatformFontsForNode), and each line of text's ink width and left edge, not only the paragraph's box. |
+| A screenshot gate launches the app once | todo | - | check-shots could take a dither tolerance (`--dither 2`) and serve as the switch guard; the switch, the ready mark and the settings check are the project's own code. |
 | A value the scale doesn't have is a question for the owner | todo | - | check-ui loads the project's scale tokens and flags every computed margin, padding, gap, radius and font-size not on the scale unless data-allow names it as the object's own geometry; a lint.d grep does the same in lint-exempt theme folders. |
 | Review a proposal in its place, with fresh eyes | todo | - | Structure check on proposal pages: a section answering the six questions (six non-empty items), a before/after pair, a quoted spec line for each option that changes the spec, and a linked critique record; the critique's quality stays human. |
+| Proposal pages pass a checklist before review | partial | check-page sideways, one-letter-end, image-width, image-pixels, doctype, charset, lang (claude-hook, Stop, pre-commit) | A before/after pair taller than 812 px at 375 px, and a page over about 1 MB, are measurable and unchecked; questions beside their images, options drawn fairly and sentences true per screen stay with review. |
 | Every fact a screen uses was entered earlier | partial | check-copy fact: every element marked data-fact="KEY" reads the same on every board, per language; a board changed alone is compared with all (claude-hook, Stop, pre-commit, lint) | Whether an earlier step supplies each fact: a click-through test of the prototype could list each data-fact's first screen in flow order and fail when a screen uses one before the step that collects it. |
 | Every control records an event or only navigates | todo | - | A check reads every button on the boards (class b-main, b-sub, b-ghost, a sheet's rows) and matches its label to the spec's event table or a `data-nav` mark; a button left over is a finding. |
 | Cross each new event with each state before asking | todo | - | In a project with a reference engine, a test enumerates every state and event pair and fails on one the engine doesn't define; whether a round's questions cover the table stays review. |

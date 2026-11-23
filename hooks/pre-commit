@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # git's pre-commit hook: nothing private (check-private); design boards
-# pass the UI gate (check-ui); the copy has no "we" (check-voice) and keeps
+# pass the UI gate (check-ui), and proposal pages read right on a phone
+# (check-page); the copy has no "we" (check-voice) and keeps
 # its language's grammar (check-copy); no button before a permission prompt
 # says "Allow" (check-permission-words); an Xcode project's targets and UI
 # tests hold (check-xcode, check-ui-tests); the
@@ -23,6 +24,16 @@ if [ -n "$boards" ] && [ -n "$staged" ]; then
     ui=$(printf '%s\n' "$staged" | grep -Fx -f <(printf '%s\n' "$boards") || true)
     if [ -n "$ui" ]; then
         printf '%s\n' "$ui" | tr '\n' '\0' | xargs -0 nice -n 10 "$bin/check-ui" || exit 1
+    fi
+fi
+# The proposal and review pages being committed read right on a phone
+# (check-page).
+# shellcheck source=/dev/null
+pages=$(cd "$(git rev-parse --show-toplevel)" && . "$bin/lib.sh" && ui_pages)
+if [ -n "$pages" ] && [ -n "$staged" ]; then
+    read_on_phone=$(printf '%s\n' "$staged" | grep -Fx -f <(printf '%s\n' "$pages") || true)
+    if [ -n "$read_on_phone" ]; then
+        printf '%s\n' "$read_on_phone" | tr '\n' '\0' | xargs -0 nice -n 10 "$bin/check-page" || exit 1
     fi
 fi
 # The copy being committed speaks as the product, never as "we" (check-voice).

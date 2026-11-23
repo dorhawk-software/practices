@@ -147,6 +147,49 @@ Never work around the failure with `CARGO_BUILD_BUILD_DIR`, `CARGO_TARGET_DIR` o
 
 **Check.** todo: a PreToolUse claude-hook could refuse a command that polls a `*.lock` path in a loop.
 
+## Simulators run one at a time until the machine is measured
+
+**What.** A gate runs one simulator or emulator at a time, under its own
+lock. Running several at once on the developer's machine waits until
+load, temperature and memory are measured there, and found to have room.
+
+**Why.** On 2026-11-23 three iOS simulators shot a screenshot gate at
+once on a 64 GB M-series laptop. The shots fell from 395 s to 163 s. The
+laptop reached a load average of 387, every core at 94–100 %, up to
+103 °C, with 52 GB of memory in use; the run was stopped that day.
+Xcode's own parallel testing was worse for this: it gave the whole test
+class to one clone, and copied 3.1 GB per clone to the internal disk.
+
+**Apply.**
+1. One simulator at a time, under the gate's lock
+   ([above](#only-the-locks-own-script-waits-for-the-lock)).
+2. Before parallel runs become a default, measure them on the machine,
+   with nothing else running: load average, temperature, memory. Try two
+   devices, not three.
+3. Parallel runs go to a machine with the room for them, such as CI.
+4. Write the measurement and the decision down
+   ([not-now.md](not-now.md)).
+
+**Check.** todo: claude-hook could refuse booting a second simulator
+while one is booted (`xcrun simctl list devices booted`).
+
+## Don't edit a script while it runs
+
+**What.** A script that a run is executing isn't edited until the run
+ends. Wait, or stop the run first.
+
+**Why.** bash reads a script as it runs, line by line. On 2026-11-23 a
+screenshot gate's `run.sh` was edited during a run. The run died with
+"syntax error near unexpected token" after minutes of shots it had
+already taken.
+
+**Apply.** Before editing a gate's script, check that no run of it is
+going (`pgrep -fl run.sh`). A script whose body is one function, called
+as `main "$@"; exit` on its last line, is read whole before it starts.
+
+**Check.** todo: claude-hook could refuse an edit to a shell script that
+a running process executes (`pgrep -f <path>`).
+
 ## Write down what is deferred
 
 See [not-now.md](not-now.md). Whatever is decided "not now" is written in the repo, in the same commit.
