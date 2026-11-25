@@ -575,6 +575,10 @@ sed 's/ data-allow="reviewed: a text fixture, no screen mock"//' "$here/tests/pa
 out=$("$p/.practices/bin/check-page" design/changes/page.html 2>&1)
 [ $? = 1 ] && case $out in *'[reviewed]'*'no mock is marked data-mock'*) true ;; *) false ;; esac && ok ||
     bad "check-page fails a page with no mock marked and no reason" "$out"
+# check-page's mark on <body> is a rule check-ui knows too: a page is read by both.
+cp "$here/tests/page/clean.html" "$p/design/changes/page.html"
+out=$("$p/.practices/bin/check-ui" design/changes/page.html 2>&1)
+case $out in *'[allow]'*) bad "check-ui takes check-page's reviewed mark as a rule" "$out" ;; *) ok ;; esac
 sed 's/reviewed: a text fixture, no screen mock/reviewed: text/' "$here/tests/page/clean.html" >"$p/design/changes/page.html"
 out=$("$p/.practices/bin/check-page" design/changes/page.html 2>&1)
 [ $? = 1 ] && case $out in *'[reviewed]'*) true ;; *) false ;; esac && ok ||

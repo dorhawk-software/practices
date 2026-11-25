@@ -3,6 +3,14 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### Fixed
+
+- `check-ui` takes `data-allow="reviewed: …"`, check-page's mark for a
+  page with no mock, as a rule. 1.16.0 refused it on a proposal page,
+  which both checks read.
+
 ## 1.16.0 (2026-11-25)
 
 ### New

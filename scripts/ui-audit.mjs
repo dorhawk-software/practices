@@ -53,7 +53,7 @@ function audit(cfg) {
   const out = [];
   const measured = { contrastMeasured: 0, contrastSkipped: 0, pending: [] };
   const RULES = ["contain", "align", "gap", "clip", "text-size", "ring", "shadow", "halo", "inset", "centre", "state", "icon", "outcome", "same-look", "contrast", "mark", "ink", "safe", "wrap", "join", "stack", "menu", "stripe", "sheet",
-    "busy", "working", "motion", "squash", "fallback", "tabular", "copy", "fact"]; // copy and fact are check-copy's, marked on the same boards
+    "busy", "working", "motion", "squash", "fallback", "tabular", "copy", "fact", "reviewed"]; // copy and fact are check-copy's, reviewed check-page's, marked on the same pages
   // A page behind an open sheet is inert in the product and aria-hidden on a board: nobody reads or taps
   // it. elementFromPoint skips inert elements, so a scrim inside one no longer covered its text, and
   // Scops' boards had false contrast findings under the scrim (2026-11-16).
