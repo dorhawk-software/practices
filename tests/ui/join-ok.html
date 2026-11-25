@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>join-ok</title>
+<style>
+body{font:14px/1.4 Helvetica,Arial,sans-serif;background:#fff;color:#222;margin:24px}
+.card{background:#f2f2f2;padding:16px;width:320px;border-radius:8px;margin-bottom:16px}
+.caption{font-family:monospace;width:12ch;margin:0}
+.one{white-space:nowrap}
+.parts{display:flex;flex-direction:column}
+</style></head>
+<body>
+<div class="card"><p>Tied with no-break spaces: it breaks elsewhere.</p><p class="caption">this week&nbsp;·&nbsp;18 in all</p></div>
+<div class="card"><p>On one line where it fits.</p><p class="caption one">week · 18</p></div>
+<div class="card"><p>A line for each part, without the dot.</p><div class="caption parts"><span>this week</span><span>18 in all</span></div></div>
+<div class="card"><p>Parts in elements of their own, on one line.</p><p><span>Today</span> · <span>3 apps</span> | <span>open</span></p></div>
+<div class="card" data-allow="join: the dot is quoted in a sentence"><p class="caption">Write a · between them, it says.</p></div>
+</body></html>

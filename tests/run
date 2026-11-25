@@ -497,7 +497,7 @@ for f in "$here"/tests/ui/*.html; do
     out=$("$p/.practices/bin/check-ui" "design/$name.html" 2>&1)
     status=$?
     case $name in
-    clean | allowed | covered | covered-wide | align-forward | mark-ok | skips | skips-* | rounded | ink-ok | inset-ok | inset-under | inset-drawing | halo-ink | busy-ok | squash-ok | type-ok)
+    clean | allowed | covered | covered-wide | align-forward | mark-ok | skips | skips-* | rounded | ink-ok | inset-ok | inset-under | inset-drawing | halo-ink | busy-ok | squash-ok | type-ok | join-ok)
         [ $status = 0 ] && ok || bad "check-ui passes tests/ui/$name.html" "$out" ;;
     *)
         rule=$name
@@ -797,6 +797,80 @@ st=$?
 [ $st != 0 ] && case $out in *"selections failed"*) true ;; *) false ;; esac && ok || bad "lint fails while a selection is animated" "$out"
 git -C "$p" add App/Chart.swift
 git -C "$p" commit -qm "Chart" >/dev/null 2>&1 && bad "pre-commit refuses an animated selection" || ok
+
+# --- check-joins: a joined line breaks between its parts (ui/visual-craft.md);
+# a quoted dot is marked with its reason
+p=$(project)
+expect 0 "check-joins with no Swift passes, saying so" "$p/.practices/bin/check-joins"
+mkdir -p "$p/App"
+cat >"$p/App/Today.swift" <<'SWIFT'
+struct Today: View {
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            Text("this week \u{00B7} \(total) in all", comment: "Under the count · one line")
+                .lineLimit(1)
+            VStack(alignment: .leading) {
+                Text("this week")
+                Text("\(total) in all")
+            }
+        }
+        Text("AVG \(avg) · LIMIT \(limit)").fixedSize()
+        Text("\(days) clean days\u{00A0}·\u{00A0}\(level). They'll get it as a notification.")
+        (Text("\(closed) closed") + Text(" · ").foregroundStyle(.gray) + Text(calls))
+        (Text("\(closed) closed") + Text(" · ") + Text(calls))
+            .lineLimit(1)
+        // Text("a · b") in a comment
+        let label = "a · b"
+        // practices-allow join: the dot is quoted, not a separator
+        Text("Write a · between them")
+        Text("Trends", comment: "A title · not joined")
+    }
+}
+SWIFT
+out=$("$p/.practices/bin/check-joins" 2>&1)
+st=$?
+[ $st = 1 ] && case $out in *'Today.swift:13 '*) true ;; *) false ;; esac && ok ||
+    bad "check-joins reads a sum of Texts in parentheses as one that may wrap (exit $st)" "$out"
+sed -i.bak '13d' "$p/App/Today.swift" && rm "$p/App/Today.swift.bak"
+expect 0 "check-joins passes one line, ViewThatFits, fixedSize, tied dots, a sum on one line, comments, other strings, a marked dot and a comment: argument" "$p/.practices/bin/check-joins"
+cat >"$p/App/Board.swift" <<'SWIFT'
+struct Board: View {
+    var body: some View {
+        Text("this week · \(total) in all")
+            .lineLimit(2)
+            .minimumScaleFactor(0.8)
+        Text("LEVEL \(n) \u{00B7} \(name)")
+        Text("Today | 3 apps").font(.caption)
+        Text("\(a) closed") + Text(" · ") + Text(b)
+        Text(open ? tr("Closed by you: \(count) apps · opens \(next)") : other)
+        Text("a · b") // practices-allow join: quoted
+    }
+}
+SWIFT
+out=$("$p/.practices/bin/check-joins" 2>&1)
+st=$?
+[ $st = 1 ] && ok || bad "check-joins fails on a joined line that may wrap (exit $st)" "$out"
+for want in 'Board.swift:3 Text("this week · \(total) in all") joins parts' 'Board.swift:6 Text("LEVEL \(n) \u{00B7} \(name)")' \
+    'Board.swift:7 Text("Today | 3 apps")' 'Board.swift:8 Text(" · ")' 'Board.swift:9 Text("Closed by you:' \
+    'Board.swift:10 marks an exception without its reason' 'Rule: A joined line breaks between its parts'; do
+    case $out in *"$want"*) ok ;; *) bad "check-joins finds $want" "$out" ;; esac
+done
+case $out in *Today.swift*) bad "check-joins leaves the clean file alone" "$out" ;; *) ok ;; esac
+# The gate runs where the others do: after an edit, before a commit, in lint.
+"$p/.practices/bin/install-hooks" >/dev/null
+rm "$p/App/Board.swift"
+git -C "$p" add App/Today.swift && git -C "$p" commit -qm "Today" >/dev/null 2>&1 && ok || bad "pre-commit lets a joined line on one line through"
+ev PostToolUse Edit | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok || bad "claude-hook passes a joined line on one line"
+printf 'struct T: View {\n    var body: some View {\n        Text("this week · 18 in all").lineLimit(2)\n    }\n}\n' >"$p/App/Today.swift"
+out=$(ev PostToolUse Edit | "$p/.practices/bin/claude-hook" 2>&1)
+st=$?
+[ $st = 2 ] && case $out in *'[join]'*'Today.swift:3'*) true ;; *) false ;; esac && ok ||
+    bad "claude-hook hands a joined line that may wrap back to the agent" "$out"
+out=$("$p/.practices/bin/lint" 2>&1)
+st=$?
+[ $st != 0 ] && case $out in *"joined lines failed"*) true ;; *) false ;; esac && ok || bad "lint fails while a joined line may wrap" "$out"
+git -C "$p" add App/Today.swift
+git -C "$p" commit -qm "Today" >/dev/null 2>&1 && bad "pre-commit refuses a joined line that may wrap" || ok
 
 # --- check-xcode: each shipped target built for the declared devices, with
 # the entitlement each gated framework it compiles needs (mobile/app-review.md)

@@ -166,6 +166,8 @@ own extra checks in `.practices/lint.d/`.
 | `check-ui-tests` | XCUITests that pin the app's language, run Xcode's accessibility audit (exceptions name their element, each screen keeps its picture) on every screen state the app can be launched in, launch the app offline once, and run on an iPhone SE simulator at a large text size |
 | `check-motion` | no selection animated in Swift (`withAnimation` setting it, `.animation(_:value:)` following it), so the old and the new choice never cross-fade; a deliberate slide is marked `practices-allow motion: reason` |
 | `motion-audit.py` | check-motion's reading half (python3, no packages) |
+| `check-joins` | no joined line in Swift (`Text("this week · 18 in all")`) that may wrap at its separator: `.lineLimit(1)`, or `ViewThatFits` into a line per part; a quoted dot is marked `practices-allow join: reason` |
+| `join-audit.py` | check-joins' reading half (python3, no packages) |
 | `check-shots` | a screen shot after a live switch (theme, language, text size) against the same screen after a fresh start: every region that differs, with `--skip-top` for the status bar; with `--only-top PX`, a placeholder against its loaded page over the top band; `shots-diff.mjs` measures |
 | `shots-diff.mjs` | check-shots' measuring half (Node, no packages) |
 | `check-size` | 700 lines per Rust, TS or JS file, 1000 per test file, a shrinking allowlist |
@@ -184,6 +186,7 @@ own extra checks in `.practices/lint.d/`.
 | `ui-pixels.mjs` | check-ui's pixels: Chrome's screenshots decoded, contrast measured on gradients and drawings |
 | `ui-mark.mjs` | check-ui's mark check: each `svg[data-mark]` drawn alone and large, measured from its pixels at the smallest size the board shows |
 | `ui-type.mjs` | check-ui's type checks: each text drawn in the face it asks for, never a fallback (Chrome's own report of the fonts it used), and times and counts in tabular figures |
+| `ui-join.mjs` | check-ui's join check, at every width: a separator joining parts on one line (" · ", " \| ") never ends or starts a line |
 | `ui-motion.mjs` | check-ui's motion check: busy controls, with reduced motion and again with motion allowed, loops that don't stop for reduced motion, and words scaled out of their shape |
 | `check-hooks` | `.claude/settings.json` still runs `claude-hook` before Bash, after edits and when a turn ends |
 | `disk-guard` | cargo's build disk keeps a free-space floor |

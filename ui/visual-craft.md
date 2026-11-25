@@ -401,6 +401,49 @@ switch, a menu item) whose text runs onto a second line, unless it sits in
 a flex column inside the target. A card-sized target whose text is a
 paragraph on purpose is marked `data-allow="wrap: …"`.
 
+## A joined line breaks between its parts
+
+**What.** Parts joined on one line by a separator ("this week · 18 in
+all", "Day 3 of 7 · limits start after", "Today | 3 apps") never break
+at the separator. The line keeps to one line where it fits; where it
+doesn't, each part gets a line of its own, without the separator. In a
+sentence that wraps anyway, the separator is tied to the words on both
+sides with no-break spaces, so the sentence breaks somewhere else.
+
+**Why.** On 25 Nov 2026 an iPhone app's Today showed "2 čisté dny" over
+"tento týden ·" and "celkem 18" ("2 clean days", "this week ·", "18 in
+all"). The owner asked: "is this alignment OK? Seems weird to be on three
+rows". The line was allowed two lines (`.lineLimit(2)`) and broke where
+the Czech ran out of width, right after the dot. The dot then ended a
+line and joined nothing, and "celkem 18" read as a leftover. The
+English fitted, so the screenshots never showed it.
+
+**Apply.**
+1. A short joined line (a caption, a status, a chip) keeps to one line:
+   `.lineLimit(1)` in SwiftUI, `white-space: nowrap` on the web.
+2. Where it may not fit (a longer language, a large text size), offer
+   the parts on lines of their own, without the separator:
+   `ViewThatFits(in: .horizontal) { joined.lineLimit(1); VStack(alignment:
+   .leading) { part1; part2 } }`. Each part is its own string in the
+   catalogue.
+3. A joined phrase inside a sentence that wraps: write the separator
+   with a no-break space on both sides (`\u{00A0}·\u{00A0}`, `&nbsp;·&nbsp;`)
+   in the source and in every translation.
+
+**Check.** `check-joins` reads the Swift files (`MOTION_FILES`, the ones
+`check-motion` reads). It finds a `Text` whose own string joins parts
+with " · " or " | " beside an ordinary space, with no `.lineLimit(1)` or
+horizontal `.fixedSize` in its modifiers. A sum of `Text`s is read to
+its end. A dot that isn't a separator is marked
+`// practices-allow join: <the reason>`, with a reason of three words or
+more. It runs in lint, in claude-hook after an edit and on Stop, and in
+pre-commit. `check-ui` (join) measures design boards: a separator whose
+line differs from the nearest character before or after it is a
+finding; `data-allow="join: …"` marks a quoted one. Not read yet
+(ROADMAP.md): a string built elsewhere and shown with `Text(name)`, a
+translation that adds a separator the source lacks, and Kotlin and
+Compose.
+
 ## Buttons follow the column
 
 **What.** A row of buttons lines up with the text above it. In a column

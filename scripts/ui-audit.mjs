@@ -1,6 +1,6 @@
 // The UI gate's measuring half: renders each HTML board in headless Chrome
 // at every width and theme, and measures what ui/visual-craft.md asks
-// (busy controls and loops: ui-motion.mjs).
+// (busy controls and loops: ui-motion.mjs; joined lines: ui-join.mjs).
 // check-ui runs it; read that script for the settings. No packages: it
 // talks to Chrome over --remote-debugging-pipe (any Node 18+).
 //
@@ -25,6 +25,7 @@ import { startChrome } from "./ui-chrome.mjs";
 import { markAudit } from "./ui-mark.mjs";
 import { motionAudit } from "./ui-motion.mjs";
 import { typeAudit } from "./ui-type.mjs";
+import { joinAudit } from "./ui-join.mjs";
 import { decodePng, pixelContrast } from "./ui-pixels.mjs";
 import { RULE, fixedWidth, THEMED } from "./ui-board.mjs";
 import { loadRules } from "./copy-audit.mjs";
@@ -49,7 +50,7 @@ const { send, openPage, load, cleanup } = startChrome(opts.chrome, die);
 function audit(cfg) {
   const out = [];
   const measured = { contrastMeasured: 0, contrastSkipped: 0, pending: [] };
-  const RULES = ["contain", "align", "gap", "clip", "text-size", "ring", "shadow", "halo", "inset", "centre", "state", "icon", "outcome", "same-look", "contrast", "mark", "ink", "safe", "wrap", "sheet",
+  const RULES = ["contain", "align", "gap", "clip", "text-size", "ring", "shadow", "halo", "inset", "centre", "state", "icon", "outcome", "same-look", "contrast", "mark", "ink", "safe", "wrap", "join", "sheet",
     "busy", "working", "motion", "squash", "fallback", "tabular", "copy", "fact"]; // copy and fact are check-copy's, marked on the same boards
   // A page behind an open sheet is inert in the product and aria-hidden on a board: nobody reads or taps
   // it. elementFromPoint skips inert elements, so a scrim inside one no longer covered its text, and
@@ -641,6 +642,8 @@ try {
       // The faces once per board: what Chrome really drew each text in, and the figures of times.
       if (!types.has(file)) types.set(file, await typeAudit(s));
       result.findings.push(...types.get(file));
+      // Joined lines at every render: where a line breaks depends on the width.
+      result.findings.push(...(await joinAudit(s)));
       if (result.measured.pending.length) await pixelContrast(s, result, width);
       // Busy controls and loops once per board, last: it may load the board again with motion allowed.
       if (!motions.has(file)) motions.set(file, await motionAudit(s, { targets: opts.targets }, () => load(sessionId, url, { "prefers-color-scheme": theme, "prefers-reduced-motion": "no-preference" }, file)));

@@ -3,6 +3,20 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### New
+
+- **A joined line breaks between its parts** (`ui/visual-craft.md`).
+  "this week · 18 in all" keeps to one line where it fits, and gives each
+  part a line of its own, without the dot, where it doesn't; a dot inside
+  a sentence is tied with no-break spaces. The new `check-joins` reads
+  Swift for a `Text` that joins parts with " · " or " | " and may wrap (no
+  `.lineLimit(1)`), in lint, claude-hook and pre-commit; `check-ui`
+  (join) measures the same on design boards. A quoted dot is marked
+  `practices-allow join: <reason>` or `data-allow="join: …"`. Expect
+  findings in apps whose captions join parts with a dot.
+
 ## 1.15.1 (2026-11-25)
 
 ### Underneath

@@ -10,7 +10,8 @@
 # don't stop for reduced motion, words scaled out of their shape) and ui/feedback.md (a busy control,
 # aria-busy="true", that can still be pressed, doesn't end its words in
 # "…", or has nothing moving in it). The measuring is in ui-audit.mjs,
-# beside this script, and ui-motion.mjs; the words a button may not say
+# beside this script, ui-motion.mjs and ui-join.mjs (a joined line that
+# breaks at its separator); the words a button may not say
 # alone are each language's, in copy-rules/<lang>.mjs.
 #
 # A fixed-width board (a 390 px phone) renders at its own width: say it in

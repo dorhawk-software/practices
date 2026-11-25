@@ -316,6 +316,10 @@ rows are this list's source; the most valuable first.
   - [ ] check-motion reads Kotlin and Compose (`animate*AsState`,
     `animateColorAsState` keyed on a selection) and the web (a CSS
     `transition` on a `selected` or `aria-selected` rule).
+  - [ ] check-joins follows a string to its Text: a `tr("a · b")` or
+    `String(localized:)` assigned to a name and shown with `Text(name)`,
+    and a catalogue translation that adds a separator its source lacks;
+    then Kotlin and Compose (`Text("a · b")` without `maxLines = 1`).
   - [ ] A placeholder ends, as a check: a UI test pattern that holds the
     content back with a launch argument and asserts the message and its
     retry button; check-ui-tests asks for one, like the offline launch.

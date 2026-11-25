@@ -17,7 +17,8 @@
 # (check-size); no "we" in the copy (check-voice); each language's
 # grammar in the copy (check-copy); no "Allow" on a button before a
 # permission prompt (check-permission-words); no selection that
-# cross-fades (check-motion); an Xcode project's targets
+# cross-fades (check-motion); no joined line that wraps at its dot
+# (check-joins); an Xcode project's targets
 # with the device family and entitlements they need (check-xcode); UI
 # tests that pin the language and run on a small iPhone at a large text
 # size (check-ui-tests); the git hooks
@@ -64,6 +65,7 @@ step "the product's voice" "$PRACTICES_BIN/check-voice"
 step "the copy's grammar" "$PRACTICES_BIN/check-copy"
 step "permission buttons" "$PRACTICES_BIN/check-permission-words"
 step "selections" "$PRACTICES_BIN/check-motion"
+step "joined lines" "$PRACTICES_BIN/check-joins"
 step "Xcode targets" "$PRACTICES_BIN/check-xcode"
 step "UI tests" "$PRACTICES_BIN/check-ui-tests"
 if [ -z "${CI:-}" ]; then

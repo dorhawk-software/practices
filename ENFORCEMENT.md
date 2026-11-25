@@ -12,7 +12,7 @@ to the agent to fix. This is where each rule stands
 - **review**: it needs a person's judgement (taste, wording, whether
   an icon is ugly); reviewers check it.
 
-Today: 15 gate, 81 partial, 130 todo, 49 review
+Today: 15 gate, 82 partial, 130 todo, 49 review
 (audited rule by rule on 2026-11-15, each claim checked against the
 scripts, not the docs). `tests/enforcement` fails when a practice has a
 rule this file doesn't list, or lists one that's gone. The todo and
@@ -304,6 +304,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | A selection switches at once | partial | check-motion: in Swift (MOTION_FILES), a selection state (selected…, selection…, highlighted…, …Selection, …Selected, plus MOTION_SELECTION) set inside withAnimation or followed by .animation(_:value:); practices-allow motion with a reason of three words or more (lint, claude-hook, Stop, pre-commit) | Kotlin and Compose (animate*AsState on a selection), the web (a CSS transition on a selected class), a highlight under another name, and an animation set by a parent's transaction: review. |
 | A resize never shows a squashed frame | partial | check-ui squash: an element holding words drawn scaled out of its shape, or playing a @keyframes rule (under any media) that scales it so; data-allow for a deliberate one (claude-hook, Stop, pre-commit) | A uniform scale (a popover's scale-in), transitions to a scaled state, and the native app's own window resize: review, by recording the resize frame by frame. |
 | Nothing runs past its surface | gate | check-ui contain and clip, at every width and theme (claude-hook, Stop, pre-commit) | - |
+| A joined line breaks between its parts | partial | check-joins: in Swift (MOTION_FILES), a Text whose own string joins parts with " · " or " \| " beside an ordinary space and has no .lineLimit(1) or horizontal .fixedSize (a sum of Texts read to its end); practices-allow join with a reason (lint, claude-hook, Stop, pre-commit). check-ui join: on a board, a separator on a different line from the nearest character before or after it; data-allow join (claude-hook, Stop, pre-commit) | A string built elsewhere and shown with Text(name), a separator only a translation adds, Kotlin and Compose: review. |
 | A button label stays on one line | gate | check-ui wrap: the text of a button, tab, radio, switch or menu item never runs onto a second line, unless it sits in a flex column inside the target (claude-hook, Stop, pre-commit) | - |
 | Buttons follow the column | partial | check-ui align: a row of buttons starts at its column's leading edge, fills it, or is centred in a centred column; a lone button may sit at the trailing edge; a lone button never stretches across a surface wider than 480 px (claude-hook, Stop, pre-commit) | Whether a lone trailing button moves on (its wording) is review; equal widths in a full-width row aren't checked. |
 | Every button names its outcome | partial | check-ui outcome: no button whose accessible name is only a word that names no outcome, from the vagueButtons of the language it is in (copy-rules/<lang>.mjs: Cancel, OK, Yes, No, Zrušit, Ano, Cancelar…) (claude-hook, Stop, pre-commit) | Whether a specific label says the outcome ("Keep the app" beside "Remove") is review. |
