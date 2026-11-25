@@ -497,7 +497,7 @@ for f in "$here"/tests/ui/*.html; do
     out=$("$p/.practices/bin/check-ui" "design/$name.html" 2>&1)
     status=$?
     case $name in
-    clean | allowed | covered | covered-wide | align-forward | mark-ok | skips | skips-* | rounded | ink-ok | inset-ok | inset-under | inset-drawing | halo-ink | busy-ok | squash-ok | type-ok | join-ok)
+    clean | allowed | covered | covered-wide | align-forward | mark-ok | skips | skips-* | rounded | ink-ok | inset-ok | inset-under | inset-drawing | halo-ink | busy-ok | squash-ok | type-ok | join-ok | stack-ok | menu-ok)
         [ $status = 0 ] && ok || bad "check-ui passes tests/ui/$name.html" "$out" ;;
     *)
         rule=$name
@@ -798,10 +798,10 @@ st=$?
 git -C "$p" add App/Chart.swift
 git -C "$p" commit -qm "Chart" >/dev/null 2>&1 && bad "pre-commit refuses an animated selection" || ok
 
-# --- check-joins: a joined line breaks between its parts (ui/visual-craft.md);
+# --- check-views: a joined line breaks between its parts (ui/visual-craft.md);
 # a quoted dot is marked with its reason
 p=$(project)
-expect 0 "check-joins with no Swift passes, saying so" "$p/.practices/bin/check-joins"
+expect 0 "check-views with no Swift passes, saying so" "$p/.practices/bin/check-views"
 mkdir -p "$p/App"
 cat >"$p/App/Today.swift" <<'SWIFT'
 struct Today: View {
@@ -827,12 +827,47 @@ struct Today: View {
     }
 }
 SWIFT
-out=$("$p/.practices/bin/check-joins" 2>&1)
+out=$("$p/.practices/bin/check-views" 2>&1)
 st=$?
 [ $st = 1 ] && case $out in *'Today.swift:13 '*) true ;; *) false ;; esac && ok ||
-    bad "check-joins reads a sum of Texts in parentheses as one that may wrap (exit $st)" "$out"
+    bad "check-views reads a sum of Texts in parentheses as one that may wrap (exit $st)" "$out"
 sed -i.bak '13d' "$p/App/Today.swift" && rm "$p/App/Today.swift.bak"
-expect 0 "check-joins passes one line, ViewThatFits, fixedSize, tied dots, a sum on one line, comments, other strings, a marked dot and a comment: argument" "$p/.practices/bin/check-joins"
+cat >"$p/App/Views.swift" <<'SWIFT'
+struct Views: View {
+    var body: some View {
+        VStack(spacing: 0) {
+            Button("Close all") { close() }
+                .buttonStyle(.flapCell(.top))
+            Rectangle().frame(height: 1)
+            Button("Until a date…") { until() }
+                .buttonStyle(.flapCell(.bottom))
+        }
+        HStack {
+            Button("Back") { back() }
+                .buttonStyle(.bordered)
+            Button("Skip") { skip() }
+                .buttonStyle(.bordered)
+        }
+        Button("Next") { next() }
+            .buttonStyle(.flap)
+        Button("Not now") { later() }
+            .buttonStyle(.plain)
+        Picker("Hour", selection: $hour) {
+            ForEach(0..<24) { Text("\($0)").tag($0) }
+        }
+        .pickerStyle(.wheel)
+        Menu("Sort") {
+            Button("Name") { sort(.name) }
+            Button("Date") { sort(.date) }
+        }
+        // practices-allow menu: the flock's members, six at most
+        Menu("Cheer") { ForEach(members) { m in Button(m.name) { cheer(m) } } }
+        DatePicker("Time", selection: $end, displayedComponents: .hourAndMinute)
+            .datePickerStyle(.wheel)
+    }
+}
+SWIFT
+expect 0 "check-views passes one line, ViewThatFits, fixedSize, tied dots, a sum on one line, comments, other strings, a marked dot, a comment: argument, one block of two buttons, a pair side by side, two styles, a wheel, a short menu and a marked one" "$p/.practices/bin/check-views"
 cat >"$p/App/Board.swift" <<'SWIFT'
 struct Board: View {
     var body: some View {
@@ -847,19 +882,57 @@ struct Board: View {
     }
 }
 SWIFT
-out=$("$p/.practices/bin/check-joins" 2>&1)
+cat >"$p/App/Focus.swift" <<'SWIFT'
+struct Focus: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if closed {
+                Text("Closed")
+            } else {
+                Button { close() } label: { Label("Close all", systemImage: "lock") }
+                    .buttonStyle(.flapCell)
+                    #if DEBUG
+                    .onAppear { open() }
+                    #endif
+            }
+            Button { until() } label: { Text("Until a date…") }
+                .buttonStyle(.flapCell)
+        }
+    }
+}
+SWIFT
+cat >"$p/App/Time.swift" <<'SWIFT'
+struct Time: View {
+    var body: some View {
+        Menu {
+            Picker(selection: $minute) {
+                ForEach(allowed, id: \.self) { m in Text(label(m)).tag(m) }
+            } label: { EmptyView() }
+        } label: { Text(label(minute)) }
+        Picker("Member", selection: $who) {
+            ForEach(members) { Text($0.name) }
+        }
+    }
+}
+SWIFT
+out=$("$p/.practices/bin/check-views" 2>&1)
 st=$?
-[ $st = 1 ] && ok || bad "check-joins fails on a joined line that may wrap (exit $st)" "$out"
+[ $st = 1 ] && ok || bad "check-views fails on a joined line that may wrap, alike buttons stacked loose and menus built from data (exit $st)" "$out"
+for want in '[stack] 1 finding. Rule: Alike buttons stacked become one block' 'Focus.swift:13 two buttons in .buttonStyle(.flapCell)' \
+    '[menu] 2 findings. Rule: A time turns on a wheel; a menu holds a handful' 'Time.swift:3 a Menu built from a ForEach' 'Time.swift:8 a Picker built from a ForEach'; do
+    case $out in *"$want"*) ok ;; *) bad "check-views finds $want" "$out" ;; esac
+done
+case $out in *Views.swift* | *Time.swift:4*) bad "check-views leaves the clean views alone, and a Picker inside a flagged Menu" "$out" ;; *) ok ;; esac
 for want in 'Board.swift:3 Text("this week · \(total) in all") joins parts' 'Board.swift:6 Text("LEVEL \(n) \u{00B7} \(name)")' \
     'Board.swift:7 Text("Today | 3 apps")' 'Board.swift:8 Text(" · ")' 'Board.swift:9 Text("Closed by you:' \
     'Board.swift:10 marks an exception without its reason' 'Rule: A joined line breaks between its parts'; do
-    case $out in *"$want"*) ok ;; *) bad "check-joins finds $want" "$out" ;; esac
+    case $out in *"$want"*) ok ;; *) bad "check-views finds $want" "$out" ;; esac
 done
-case $out in *Today.swift*) bad "check-joins leaves the clean file alone" "$out" ;; *) ok ;; esac
+case $out in *Today.swift*) bad "check-views leaves the clean file alone" "$out" ;; *) ok ;; esac
 # The gate runs where the others do: after an edit, before a commit, in lint.
 "$p/.practices/bin/install-hooks" >/dev/null
-rm "$p/App/Board.swift"
-git -C "$p" add App/Today.swift && git -C "$p" commit -qm "Today" >/dev/null 2>&1 && ok || bad "pre-commit lets a joined line on one line through"
+rm "$p/App/Board.swift" "$p/App/Focus.swift" "$p/App/Time.swift"
+git -C "$p" add App/Today.swift App/Views.swift && git -C "$p" commit -qm "Today" >/dev/null 2>&1 && ok || bad "pre-commit lets a joined line on one line through"
 ev PostToolUse Edit | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok || bad "claude-hook passes a joined line on one line"
 printf 'struct T: View {\n    var body: some View {\n        Text("this week · 18 in all").lineLimit(2)\n    }\n}\n' >"$p/App/Today.swift"
 out=$(ev PostToolUse Edit | "$p/.practices/bin/claude-hook" 2>&1)
@@ -868,7 +941,7 @@ st=$?
     bad "claude-hook hands a joined line that may wrap back to the agent" "$out"
 out=$("$p/.practices/bin/lint" 2>&1)
 st=$?
-[ $st != 0 ] && case $out in *"joined lines failed"*) true ;; *) false ;; esac && ok || bad "lint fails while a joined line may wrap" "$out"
+[ $st != 0 ] && case $out in *"SwiftUI views failed"*) true ;; *) false ;; esac && ok || bad "lint fails while a joined line may wrap" "$out"
 git -C "$p" add App/Today.swift
 git -C "$p" commit -qm "Today" >/dev/null 2>&1 && bad "pre-commit refuses a joined line that may wrap" || ok
 

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>stack-ok</title>
+<style>
+body{font:14px/1.4 Helvetica,Arial,sans-serif;background:#fff;color:#222;margin:24px}
+.card{background:#f2f2f2;padding:16px;width:320px;border-radius:8px;margin-bottom:16px}
+.b{display:block;width:100%;font:inherit;font-weight:700;color:#7a2a10;background:#e2e2e2;border:0;border-radius:8px;padding:10px 12px;white-space:nowrap}
+.b + .b{margin-top:9px}
+.primary{color:#fff;background:#a8361a}
+.pair{border-radius:8px;overflow:hidden;background:#e2e2e2}
+.row{display:block;width:100%;font:inherit;font-weight:700;color:#7a2a10;background:transparent;border:0;border-radius:0;padding:10px 12px;white-space:nowrap}
+.sep{height:1px;background:#bbb}
+.or{text-align:center;margin:6px 0;color:#555}
+.plan{display:block;width:100%;font:inherit;color:#222;background:#e2e2e2;border:0;border-radius:8px;padding:10px;margin-top:8px;text-align:left}
+</style></head>
+<body>
+<div class="card"><p>One block, a hairline between.</p><div class="pair" data-allow="gap: two rows of one block, a hairline between"><button class="row" type="button"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg> Close all until 04:00</button><div class="sep"></div><button class="row" type="button"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="1" y="1" width="10" height="10" rx="2" fill="currentColor"/></svg> Until a date…</button></div></div>
+<div class="card"><p>A word between.</p><button class="b" type="button"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg> Close all until 04:00</button><p class="or">or</p><button class="b" type="button"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="1" y="1" width="10" height="10" rx="2" fill="currentColor"/></svg> Until a date…</button></div>
+<div class="card"><p>The main action and a second one look different.</p><button class="b primary" type="button"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg> Close all until 04:00</button><button class="b" type="button"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="1" y="1" width="10" height="10" rx="2" fill="currentColor"/></svg> Until a date…</button></div>
+<div class="card" role="radiogroup" aria-label="Plans"><button class="plan" role="radio" aria-checked="true" type="button">Yearly</button><button class="plan" role="radio" aria-checked="false" type="button">Monthly</button></div>
+</body></html>

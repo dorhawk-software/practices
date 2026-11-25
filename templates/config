@@ -86,7 +86,7 @@
 # The ratchet for states from before that rule, one per line.
 #UITEST_STATES_BASELINE='.practices/unaudited-states'
 
-# The Swift files check-motion and check-joins read (git pathspecs; tests
+# The Swift files check-motion and check-views read (git pathspecs; tests
 # left out), and
 # the app's own names for a selection state, added to selected…,
 # selection…, highlighted…, …Selection and …Selected (a regex alternation):

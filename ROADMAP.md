@@ -316,7 +316,11 @@ rows are this list's source; the most valuable first.
   - [ ] check-motion reads Kotlin and Compose (`animate*AsState`,
     `animateColorAsState` keyed on a selection) and the web (a CSS
     `transition` on a `selected` or `aria-selected` rule).
-  - [ ] check-joins follows a string to its Text: a `tr("a · b")` or
+  - [ ] check-views stack sees alike buttons of two styles that draw the
+    same (two names for one look), and a pair split across two views.
+  - [ ] check-views menu reads Kotlin and Compose (`DropdownMenu` over a
+    range or a list) and a long `Menu` of literal choices.
+  - [ ] check-views follows a string to its Text: a `tr("a · b")` or
     `String(localized:)` assigned to a name and shown with `Text(name)`,
     and a catalogue translation that adds a separator its source lacks;
     then Kotlin and Compose (`Text("a · b")` without `maxLines = 1`).

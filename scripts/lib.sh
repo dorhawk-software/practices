@@ -116,7 +116,7 @@ UITEST_OFFLINE='"-[A-Za-z]*Offline"'
 # test; and the ratchet listing states from before that rule.
 UITEST_STATES='arguments\.contains\("-[A-Za-z][A-Za-z0-9]*"\)'
 UITEST_STATES_BASELINE='.practices/unaudited-states'
-# The motion gate (check-motion) and the joins gate (check-joins): the
+# The motion gate (check-motion) and the views gate (check-views): the
 # Swift files they read, tests left
 # out, and more names of selection states (a regex, matched whole, added
 # to selected..., selection..., highlighted..., ...Selection, ...Selected).
@@ -208,7 +208,7 @@ permission_files() {
     } | grep -vE '\.(md|txt|html?)$' | awk '!seen[$0]++'
 }
 
-# The Swift files check-motion and check-joins read: tracked or new,
+# The Swift files check-motion and check-views read: tracked or new,
 # matching MOTION_FILES.
 motion_files() {
     local spec

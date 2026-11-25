@@ -10,12 +10,26 @@ newest first, in the kinds common/changelog.md describes.
 - **A joined line breaks between its parts** (`ui/visual-craft.md`).
   "this week · 18 in all" keeps to one line where it fits, and gives each
   part a line of its own, without the dot, where it doesn't; a dot inside
-  a sentence is tied with no-break spaces. The new `check-joins` reads
+  a sentence is tied with no-break spaces. The new `check-views` (join) reads
   Swift for a `Text` that joins parts with " · " or " | " and may wrap (no
   `.lineLimit(1)`), in lint, claude-hook and pre-commit; `check-ui`
   (join) measures the same on design boards. A quoted dot is marked
   `practices-allow join: <reason>` or `data-allow="join: …"`. Expect
   findings in apps whose captions join parts with a dot.
+- **Alike buttons stacked become one block** (`ui/visual-craft.md`). Two
+  buttons that look alike, one under the other with nothing between,
+  read as one button twice. Both answers to one question become one
+  block, a hairline between; otherwise a word ("or") or a different look
+  sets them apart. `check-views` (stack) reads Swift for two `Button`s in
+  the same style one straight after the other; `check-ui` (stack)
+  measures boards.
+- **A time turns on a wheel; a menu holds a handful** (`ui/pickers.md`).
+  A time is picked on the platform's time picker, a list built from data
+  on a wheel or a list screen. `check-views` (menu) finds a `Menu`, or a
+  `Picker` that isn't a wheel, built from a `ForEach`; `check-ui` (menu)
+  finds a menu of more than 12 choices on a board.
+- `check-views` reads SwiftUI for these three rules, in lint, claude-hook
+  and pre-commit.
 
 ## 1.15.1 (2026-11-25)
 

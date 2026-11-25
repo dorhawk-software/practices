@@ -430,7 +430,7 @@ English fitted, so the screenshots never showed it.
    with a no-break space on both sides (`\u{00A0}·\u{00A0}`, `&nbsp;·&nbsp;`)
    in the source and in every translation.
 
-**Check.** `check-joins` reads the Swift files (`MOTION_FILES`, the ones
+**Check.** `check-views` (join) reads the Swift files (`MOTION_FILES`, the ones
 `check-motion` reads). It finds a `Text` whose own string joins parts
 with " · " or " | " beside an ordinary space, with no `.lineLimit(1)` or
 horizontal `.fixedSize` in its modifiers. A sum of `Text`s is read to
@@ -443,6 +443,44 @@ finding; `data-allow="join: …"` marks a quoted one. Not read yet
 (ROADMAP.md): a string built elsewhere and shown with `Text(name)`, a
 translation that adds a separator the source lacks, and Kotlin and
 Compose.
+
+## Alike buttons stacked become one block
+
+**What.** Two buttons that look alike never sit one under the other with
+nothing between them. When both answer one question ("close until
+when?"), they become one block: one surface, the rows rounded only at
+its ends, a hairline between. Otherwise a word sits between them ("or"),
+or the second takes a different look, the way a main action and a second
+one differ. A run of three or more alike rows is a list, and reads as
+one.
+
+**Why.** On 25 Nov 2026 an iPhone app's Focus card showed "Close all
+until 04:00" and "Until a date…" as two identical dark bars, 8 pt apart.
+The owner: "The buttons zavřít vše do 4 or do data being right under
+each other is visually confusing, either there should be a section like
+'nebo' between them, or they should be both in a bigger button one block
+with rounded corners and separated by some separator". The design board
+had drawn them in two colours; the build gave both the card's one button
+style, and nothing compared them.
+
+**Apply.**
+1. Two answers to one question: one block. In SwiftUI, a `VStack(spacing:
+   0)` of the two buttons, the style rounding the first at the top and the
+   second at the bottom, and a 1 pt view between them in the style's seam
+   colour.
+2. Two separate actions: give the lesser one a different look, or put a
+   word between ("or"), or move it away.
+3. Three or more like actions are a list: rows of one block, or a list
+   screen.
+
+**Check.** `check-views` (stack) finds two `Button`s with the same
+`.buttonStyle`, the second straight after the first (only closing braces
+and `#if` blocks between), outside an `HStack`, `Form`, `List` or
+toolbar. `check-ui` (stack) measures boards: two buttons with a surface
+of the same look, in one column, less than 24 px apart with nothing drawn
+between, not part of a run of three. Marked `practices-allow stack:` or
+`data-allow="stack: …"` with a reason. Whether three alike rows are a
+list or a muddle is review.
 
 ## Buttons follow the column
 
