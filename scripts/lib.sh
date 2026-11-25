@@ -111,6 +111,11 @@ UITEST_LANGUAGE='-AppleLanguages|-AppleLocale'
 # ... and the launch argument that starts the app offline, its own
 # networking stubbed (a regex; any "-...Offline" by default).
 UITEST_OFFLINE='"-[A-Za-z]*Offline"'
+# ... the switches that launch the app in one of its screen states (an
+# ERE whose first quoted string is the switch), each passed by an audited
+# test; and the ratchet listing states from before that rule.
+UITEST_STATES='arguments\.contains\("-[A-Za-z][A-Za-z0-9]*"\)'
+UITEST_STATES_BASELINE='.practices/unaudited-states'
 # The motion gate (check-motion): the Swift files it reads, tests left
 # out, and more names of selection states (a regex, matched whole, added
 # to selected..., selection..., highlighted..., ...Selection, ...Selected).

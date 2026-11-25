@@ -191,9 +191,66 @@ screens the reviewer saw first.
 step, and audit each one. Fix what it finds; an exception is a closure
 that names the issue and says why.
 
+Keep a picture of every screen the audit visits: in the helper that
+audits, `add(XCTAttachment(screenshot: app.screenshot()))` with
+`lifetime = .keepAlways`. The audit doesn't measure spacing, so look at
+those pictures from the iPhone SE run at xxLarge before calling a screen
+done.
+
 **Check.** `check-ui-tests` fails when no UI test calls
-`performAccessibilityAudit`. Whether every screen is audited is review:
-list the screens next to the test.
+`performAccessibilityAudit`, and on a file that audits without
+`XCTAttachment(screenshot:`. Which screens are visited is the next
+rule's check. Whether the pictures were looked at is review.
+
+## An audit exception names its element
+
+**What.** An exception in the audit's closure names the element it
+excuses (an identifier, a label, a frame) and says why the finding is
+false. It never turns a check off for the whole app.
+
+**Why.** On 25 Nov 2026 a board row's category line wrapped on an
+iPhone 15 Pro in Czech, and the line touched its row's edges. The
+audit's closure returned true for every `.textClipped` issue, "checked
+by eye at accessibility text sizes". Nobody looked, so the check was off.
+
+**Apply.** `if issue.auditType == .textClipped, issue.element?.identifier
+== "appName" { return true }`, with a comment saying why it's false.
+For a finding you can't place yet, fix the screen instead.
+
+**Check.** `check-ui-tests` fails on a line in an audited file that
+returns true on the audit type alone: `auditType == .x { return true }`
+or `case .x: return true`. It runs in lint, claude-hook and pre-commit.
+An exception that names an element too broadly is review.
+
+## Every screen state is audited before it's built
+
+**What.** Each state the app can be launched in for a test or a demo (a
+launch argument read in the app's code) is launched by a UI test that
+runs the audit. The test comes first; then the state is built.
+
+**Why.** On 25 Nov 2026 a new board was built under a demo switch
+(`-AcmeUntracked`) that no audited test passed. Its cramped row and a
+unit off its number reached a phone; the owner found them, not a check.
+The owner: "ideally, you cannot start working on something until it is
+tracked by practices".
+
+**Apply.**
+1. Before building a screen or a state of one, add its launch argument
+   to an audited test. claude-hook fails as soon as the app's code reads
+   a switch that no audited test passes.
+2. A switch that draws no screen of the app (a marketing render, an icon
+   export) says so: `// practices-allow audit: <reason>` on its line or
+   the one above.
+3. States from before this rule go in `.practices/unaudited-states`, one
+   per line (`-AcmeTour  # why`), a ratchet: the gate fails once a listed
+   state is audited or gone, until its line is deleted.
+
+**Check.** `check-ui-tests` reads the app's Swift for `UITEST_STATES`
+(by default `arguments.contains("-Name")`) and fails on a switch that no
+file with `performAccessibilityAudit` passes, unless it's allowed or
+listed in `UITEST_STATES_BASELINE`. It runs in lint, claude-hook and
+pre-commit. States chosen another way (a value after a switch, an
+environment variable) need the app's own pattern in `UITEST_STATES`.
 
 ## UI tests pin the app's language
 

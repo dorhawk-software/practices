@@ -968,7 +968,7 @@ p=$(project)
 expect 0 "check-ui-tests with no UI tests passes, saying so" "$p/.practices/bin/check-ui-tests"
 mkdir -p "$p/UITests" "$p/scripts"
 uitest() { # uitest ARGUMENTS AUDIT: a UI test file
-    printf 'import XCTest\n\nfinal class FlowTests: XCTestCase {\n    func testOnboarding() throws {\n        let app = XCUIApplication()\n        app.launchArguments = [%s]\n        app.launch()\n        %s\n        XCTAssertTrue(app.buttons["Continue"].isHittable)\n    }\n}\n' "$1" "$2" >"$p/UITests/FlowTests.swift"
+    printf 'import XCTest\n\nfinal class FlowTests: XCTestCase {\n    func testOnboarding() throws {\n        let app = XCUIApplication()\n        app.launchArguments = [%s]\n        app.launch()\n        add(XCTAttachment(screenshot: app.screenshot()))\n        %s\n        XCTAssertTrue(app.buttons["Continue"].isHittable)\n    }\n}\n' "$1" "$2" >"$p/UITests/FlowTests.swift"
 }
 printf 'import XCTest\n\nfinal class OfflineTests: XCTestCase {\n    func testTodayOffline() throws {\n        let app = XCUIApplication()\n        app.launchArguments = ["-AppleLanguages", "(en)", "-AcmeLanguage", "en", "-AcmeOffline"]\n        app.launch()\n        XCTAssertTrue(app.staticTexts["Today"].waitForExistence(timeout: 3))\n    }\n}\n' >"$p/UITests/OfflineTests.swift"
 uitest '"-AppleLanguages", "(en)", "-AppleLocale", "en_US"' 'try app.performAccessibilityAudit()'
@@ -1002,6 +1002,43 @@ out=$("$p/.practices/bin/check-ui-tests" 2>&1)
 case $out in *'no test run names an iPhone SE'*) ok ;; *) bad "check-ui-tests doesn't take a Swift comment for an iPhone SE run" "$out" ;; esac
 printf 'xcodebuild test -scheme Acme -destination "platform=iOS Simulator,name=iPhone SE (3rd generation)"\n' >"$p/scripts/ui-tests.sh"
 expect 0 "check-ui-tests reads the large size from the launch arguments" "$p/.practices/bin/check-ui-tests"
+# An audit exception names its element; each audited screen keeps its picture.
+# shellcheck disable=SC2016 # the script's own variable
+printf 'xcrun simctl ui "$SIM" content_size extra-extra-large\n' >>"$p/scripts/ui-tests.sh"
+uitest '"-AcmeLanguage", "en"' 'try app.performAccessibilityAudit { issue in if issue.auditType == .textClipped { return true }; return false }'
+out=$("$p/.practices/bin/check-ui-tests" 2>&1)
+[ $? = 1 ] && case $out in *'turns a whole check off'*'FlowTests.swift:'*) true ;; *) false ;; esac && ok ||
+    bad "check-ui-tests finds an audit exception on the type alone" "$out"
+uitest '"-AcmeLanguage", "en"' 'try app.performAccessibilityAudit { issue in switch issue.auditType { case .contrast: return true; default: return false } }'
+out=$("$p/.practices/bin/check-ui-tests" 2>&1)
+[ $? = 1 ] && case $out in *'turns a whole check off'*) true ;; *) false ;; esac && ok ||
+    bad "check-ui-tests finds a case that returns true on the type alone" "$out"
+uitest '"-AcmeLanguage", "en"' 'try app.performAccessibilityAudit { issue in if issue.auditType == .textClipped, issue.element?.identifier == "appName" { return true }; return false }'
+expect 0 "check-ui-tests passes an exception that names its element" "$p/.practices/bin/check-ui-tests"
+sed -i.bak '/XCTAttachment(screenshot:/d' "$p/UITests/FlowTests.swift" && rm "$p/UITests/FlowTests.swift.bak"
+out=$("$p/.practices/bin/check-ui-tests" 2>&1)
+[ $? = 1 ] && case $out in *'without keeping a picture'*'UITests/FlowTests.swift'*) true ;; *) false ;; esac && ok ||
+    bad "check-ui-tests finds an audit that keeps no picture of the screen" "$out"
+# Every screen state the app can be launched in is audited, or says why not.
+uitest '"-AcmeLanguage", "en"' 'try app.performAccessibilityAudit()'
+mkdir -p "$p/App"
+printf 'enum Demo {\n    static let arguments = ProcessInfo.processInfo.arguments\n    static var tour: Bool { arguments.contains("-AcmeTour") }\n}\n' >"$p/App/Demo.swift"
+out=$("$p/.practices/bin/check-ui-tests" 2>&1)
+[ $? = 1 ] && case $out in *'never audited'*'-AcmeTour (App/Demo.swift:3)'*) true ;; *) false ;; esac && ok ||
+    bad "check-ui-tests finds a screen state no audited test launches" "$out"
+uitest '"-AcmeLanguage", "en", "-AcmeTour"' 'try app.performAccessibilityAudit()'
+expect 0 "check-ui-tests passes a state an audited test launches" "$p/.practices/bin/check-ui-tests"
+uitest '"-AcmeLanguage", "en"' 'try app.performAccessibilityAudit()'
+printf 'enum Demo {\n    static let arguments = ProcessInfo.processInfo.arguments\n    // practices-allow audit: renders the store pictures, not a screen\n    static var tour: Bool { arguments.contains("-AcmeTour") }\n}\n' >"$p/App/Demo.swift"
+expect 0 "check-ui-tests passes a state marked practices-allow audit" "$p/.practices/bin/check-ui-tests"
+printf 'enum Demo {\n    static let arguments = ProcessInfo.processInfo.arguments\n    static var tour: Bool { arguments.contains("-AcmeTour") }\n}\n' >"$p/App/Demo.swift"
+printf -- '-AcmeTour  # from before the rule\n' >"$p/.practices/unaudited-states"
+expect 0 "check-ui-tests passes a state listed in the baseline" "$p/.practices/bin/check-ui-tests"
+uitest '"-AcmeLanguage", "en", "-AcmeTour"' 'try app.performAccessibilityAudit()'
+out=$("$p/.practices/bin/check-ui-tests" 2>&1)
+[ $? = 1 ] && case $out in *'no longer need it'*'-AcmeTour (audited now)'*) true ;; *) false ;; esac && ok ||
+    bad "check-ui-tests asks for the baseline to be lowered once a state is audited" "$out"
+rm "$p/.practices/unaudited-states" "$p/App/Demo.swift"
 uitest '"-AcmeDemo"' 'try app.performAccessibilityAudit()'
 out=$("$p/.practices/bin/lint" 2>&1)
 st=$?

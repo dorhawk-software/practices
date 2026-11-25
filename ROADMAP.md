@@ -298,8 +298,14 @@ rows are this list's source; the most valuable first.
     `pilot`/`deliver` (no build path in the command to read).
   - [ ] check-ui-tests reads Espresso, Detox and Maestro tests, and a
     dark-mode run.
-  - [ ] Every screen audited and its main button asserted on screen: a
-    list of the app's screens checked against the UI tests.
+  - [x] Every screen state audited: each launch switch in the app's
+    code is passed by an audited test, an audit exception names its
+    element, and each audited screen keeps its picture (Unreleased).
+  - [ ] Each screen's main button asserted on screen, checked against
+    the same list of states.
+  - [ ] Spacing measured, not only looked at: a UI test helper that
+    fails when a text's frame comes closer than N pt to its row's edges
+    (the row a wrapped line touched, 25 Nov 2026).
   - [ ] check-permission-words follows a view to the file that asks for
     the permission, so a bare "Allow" there is found too.
 - **Mobile, from a phone in an elevator** (25 Nov 2026: a home screen

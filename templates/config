@@ -79,6 +79,12 @@
 # The launch argument a UI test starts the app offline with (an extended
 # regex, for check-ui-tests); the default is any argument ending in Offline.
 #UITEST_OFFLINE='-AcmeNoNetwork'
+# How the app's code reads a launch switch for a screen state (an extended
+# regex whose first quoted string is the switch); each one is passed by an
+# audited UI test. The default: arguments.contains("-AcmeTour").
+#UITEST_STATES='arguments\.contains\("-[A-Za-z][A-Za-z0-9]*"\)|launchFlag\("-[A-Za-z]+"\)'
+# The ratchet for states from before that rule, one per line.
+#UITEST_STATES_BASELINE='.practices/unaudited-states'
 
 # The Swift files check-motion reads (git pathspecs; tests left out), and
 # the app's own names for a selection state, added to selected…,

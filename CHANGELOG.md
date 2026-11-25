@@ -3,6 +3,29 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### New
+
+- **Every screen state is audited before it's built**
+  (`mobile/app-review.md`). `check-ui-tests` reads the app's Swift for
+  launch switches (`arguments.contains("-AcmeTour")`, or the app's own
+  `UITEST_STATES`) and fails on one that no UI test running the
+  accessibility audit passes. A switch that draws no screen says
+  `practices-allow audit: <reason>`; states from before the rule go in
+  `.practices/unaudited-states`, a ratchet. Write the test first: the
+  gate fails as soon as the app reads a new switch.
+- **An audit exception names its element** (`mobile/app-review.md`).
+  `check-ui-tests` fails on an audit closure that returns true on the
+  audit type alone, which turns that check off for the whole app.
+
+### Changed
+
+- **The audit keeps a picture of each screen** (`mobile/app-review.md`).
+  `check-ui-tests` fails on a file that runs the accessibility audit
+  without `XCTAttachment(screenshot:)`: the audit doesn't measure
+  spacing, so the iPhone SE run at xxLarge leaves pictures to look at.
+
 ## 1.14.0 (2026-11-25)
 
 ### New

@@ -12,7 +12,7 @@ to the agent to fix. This is where each rule stands
 - **review**: it needs a person's judgement (taste, wording, whether
   an icon is ugly); reviewers check it.
 
-Today: 15 gate, 79 partial, 130 todo, 49 review
+Today: 15 gate, 81 partial, 130 todo, 49 review
 (audited rule by rule on 2026-11-15, each claim checked against the
 scripts, not the docs). `tests/enforcement` fails when a practice has a
 rule this file doesn't list, or lists one that's gone. The todo and
@@ -419,7 +419,9 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | The app is built for the devices it declares | gate | check-xcode: TARGETED_DEVICE_FAMILY of each shipped target, per configuration, against DEVICE_FAMILY or the project level (lint, claude-hook, pre-commit); check-ios-artefact: UIDeviceFamily of each bundle | - |
 | A button that leads to a permission prompt says Continue | partial | check-permission-words (lint, claude-hook after edits and on Stop, pre-commit): a grant verb and a permission as a whole string, anywhere; a bare grant verb in a file that asks the OS for a permission | A bare "Allow" in a view whose permission request is in another file isn't found; languages past en, cs, es and vi need PERMISSION_VERBS and PERMISSION_NOUNS; whether other words lead to a prompt, and the Settings link after a refusal, are review. |
 | Every screen fits a small iPhone at a large text size | partial | check-ui-tests (lint, claude-hook, pre-commit): a test run names an iPhone SE simulator and sets a large text size | That the run happens (no kit iOS CI), that every screen is reached with its main button asserted on screen, and dark mode, aren't checked. |
-| Xcode's accessibility audit runs on every screen, the first-run ones too | partial | check-ui-tests: some UI test calls performAccessibilityAudit | Which screens are audited: a list of the app's screens checked against the audited ones would close it. |
+| Xcode's accessibility audit runs on every screen, the first-run ones too | partial | check-ui-tests: some UI test calls performAccessibilityAudit, and each file that does keeps a picture (XCTAttachment(screenshot:)) | Whether the pictures were looked at is review; spacing (text against its container's edges) isn't measured by any check. |
+| An audit exception names its element | partial | check-ui-tests (lint, claude-hook, pre-commit): an audit closure line that returns true on the audit type alone | An exception that names an element too broadly (a label that matches every row) is review. |
+| Every screen state is audited before it's built | partial | check-ui-tests (lint, claude-hook, pre-commit): every UITEST_STATES switch in the app's Swift is passed by an audited test, allowed with a reason, or listed in the UITEST_STATES_BASELINE ratchet | States chosen by a value or an environment variable need the app's own UITEST_STATES; Kotlin and the web aren't read. |
 | UI tests pin the app's language | partial | check-ui-tests: each Swift file that launches XCUIApplication() names a UITEST_LANGUAGE argument | Espresso, Detox and Maestro tests aren't read. |
 
 ### [mobile/ci.md](mobile/ci.md)

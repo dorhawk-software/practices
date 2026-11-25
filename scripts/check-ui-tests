@@ -14,7 +14,20 @@
 #     -UIPreferredContentSizeCategoryName UICTContentSizeCategoryXXL;
 #   - some UI test launches the app offline (a launch argument matching
 #     UITEST_OFFLINE, any "-...Offline" by default), which the app honours
-#     by stubbing its own networking (mobile/lifecycle.md).
+#     by stubbing its own networking (mobile/lifecycle.md);
+#   - an audit exception names its element: a closure line that returns
+#     true on the audit type alone (`if issue.auditType == .textClipped {
+#     return true }`, `case .contrast: return true`) turns a whole check off;
+#   - each file that audits keeps a picture of each screen
+#     (XCTAttachment(screenshot:)), for the eye check of spacing and
+#     clipping that no audit makes;
+#   - every screen state the app's code can be launched in (a switch
+#     matching UITEST_STATES, `arguments.contains("-AcmeTour")` by default)
+#     is passed by a test that runs the audit, unless its line or the one
+#     above says `practices-allow audit: <reason>` (a marketing render, not
+#     a screen), or it's listed in UITEST_STATES_BASELINE, the ratchet for
+#     states from before this rule (one per line, "-AcmeTour  # why");
+#     a listed state that is now audited, or gone, must leave the list.
 # Whether every screen is reached, and its main button asserted on
 # screen, is the tests' own job; this checks they run where it matters.
 #
@@ -28,7 +41,11 @@
 # SE simulator showed it at once. The same day, UI tests that found
 # buttons by their words failed on a Czech simulator: they never set the
 # app's language. On 25 Nov 2026 the owner asked that no app's first
-# screen ever wait on the network.
+# screen ever wait on the network. The same day a wrapped line touched its
+# row's edges on a phone: the audit had its clipping check turned off as a
+# whole, and the new board was built under a demo switch no audit
+# visited. The owner: "ideally, you cannot start working on something
+# until it is tracked by practices".
 
 # shellcheck source=lib.sh
 . "$(dirname "$0")/lib.sh"
@@ -75,8 +92,69 @@ fi
 if ! printf '%s\n' "$tests" | tr '\n' '\0' | xargs -0 grep -lE -e "$UITEST_OFFLINE" >/dev/null 2>&1; then
     findings+=("no UI test launches the app offline (no match of UITEST_OFFLINE, $UITEST_OFFLINE). Fix: a test launches with app.launchArguments += [\"-AcmeOffline\"], the app then fails every request of its own at once, and the test asserts the first screen's content. Name the app's own switch in UITEST_OFFLINE. Why: the first screen never waits on the network (.practices/docs/mobile/lifecycle.md).")
 fi
+audited=$(printf '%s\n' "$tests" | tr '\n' '\0' | xargs -0 grep -l 'performAccessibilityAudit' 2>/dev/null)
+if [ -n "$audited" ]; then
+    # An exception on the type alone: nothing after the type but the closing brace.
+    blanket=$(printf '%s\n' "$audited" | tr '\n' '\0' | xargs -0 grep -HnE \
+        -e 'auditType[[:space:]]*==[[:space:]]*\.[A-Za-z]+[[:space:]]*\{[[:space:]]*return[[:space:]]+true' \
+        -e '(^|[{;])[[:space:]]*case[[:space:]]+\.[A-Za-z]+[[:space:]]*:[[:space:]]*return[[:space:]]+true' 2>/dev/null)
+    if [ -n "$blanket" ]; then
+        findings+=("an audit exception turns a whole check off:
+$(printf '%s\n' "$blanket" | sed 's/^/    /')
+    Fix: name the element as well, \`if issue.auditType == .textClipped, issue.element?.identifier == \"appName\" { return true }\`, with a comment saying why it's a false finding. Why: a whole check off hid a line cut short on a phone (25 Nov 2026).")
+    fi
+    pictureless=$(printf '%s\n' "$audited" | tr '\n' '\0' | xargs -0 grep -L 'XCTAttachment(screenshot:' 2>/dev/null)
+    if [ -n "$pictureless" ]; then
+        findings+=("these run the audit without keeping a picture of the screen:
+$(printf '%s\n' "$pictureless" | sed 's/^/    /')
+    Fix: in the helper that audits, let shot = XCTAttachment(screenshot: app.screenshot()); shot.lifetime = .keepAlways; add(shot). Then look at the pictures from the iPhone SE run at xxLarge. Why: no audit measures spacing; a row whose wrapped line touched its edges passed every check (25 Nov 2026).")
+    fi
+fi
+# Every state the app can be launched in is audited, or says why not.
+app_files=$(git grep --untracked -l -E -e "$UITEST_STATES" -- '*.swift' ${spec[@]+"${spec[@]}"} 2>/dev/null |
+    grep -v -x -F -e "$(printf '%s' "$tests")" | grep -v -E '(^|/)[^/]*Tests?(/|\.swift$)')
+listed=
+[ -f "$UITEST_STATES_BASELINE" ] && listed=$(sed -E 's/#.*//; s/[[:space:]]+$//; s/^[[:space:]]+//' "$UITEST_STATES_BASELINE" | grep -v '^$' | awk '{ print $1 }')
+unaudited=
+seen=
+if [ -n "$app_files" ]; then
+    while IFS= read -r f; do
+        while IFS=: read -r n line; do
+            [ -n "$n" ] || continue
+            if [ "$n" -gt 1 ] && sed -n "$((n - 1))p" "$f" | grep -q 'practices-allow audit:'; then
+                allowed=yes
+            else
+                allowed=
+            fi
+            printf '%s\n' "$line" | grep -q 'practices-allow audit:' && allowed=yes
+            for sw in $(printf '%s\n' "$line" | grep -oE -e "$UITEST_STATES" | sed -E 's/^[^"]*"([^"]+)".*/\1/'); do
+                seen="$seen $sw"
+                [ -n "$allowed" ] && continue
+                if [ -n "$audited" ] && printf '%s\n' "$audited" | tr '\n' '\0' | xargs -0 grep -qF -e "\"$sw\"" 2>/dev/null; then
+                    continue
+                fi
+                printf '%s\n' "$listed" | grep -qx -F -e "$sw" && continue
+                unaudited="$unaudited"$'\n'"    $sw ($f:$n)"
+            done
+        done < <(grep -nE -e "$UITEST_STATES" "$f")
+    done <<<"$app_files"
+fi
+if [ -n "$unaudited" ]; then
+    findings+=("these screen states are never audited:$unaudited
+    Fix: first write the test that launches with the switch and runs try app.performAccessibilityAudit() (the helper keeps its picture), then build the state. A switch that draws no screen of the app (a marketing render) gets // practices-allow audit: <reason> on its line or the one above. Why: a new board was built under a switch no audit visited, and a line touching its row's edges reached a phone (25 Nov 2026).")
+fi
+stale=
+for sw in $listed; do
+    case " $seen " in *" $sw "*) ;; *) stale="$stale $sw (gone)"; continue ;; esac
+    if [ -n "$audited" ] && printf '%s\n' "$audited" | tr '\n' '\0' | xargs -0 grep -qF -e "\"$sw\"" 2>/dev/null; then
+        stale="$stale $sw (audited now)"
+    fi
+done
+if [ -n "$stale" ]; then
+    findings+=("$UITEST_STATES_BASELINE lists states that no longer need it:$stale. Fix: delete their lines; at zero, delete the file. Why: a baseline that isn't lowered lets the count climb back (common/gates.md).")
+fi
 if [ ${#findings[@]} -gt 0 ]; then
-    echo "[ui-tests] ${#findings[@]} finding(s). Rules: Every screen fits a small iPhone at a large text size; UI tests pin the app's language (.practices/docs/mobile/app-review.md); The first screen never waits on the network (.practices/docs/mobile/lifecycle.md)."
+    echo "[ui-tests] ${#findings[@]} finding(s). Rules: Every screen fits a small iPhone at a large text size; Xcode's accessibility audit runs on every screen; An audit exception names its element; Every screen state is audited before it's built; UI tests pin the app's language (.practices/docs/mobile/app-review.md); The first screen never waits on the network (.practices/docs/mobile/lifecycle.md)."
     printf '  - %s\n' "${findings[@]}"
     exit 1
 fi
