@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""check-views' reading half: SwiftUI views read for three of the craft
+"""check-views' reading half: SwiftUI views read for four of the craft
 rules. Each finding names its rule.
 
 - join (ui/visual-craft.md, "A joined line breaks between its parts"): a
@@ -18,6 +18,12 @@ rules. Each finding names its rule.
   ForEach that isn't .wheel, .inline, .segmented, .palette or
   .navigationLink. Choices built from data (every quarter hour) scroll
   in a popover over the screen.
+- stripe (ui/visual-craft.md, "A box has no stripe down one side"): an
+  .overlay or .background aligned to one edge (.leading, .trailing,
+  .top, .bottom) that draws a shape 2 to 6 points thick along it
+  (.frame(width:) for a side, .frame(height:) for the top or bottom). A
+  generic callout's accent, not the product's own sign, and a second
+  shape whose corners fight the box's. A hairline (under 2) passes.
 
     view-audit.py FILE...
 
@@ -26,12 +32,16 @@ of three words or more:
     // practices-allow join: the dot is quoted, not a separator
     // practices-allow stack: an alert's two answers, which iOS spaces
     // practices-allow menu: the flock's members, six at most
+    // practices-allow stripe: a progress bar along the bottom
 
 Exit 0 clean, 1 findings, 2 a file it couldn't read.
 Why: 25 Nov 2026, one iPhone app. Its Today read "tento týden ·" over
 "celkem 18"; its Focus card had "Close all until 04:00" and "Until a
 date…" alike, one under the other; and its time came from a menu of 96
-quarter hours. The owner asked for a rule and a check for each.
+quarter hours. The owner asked for a rule and a check for each. The same
+day its lock's confirmation drew its warning as a grey box with a 4 pt
+stripe down its left edge, whose corners broke the box's ("Seems kinda ai
+sloppy and on top of that it contains rounding visual bug").
 """
 import importlib.util
 import os
@@ -44,7 +54,7 @@ _motion = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_motion)
 strip, matching, line_of = _motion.strip, _motion.matching, _motion.line_of
 
-ALLOW = {rule: re.compile(r"practices-allow\s+" + rule + r"\s*:\s*(.*)") for rule in ("join", "stack", "menu")}
+ALLOW = {rule: re.compile(r"practices-allow\s+" + rule + r"\s*:\s*(.*)") for rule in ("join", "stack", "menu", "stripe")}
 TEXT = re.compile(r"(?<![\w.])Text\s*\(")
 # A separator beside an ordinary space, where a line may break. Tied with no-break spaces
 # (U+00A0) on both sides, it can't: that passes, the fix for a dot inside a sentence.
@@ -313,10 +323,33 @@ def menu_audit(text, code, lines):
     return out
 
 
+EDGED = re.compile(r"\.(overlay|background)\s*\(\s*alignment\s*:\s*\.(leading|trailing|top|bottom)\s*\)\s*\{")
+SHAPE = re.compile(r"(?<![\w.])(Rectangle|RoundedRectangle|UnevenRoundedRectangle|Capsule|Color)\b|(?<![\w])\.fill\(")
+THICK = {"leading": "width", "trailing": "width", "top": "height", "bottom": "height"}
+
+
+def stripe_audit(text, code, lines):
+    out = []
+    for m in EDGED.finditer(code):
+        start = m.end() - 1
+        body = code[start:matching(code, start, "{", "}")]
+        if not SHAPE.search(body):
+            continue
+        side = THICK[m.group(2)]
+        size = re.search(r"\.frame\(\s*" + side + r"\s*:\s*(\d+(?:\.\d+)?)\s*[,)]", body)
+        if not size or not 2 <= float(size.group(1)) <= 6:
+            continue
+        ln = line_of(code, m.start())
+        f = judged("stripe", lines, ln, f"a {size.group(1)} pt shape along the box's {m.group(2)} edge, an accent stripe. Say it with the product's own sign (its badge or chip, an icon in the line), or the box's whole tone.")
+        if f:
+            out.append(f)
+    return out
+
+
 def audit(text):
     code = strip(text)
     lines = text.split("\n")
-    return join_audit(text, code, lines) + stack_audit(text, code, lines) + menu_audit(text, code, lines)
+    return join_audit(text, code, lines) + stack_audit(text, code, lines) + menu_audit(text, code, lines) + stripe_audit(text, code, lines)
 
 
 RULES = {
@@ -329,6 +362,9 @@ RULES = {
     "menu": ("A time turns on a wheel; a menu holds a handful", "ui/pickers.md",
              "pick a time with a DatePicker (a wheel, in minute steps) and a list built from data with Picker(...).pickerStyle(.wheel); a menu keeps a few fixed choices.",
              "an iPhone app picked a lock's end time from a menu of 96 quarter hours (25 Nov 2026), a popover over the calendar."),
+    "stripe": ("A box has no stripe down one side", "ui/visual-craft.md",
+               "drop the stripe: say it with the product's own sign (the chip or badge it already uses for that meaning, an icon at the line's start), or tint the whole box.",
+               "an iPhone app's lock confirmation drew its warning as a grey box with a 4 pt stripe down its left edge (25 Nov 2026): a generic callout, and the stripe's corners broke the box's."),
 }
 
 

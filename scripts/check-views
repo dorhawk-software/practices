@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
-# The views gate: SwiftUI views read for three craft rules. In the Swift
+# The views gate: SwiftUI views read for four craft rules. In the Swift
 # files (MOTION_FILES, the same files check-motion reads) it finds:
 # - join (ui/visual-craft.md, "A joined line breaks between its parts"):
 #   a Text joining parts with " · " or " | " that may wrap at the dot;
 # - stack (ui/visual-craft.md, "Alike buttons stacked become one block"):
 #   two Buttons in the same .buttonStyle, one straight under the other;
 # - menu (ui/pickers.md, "A time turns on a wheel; a menu holds a
-#   handful"): a Menu, or a Picker that isn't a wheel, built from a ForEach.
+#   handful"): a Menu, or a Picker that isn't a wheel, built from a ForEach;
+# - stripe (ui/visual-craft.md, "A box has no stripe down one side"): an
+#   overlay or background along one edge, a shape 2 to 6 pt thick.
 # The reading is in view-audit.py; design boards are measured by check-ui
-# (join, stack, menu).
+# (join, stack, menu, stripe).
 #
 #   .practices/bin/check-views            # every Swift file
 #   .practices/bin/check-views FILE...    # just these
@@ -21,7 +23,8 @@
 # Why: one iPhone app on 25 Nov 2026. Today read "tento týden ·" over
 # "celkem 18"; the Focus card had "Close all until 04:00" and "Until a
 # date…" alike, one under the other; a lock's time came from a menu of 96
-# quarter hours. A string built elsewhere and shown with Text(name), and
+# quarter hours; the lock's warning was a grey box with a stripe down its
+# left edge, whose corners broke the box's. A string built elsewhere and shown with Text(name), and
 # Kotlin or Compose, aren't read (ROADMAP.md).
 #
 # Needs python3; without it, it fails, never passes.

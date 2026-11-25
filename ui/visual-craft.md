@@ -482,6 +482,39 @@ between, not part of a run of three. Marked `practices-allow stack:` or
 `data-allow="stack: …"` with a reason. Whether three alike rows are a
 list or a muddle is review.
 
+## A box has no stripe down one side
+
+**What.** A box never wears a thick stripe down one edge, the accent of a
+generic callout. What the stripe would say, the product says with its own
+sign: the chip or badge it already uses for that meaning, an icon at the
+line's start, or the whole box's tone. A hairline that separates rows is
+not a stripe.
+
+**Why.** On 25 Nov 2026 an iPhone app's lock confirmation drew its
+warning as a grey box with a 4 pt orange stripe down its left edge. The
+design board had drawn it that way, and nobody critiqued the drawing. The
+owner, on the device: "Seems kinda ai sloppy and on top of that it
+contains rounding visual bug". The stripe was a second shape laid over
+the box, with corners of its own, and two curves met at its left edge. It
+looked like no other part of the app, whose sign for "closed by you" is
+the board's red chip. The warning now wears that chip.
+
+**Apply.**
+1. Ask what the stripe means. If the product has a sign for it (a chip,
+   a badge, an icon), use that sign.
+2. If not, tint the whole box, or let the words carry it, the first ones
+   in bold.
+3. A progress bar along a card's edge is a drawing of progress, not an
+   accent: mark it.
+
+**Check.** `check-views` (stripe) finds an `.overlay` or `.background`
+aligned to one edge (`.leading`, `.trailing`, `.top`, `.bottom`) that
+draws a shape 2 to 6 pt thick along it. `check-ui` (stripe) finds a box
+with a ground of its own and a border 2 px or more on one side only, or
+an inset shadow that draws one. Marked `practices-allow stripe:` or
+`data-allow="stripe: …"` with a reason. A stripe drawn as a sibling view
+in an `HStack`, or as a gradient, is review.
+
 ## Buttons follow the column
 
 **What.** A row of buttons lines up with the text above it. In a column

@@ -364,7 +364,45 @@ touches, and ask it to quote the line each option follows or changes.
 Show before and after side by side.
 
 **Check.** The proposal page or message answers the six questions, and
-quotes the spec line any option changes.
+quotes the spec line any option changes. Each mock records its
+critique ([below](#every-mock-is-critiqued-before-its-shown-and-again-after-it-changes)).
+
+## Every mock is critiqued before it's shown, and again after it changes
+
+**What.** Every screen mock on a proposal or review page is critiqued in
+its place before anyone else sees it: impeccable's critique, or an
+independent reviewer given the spec's sections and the six questions
+above. What the critique finds is fixed. The mock then records who
+reviewed it, when, and a hash of the mock as reviewed. A mock edited
+after its review is critiqued again: its hash no longer matches. A page
+with no screen mock says why.
+
+**Why.** On 25 Nov 2026 an iPhone app's lock confirmation was built from
+a proposal whose words and place the owner had agreed, while its drawing
+(a grey box with a stripe down its left edge) was never critiqued by
+anyone. The owner, on the device: "Was the cesta není zpět block audited
+against design and impeccable? Seems kinda ai sloppy and on top of that
+it contains rounding visual bug... If it has been audited why does it not
+fit the style of the rest of the app? If it has not been audited, why?"
+It hadn't been: the review rule above had no check, and the step was
+skipped.
+
+**Apply.**
+1. Mark each screen mock: `data-mock="<its name>"` on the element that
+   draws the screen.
+2. Have it critiqued (impeccable's critique of the mock in its place, or
+   an independent reviewer), and fix what it finds.
+3. Run `check-page`: the finding gives the mock's hash. Record the
+   review: `data-reviewed="<reviewer> <YYYY-MM-DD> <hash>"`.
+4. Change the mock later, and `check-page` says it changed since its
+   review: critique it again, then record the new hash.
+
+**Check.** `check-page` (reviewed): every `[data-mock]` carries a
+`data-reviewed` record whose hash matches the mock as it is; a page with
+no `[data-mock]` says why on `<body>` (`data-allow="reviewed: <the
+reason>"`, three words or more). **Known gap:** a record can be written
+without a review. It names the reviewer and the date, so the owner can
+ask for the critique; a mock drawn without `data-mock` is not seen.
 
 ## Proposal pages pass a checklist before review
 

@@ -497,7 +497,7 @@ for f in "$here"/tests/ui/*.html; do
     out=$("$p/.practices/bin/check-ui" "design/$name.html" 2>&1)
     status=$?
     case $name in
-    clean | allowed | covered | covered-wide | align-forward | mark-ok | skips | skips-* | rounded | ink-ok | inset-ok | inset-under | inset-drawing | halo-ink | busy-ok | squash-ok | type-ok | join-ok | stack-ok | menu-ok)
+    clean | allowed | covered | covered-wide | align-forward | mark-ok | skips | skips-* | rounded | ink-ok | inset-ok | inset-under | inset-drawing | halo-ink | busy-ok | squash-ok | type-ok | join-ok | stack-ok | menu-ok | stripe-ok)
         [ $status = 0 ] && ok || bad "check-ui passes tests/ui/$name.html" "$out" ;;
     *)
         rule=$name
@@ -554,12 +554,32 @@ for f in "$here"/tests/page/*.html; do
     case $name in
     clean)
         [ $status = 0 ] && ok || bad "check-page passes tests/page/clean.html (a tied Czech word, an English a at a line's end, a wide table in its own scroll box)" "$out" ;;
+    *-ok)
+        [ $status = 0 ] && ok || bad "check-page passes tests/page/$name.html" "$out" ;;
     *)
         [ $status = 1 ] && grep -q "^\[$name\]" <<<"$out" && [ "$(grep -c '^\[' <<<"$out")" = 1 ] && ok ||
             bad "check-page catches tests/page/$name.html as [$name], and on no other rule (exit $status)" "$out" ;;
     esac
     rm "$p/design/changes/$name.html"
 done
+# A mock with no record says so, and gives its hash to record.
+cp "$here/tests/page/reviewed.html" "$p/design/changes/page.html"
+out=$("$p/.practices/bin/check-page" design/changes/page.html 2>&1)
+case $out in *"mock 'the confirmation' has no review record (its hash now: "*) ok ;; *) bad "check-page says a mock has no review record, with its hash" "$out" ;; esac
+# A mock changed after its review says so; a page with no mock and no reason fails.
+sed 's/No way back\./Nothing ends it early./' "$here/tests/page/reviewed-ok.html" >"$p/design/changes/page.html"
+out=$("$p/.practices/bin/check-page" design/changes/page.html 2>&1)
+[ $? = 1 ] && case $out in *"mock 'the confirmation' changed since its review by impeccable on 2026-11-25 (reviewed as 4a1ed51c, now "*) true ;; *) false ;; esac && ok ||
+    bad "check-page finds a mock changed since its review" "$out"
+sed 's/ data-allow="reviewed: a text fixture, no screen mock"//' "$here/tests/page/clean.html" >"$p/design/changes/page.html"
+out=$("$p/.practices/bin/check-page" design/changes/page.html 2>&1)
+[ $? = 1 ] && case $out in *'[reviewed]'*'no mock is marked data-mock'*) true ;; *) false ;; esac && ok ||
+    bad "check-page fails a page with no mock marked and no reason" "$out"
+sed 's/reviewed: a text fixture, no screen mock/reviewed: text/' "$here/tests/page/clean.html" >"$p/design/changes/page.html"
+out=$("$p/.practices/bin/check-page" design/changes/page.html 2>&1)
+[ $? = 1 ] && case $out in *'[reviewed]'*) true ;; *) false ;; esac && ok ||
+    bad "check-page fails a reason under three words" "$out"
+rm "$p/design/changes/page.html"
 cp "$here/tests/page/one-letter-end.html" "$p/design/changes/page.html"
 out=$("$p/.practices/bin/check-page" 2>&1)
 case $out in *'"C / rozhodne." (cs) [375, 390 px]'*) ok ;; *) bad "check-page finds the pages by UI_PAGES and quotes the line's end, with the widths" "$out" ;; esac
@@ -915,14 +935,34 @@ struct Time: View {
     }
 }
 SWIFT
+cat >"$p/App/Warning.swift" <<'SWIFT'
+struct Warning: View {
+    var body: some View {
+        Text(warning)
+            .background(Color.gray, in: RoundedRectangle(cornerRadius: 10))
+            .overlay(alignment: .leading) {
+                UnevenRoundedRectangle(topLeadingRadius: 10, bottomLeadingRadius: 10)
+                    .fill(Color.orange)
+                    .frame(width: 4)
+            }
+        Text(row)
+            .overlay(alignment: .bottom) { Rectangle().fill(.separator).frame(height: 1) }
+            .overlay(alignment: .top) { Color.red.frame(height: 3) }
+        // practices-allow stripe: a progress bar along the bottom
+        Text(card).overlay(alignment: .bottom) { Capsule().frame(height: 4) }
+        Text(badge).overlay(alignment: .trailing) { Text("NEW").frame(width: 4) }
+    }
+}
+SWIFT
 out=$("$p/.practices/bin/check-views" 2>&1)
 st=$?
 [ $st = 1 ] && ok || bad "check-views fails on a joined line that may wrap, alike buttons stacked loose and menus built from data (exit $st)" "$out"
 for want in '[stack] 1 finding. Rule: Alike buttons stacked become one block' 'Focus.swift:13 two buttons in .buttonStyle(.flapCell)' \
-    '[menu] 2 findings. Rule: A time turns on a wheel; a menu holds a handful' 'Time.swift:3 a Menu built from a ForEach' 'Time.swift:8 a Picker built from a ForEach'; do
+    '[menu] 2 findings. Rule: A time turns on a wheel; a menu holds a handful' 'Time.swift:3 a Menu built from a ForEach' 'Time.swift:8 a Picker built from a ForEach' \
+    '[stripe] 2 findings. Rule: A box has no stripe down one side' "Warning.swift:5 a 4 pt shape along the box's leading edge" "Warning.swift:12 a 3 pt shape along the box's top edge"; do
     case $out in *"$want"*) ok ;; *) bad "check-views finds $want" "$out" ;; esac
 done
-case $out in *Views.swift* | *Time.swift:4*) bad "check-views leaves the clean views alone, and a Picker inside a flagged Menu" "$out" ;; *) ok ;; esac
+case $out in *Views.swift* | *Time.swift:4* | *Warning.swift:11* | *Warning.swift:14* | *Warning.swift:15*) bad "check-views leaves the clean views alone, a Picker inside a flagged Menu, a hairline, a marked bar and a text along an edge" "$out" ;; *) ok ;; esac
 for want in 'Board.swift:3 Text("this week · \(total) in all") joins parts' 'Board.swift:6 Text("LEVEL \(n) \u{00B7} \(name)")' \
     'Board.swift:7 Text("Today | 3 apps")' 'Board.swift:8 Text(" · ")' 'Board.swift:9 Text("Closed by you:' \
     'Board.swift:10 marks an exception without its reason' 'Rule: A joined line breaks between its parts'; do
@@ -931,7 +971,7 @@ done
 case $out in *Today.swift*) bad "check-views leaves the clean file alone" "$out" ;; *) ok ;; esac
 # The gate runs where the others do: after an edit, before a commit, in lint.
 "$p/.practices/bin/install-hooks" >/dev/null
-rm "$p/App/Board.swift" "$p/App/Focus.swift" "$p/App/Time.swift"
+rm "$p/App/Board.swift" "$p/App/Focus.swift" "$p/App/Time.swift" "$p/App/Warning.swift"
 git -C "$p" add App/Today.swift App/Views.swift && git -C "$p" commit -qm "Today" >/dev/null 2>&1 && ok || bad "pre-commit lets a joined line on one line through"
 ev PostToolUse Edit | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok || bad "claude-hook passes a joined line on one line"
 printf 'struct T: View {\n    var body: some View {\n        Text("this week · 18 in all").lineLimit(2)\n    }\n}\n' >"$p/App/Today.swift"

@@ -316,6 +316,11 @@ rows are this list's source; the most valuable first.
   - [ ] check-motion reads Kotlin and Compose (`animate*AsState`,
     `animateColorAsState` keyed on a selection) and the web (a CSS
     `transition` on a `selected` or `aria-selected` rule).
+  - [ ] check-views stripe sees a stripe drawn as a sibling view in an
+    HStack, or as a gradient; check-ui the same on boards.
+  - [ ] check-page reviewed finds a screen mock drawn without
+    `data-mock` (a phone-shaped frame), and ties a record to a critique
+    kept beside the page, so a hash can't be written without one.
   - [ ] check-views stack sees alike buttons of two styles that draw the
     same (two names for one look), and a pair split across two views.
   - [ ] check-views menu reads Kotlin and Compose (`DropdownMenu` over a

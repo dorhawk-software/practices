@@ -28,6 +28,20 @@ newest first, in the kinds common/changelog.md describes.
   on a wheel or a list screen. `check-views` (menu) finds a `Menu`, or a
   `Picker` that isn't a wheel, built from a `ForEach`; `check-ui` (menu)
   finds a menu of more than 12 choices on a board.
+- **A box has no stripe down one side** (`ui/visual-craft.md`). A thick
+  stripe down one edge is a generic callout's accent; the product says it
+  with its own sign (its chip or badge, an icon) or the box's whole tone.
+  `check-views` (stripe) finds an overlay along one edge 2 to 6 pt thick;
+  `check-ui` (stripe) finds a box with its own ground and a thick border
+  on one side only, or an inset shadow that draws one.
+- **Every mock is critiqued before it's shown, and again after it
+  changes** (`ui/design-before-build.md`). `check-page` (reviewed) wants
+  every screen mock marked `data-mock="<name>"` with
+  `data-reviewed="<reviewer> <YYYY-MM-DD> <hash>"`; the finding gives the
+  hash, and a mock edited since its review is flagged. A page with no
+  mock says why: `<body data-allow="reviewed: <the reason>">`. Expect a
+  finding on every proposal and review page until its mocks are
+  critiqued and marked.
 - `check-views` reads SwiftUI for these three rules, in lint, claude-hook
   and pre-commit.
 

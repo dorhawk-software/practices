@@ -12,9 +12,16 @@
 //   <select>, listbox or menu with more than 12 choices. A time or a list built
 //   from data turns on a wheel.
 //
+// - stripe (ui/visual-craft.md, "A box has no stripe down one side"): a box
+//   (an element with its own ground) with a border on one side 2 px or more
+//   while the others have none (or under 1 px), or an inset shadow that draws
+//   one (inset 4px 0 0). A generic callout's accent, not the product's own
+//   sign. A hairline passes; so does an underline with no ground behind it.
+//
 // Why: one iPhone app, 25 Nov 2026. Its Focus card had "Close all until 04:00"
 // and "Until a date…" alike, one under the other, and the owner read one button
-// twice; its lock's end time came from a menu of 96 quarter hours.
+// twice; its lock's end time came from a menu of 96 quarter hours; and its
+// lock's warning was a grey box with a 4 px stripe down its left edge.
 
 // --- What runs in the page: the findings for one render.
 function page() {
@@ -98,6 +105,31 @@ function page() {
     const n = l.tagName === "SELECT" ? l.querySelectorAll("option").length : l.querySelectorAll("[role=option], [role=menuitem], [role=menuitemradio], [role=menuitemcheckbox]").length;
     if (n <= 12) continue;
     add("menu", l, `${label(l)} offers ${n} choices in a menu; a time or a list built from data turns on a wheel.`);
+  }
+  // stripe
+  const SIDES = ["Top", "Right", "Bottom", "Left"];
+  for (const e of document.querySelectorAll("body *")) {
+    if (!visible(e) || allowNode(e, "stripe")) continue;
+    const s = cs(e), r = e.getBoundingClientRect();
+    // A box: its own ground. A heading's underline or a tab's selected edge has none.
+    if (r.width < 24 || r.height < 16 || !(alpha(s.backgroundColor) > 0.05 || s.backgroundImage !== "none")) continue;
+    const w = SIDES.map((x) => (s["border" + x + "Style"] === "none" || alpha(s["border" + x + "Color"]) < 0.05 ? 0 : parseFloat(s["border" + x + "Width"])));
+    const thick = w.map((x, i) => (x >= 2 && w.every((y, j) => j === i || y < 1) ? i : -1)).filter((i) => i >= 0);
+    let side = thick.length === 1 ? SIDES[thick[0]].toLowerCase() : null, px = side ? w[thick[0]] : 0;
+    if (!side && s.boxShadow !== "none") {
+      for (const sh of s.boxShadow.split(/,(?![^(]*\))/)) {
+        if (!/inset/.test(sh) || alpha(sh) < 0.05) continue;
+        const n = (sh.replace(/rgba?\([^)]*\)/, "").match(/-?\d+(\.\d+)?px/g) || []).map(parseFloat);
+        const [x = 0, y = 0, blur = 0, spread = 0] = n;
+        if (blur === 0 && spread === 0 && (Math.abs(x) >= 2) !== (Math.abs(y) >= 2)) {
+          side = Math.abs(x) >= 2 ? (x > 0 ? "left" : "right") : (y > 0 ? "top" : "bottom");
+          px = Math.abs(x) >= 2 ? Math.abs(x) : Math.abs(y);
+          break;
+        }
+      }
+    }
+    if (!side) continue;
+    add("stripe", e, `${label(e)} "${words(e)}" draws a ${px} px stripe down its ${side} side, an accent no other box wears.`);
   }
   return out;
 }

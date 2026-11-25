@@ -12,14 +12,19 @@
 //   - image-width: no image runs past the screen;
 //   - image-pixels: no image is drawn wider than its pixels at 2x (a blurred crop).
 // Once per page: doctype, <!doctype html> on the first line; charset, <meta charset="utf-8">
-// in the first 1024 bytes; lang, text that names no language while --lang is empty.
+// in the first 1024 bytes; lang, text that names no language while --lang is empty; reviewed,
+// every mock (an element marked data-mock) carries data-reviewed="<reviewer> <YYYY-MM-DD>
+// <hash>", the hash of the mock as it was reviewed, so a mock changed since says so; a page
+// with no mock marked says why on <body> (data-allow="reviewed: <the reason>").
 //
 // Exit 0: no findings. 1: findings, grouped by rule, each rule with its fix. 2: a page or Chrome
 // it couldn't use: never "clean".
 //
 // Why: Scops' proposal pages went through three review rounds before the owner saw them
 // (2026-11-20 to 23). Each round found what a script finds: "C / rozhodne", an option's letter
-// ending a line, and a table that scrolled sideways at 375 px.
+// ending a line, and a table that scrolled sideways at 375 px. reviewed: on 25 Nov 2026 an
+// iPhone app built a warning box from a proposal's mock nobody had critiqued; its owner found
+// it "kinda ai sloppy" on the device, with a broken corner.
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -55,7 +60,33 @@ const RULE = {
   doctype: ["the page starts with <!doctype html>", "put <!doctype html> on the first line: without it the page renders in quirks mode."],
   charset: ["the page says its charset", "put <meta charset=\"utf-8\"> first in <head>: without it letters like č and ř can show garbled."],
   lang: ["the page names its language", "set <html lang=\"…\">, or COPY_LANG in .practices/config: a line's end is checked by its language's rules."],
+  reviewed: ["every mock is critiqued before it's shown, and again after it changes",
+    "have the mock critiqued in its place (impeccable's critique, or an independent reviewer given the spec's sections and the six questions), fix what it finds, then mark it data-reviewed=\"<reviewer> <YYYY-MM-DD> <hash>\" with the hash the finding gives. Mark each screen mock data-mock=\"<its name>\"; a page with none says why on <body>: data-allow=\"reviewed: <the reason>\".",
+    "Every mock is critiqued before it's shown, and again after it changes"],
 };
+
+// In the page, once: each mock's review record against the mock as it is now.
+const REVIEWS = `(() => {
+  const found = [];
+  const hash = (t) => { let h = 0x811c9dc5; for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16).padStart(8, "0"); };
+  const mocks = [...document.querySelectorAll("[data-mock]")];
+  const allow = (document.body.getAttribute("data-allow") || "").split(";").map((p) => p.split(":")).find((p) => p[0].trim() === "reviewed");
+  if (!mocks.length) {
+    if (!allow || (allow[1] || "").trim().split(/\\s+/).filter(Boolean).length < 3)
+      found.push({ rule: "reviewed", text: "no mock is marked data-mock, and <body> says no reason in three words or more" });
+    return found;
+  }
+  for (const m of mocks) {
+    const name = m.getAttribute("data-mock") || "(unnamed)";
+    const now = hash(m.outerHTML.replace(/\\sdata-reviewed="[^"]*"/g, "").replace(/\\s+/g, " ").trim());
+    const record = (m.getAttribute("data-reviewed") || "").trim();
+    const r = record.match(/^([\\w-]+) (\\d{4}-\\d{2}-\\d{2}) ([0-9a-f]{8})$/);
+    if (!record) found.push({ rule: "reviewed", text: "mock '" + name + "' has no review record (its hash now: " + now + ")" });
+    else if (!r) found.push({ rule: "reviewed", text: "mock '" + name + "' has a review record that isn't '<reviewer> <YYYY-MM-DD> <hash>': '" + record + "' (its hash now: " + now + ")" });
+    else if (r[3] !== now) found.push({ rule: "reviewed", text: "mock '" + name + "' changed since its review by " + r[1] + " on " + r[2] + " (reviewed as " + r[3] + ", now " + now + ")" });
+  }
+  return found;
+})()`;
 
 // In the page, at width W: every finding, as { rule, text }.
 const PROBE = (W, tieLangs, fallback) => `(() => {
@@ -112,6 +143,10 @@ try {
       const r = await s("Runtime.evaluate", { expression: PROBE(W, tie, opts.lang), returnByValue: true });
       if (r.exceptionDetails) die(`${page} couldn't be measured: ${r.exceptionDetails.exception?.description || r.exceptionDetails.text}`);
       for (const f of r.result.value) add(f.rule, f.text, W);
+      if (W !== widths[0]) continue;
+      const v = await s("Runtime.evaluate", { expression: REVIEWS, returnByValue: true });
+      if (v.exceptionDetails) die(`${page}'s mocks couldn't be read: ${v.exceptionDetails.exception?.description || v.exceptionDetails.text}`);
+      for (const f of v.result.value) add(f.rule, f.text);
     }
   }
 } catch (err) {
@@ -133,7 +168,7 @@ for (const g of list) {
   if (g.rule !== last) {
     last = g.rule;
     const n = list.filter((x) => x.rule === g.rule).length;
-    console.log(`\n[${g.rule}] ${n} finding${n > 1 ? "s" : ""}. Rule: ${RULE[g.rule][0]} (.practices/docs/ui/design-before-build.md, "Proposal pages pass a checklist before review").`);
+    console.log(`\n[${g.rule}] ${n} finding${n > 1 ? "s" : ""}. Rule: ${RULE[g.rule][0]} (.practices/docs/ui/design-before-build.md, "${RULE[g.rule][2] || "Proposal pages pass a checklist before review"}").`);
     console.log(`  Fix: ${RULE[g.rule][1]}`);
   }
   console.log(`  - ${g.page}: ${g.text}${g.at.length ? ` [${g.at.join(", ")} px]` : ""}`);
