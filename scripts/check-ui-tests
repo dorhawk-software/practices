@@ -11,7 +11,10 @@
 #     gets on an iPad;
 #   - a test run sets a large text size: `xcrun simctl ui <device>
 #     content_size extra-extra-large` (or larger), or the launch argument
-#     -UIPreferredContentSizeCategoryName UICTContentSizeCategoryXXL.
+#     -UIPreferredContentSizeCategoryName UICTContentSizeCategoryXXL;
+#   - some UI test launches the app offline (a launch argument matching
+#     UITEST_OFFLINE, any "-...Offline" by default), which the app honours
+#     by stubbing its own networking (mobile/lifecycle.md).
 # Whether every screen is reached, and its main button asserted on
 # screen, is the tests' own job; this checks they run where it matters.
 #
@@ -24,7 +27,8 @@
 # iPad simulator opened the app in a tall window, which hid it; an iPhone
 # SE simulator showed it at once. The same day, UI tests that found
 # buttons by their words failed on a Czech simulator: they never set the
-# app's language.
+# app's language. On 25 Nov 2026 the owner asked that no app's first
+# screen ever wait on the network.
 
 # shellcheck source=lib.sh
 . "$(dirname "$0")/lib.sh"
@@ -68,8 +72,11 @@ if ! git grep --untracked -q -E -e 'content_size[[:space:]]+(extra-extra-large|e
     -e 'UICTContentSizeCategory(XXL|XXXL|Accessibility)' -- "${runs[@]}" ${spec[@]+"${spec[@]}"} 2>/dev/null; then
     findings+=("no test run sets a large text size. Fix: xcrun simctl ui <device> content_size extra-extra-large before the run, or launch with -UIPreferredContentSizeCategoryName UICTContentSizeCategoryXXL. Why: the reviewer's larger text pushed a Continue button off screen.")
 fi
+if ! printf '%s\n' "$tests" | tr '\n' '\0' | xargs -0 grep -lE -e "$UITEST_OFFLINE" >/dev/null 2>&1; then
+    findings+=("no UI test launches the app offline (no match of UITEST_OFFLINE, $UITEST_OFFLINE). Fix: a test launches with app.launchArguments += [\"-AcmeOffline\"], the app then fails every request of its own at once, and the test asserts the first screen's content. Name the app's own switch in UITEST_OFFLINE. Why: the first screen never waits on the network (.practices/docs/mobile/lifecycle.md).")
+fi
 if [ ${#findings[@]} -gt 0 ]; then
-    echo "[ui-tests] ${#findings[@]} finding(s). Rules: Every screen fits a small iPhone at a large text size; UI tests pin the app's language (.practices/docs/mobile/app-review.md)."
+    echo "[ui-tests] ${#findings[@]} finding(s). Rules: Every screen fits a small iPhone at a large text size; UI tests pin the app's language (.practices/docs/mobile/app-review.md); The first screen never waits on the network (.practices/docs/mobile/lifecycle.md)."
     printf '  - %s\n' "${findings[@]}"
     exit 1
 fi

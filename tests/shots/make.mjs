@@ -3,6 +3,9 @@
 //   glyph/       live lacks a 7×21 glyph at 60,40 (the lost "í")
 //   clock/       only the top 12 rows differ (a status bar's clock)
 //   size/        live is one row taller
+//   edge/        a page whose glow runs under the status bar, and its placeholder cut off above row 12
+//                (below row 40 they differ anyway: the content isn't drawn yet)
+//   edge-fixed/  the same placeholder with the glow reaching the top
 import { deflateSync } from "node:zlib";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -26,3 +29,9 @@ write("clock/fresh", "switcher.png", png(120, 90, screen));
 write("clock/live", "switcher.png", png(120, 90, (x, y) => (y < 12 && x > 4 && x < 30 ? [230, 230, 230] : screen(x, y))));
 write("size/fresh", "switcher.png", png(120, 90, screen));
 write("size/live", "switcher.png", png(120, 91, screen));
+const glow = (x, y) => (x > 80 && y < 40 ? [230, 150, 60] : screen(x, y));
+const content = (x, y) => (y >= 40 ? [90, 90, 90] : glow(x, y));
+write("edge/fresh", "today.png", png(120, 90, glow));
+write("edge/live", "today.png", png(120, 90, (x, y) => (y < 12 ? [20, 20, 20] : content(x, y))));
+write("edge-fixed/fresh", "today.png", png(120, 90, glow));
+write("edge-fixed/live", "today.png", png(120, 90, content));

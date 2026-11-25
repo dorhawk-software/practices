@@ -76,3 +76,12 @@
 # The launch arguments that pin the app's language in UI tests (a regex,
 # for check-ui-tests); add the app's own switch.
 #UITEST_LANGUAGE='-AppleLanguages|-AppleLocale|-AcmeLanguage'
+# The launch argument a UI test starts the app offline with (an extended
+# regex, for check-ui-tests); the default is any argument ending in Offline.
+#UITEST_OFFLINE='-AcmeNoNetwork'
+
+# The Swift files check-motion reads (git pathspecs; tests left out), and
+# the app's own names for a selection state, added to selected…,
+# selection…, highlighted…, …Selection and …Selected (a regex alternation):
+#MOTION_FILES=':(glob)App/**/*.swift'
+#MOTION_SELECTION='picked\w*|chosen\w*'

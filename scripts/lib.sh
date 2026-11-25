@@ -108,6 +108,14 @@ ENTITLED_FRAMEWORKS=''
 # The UI-test gate (check-ui-tests): the launch arguments that pin the
 # app's language (a regex; add the app's own switch, "-AcmeLanguage").
 UITEST_LANGUAGE='-AppleLanguages|-AppleLocale'
+# ... and the launch argument that starts the app offline, its own
+# networking stubbed (a regex; any "-...Offline" by default).
+UITEST_OFFLINE='"-[A-Za-z]*Offline"'
+# The motion gate (check-motion): the Swift files it reads, tests left
+# out, and more names of selection states (a regex, matched whole, added
+# to selected..., selection..., highlighted..., ...Selection, ...Selected).
+MOTION_FILES=':(glob)**/*.swift :(exclude,glob)**/*Tests/** :(exclude,glob)**/*Tests.swift'
+MOTION_SELECTION=''
 
 if [ -f .practices/config ]; then
     # shellcheck source=/dev/null
@@ -192,6 +200,14 @@ permission_files() {
             git ls-files --cached --others --exclude-standard -- "${spec[@]}"
         fi
     } | grep -vE '\.(md|txt|html?)$' | awk '!seen[$0]++'
+}
+
+# The Swift files check-motion reads: tracked or new, matching MOTION_FILES.
+motion_files() {
+    local spec
+    [ -n "$MOTION_FILES" ] || return 0
+    read -r -a spec <<<"$MOTION_FILES $EXCLUDE"
+    git ls-files --cached --others --exclude-standard -- "${spec[@]}"
 }
 
 # The files whose change can change what check-xcode and check-ui-tests

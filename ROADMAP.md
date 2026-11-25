@@ -302,6 +302,20 @@ rows are this list's source; the most valuable first.
     list of the app's screens checked against the UI tests.
   - [ ] check-permission-words follows a view to the file that asks for
     the permission, so a bare "Allow" there is found too.
+- **Mobile, from a phone in an elevator** (25 Nov 2026: a home screen
+  stuck on its placeholder, its glow cut off, and a chart that flickered
+  on each tap):
+  - [x] `check-motion` (Swift), the offline UI test in `check-ui-tests`,
+    and `check-shots --only-top` (Unreleased).
+  - [ ] check-motion reads Kotlin and Compose (`animate*AsState`,
+    `animateColorAsState` keyed on a selection) and the web (a CSS
+    `transition` on a `selected` or `aria-selected` rule).
+  - [ ] A placeholder ends, as a check: a UI test pattern that holds the
+    content back with a launch argument and asserts the message and its
+    retry button; check-ui-tests asks for one, like the offline launch.
+  - [ ] The offline UI test checked from the app's side: the launch
+    argument is read in the app's code and routes every request to a
+    stub that fails at once (URLProtocol), not only the app's own client.
 - **TypeScript:**
   - [ ] A shared ESLint flat config (`curly: all`, `no-console`, comments
     that disable a rule say why, `--max-warnings 0`) and a reusable Node

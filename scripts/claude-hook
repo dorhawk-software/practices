@@ -14,6 +14,7 @@
 #   check-voice; when a board or a copy file (COPY_FILES) changed: the
 #   copy gate, check-copy;
 #   when copy or code changed (PERMISSION_FILES): check-permission-words;
+#   when Swift changed (MOTION_FILES): check-motion;
 #   when an Xcode project, entitlements, Swift or a test script changed:
 #   check-xcode and check-ui-tests;
 # - after `xcodebuild archive` or `-exportArchive`: check-ios-artefact on
@@ -107,6 +108,7 @@ gates() { # every gate, each one run; 1 when any fails
     gate voice voice_files check-voice || failed=1
     gate copy copy_files check-copy || failed=1
     gate permission permission_files check-permission-words || failed=1
+    gate motion motion_files check-motion || failed=1
     gate xcode xcode_files check-xcode || failed=1
     gate uitests xcode_files check-ui-tests || failed=1
     return $failed
@@ -180,7 +182,7 @@ if [ "$event" = Stop ] || [ "$event" = SubagentStop ]; then
     if [ "$(field stop_hook_active)" = true ] && [ -f "$blocked" ] && [ "$found" = "$(cat "$blocked")" ]; then
         n=$(printf '%s\n' "$found" | grep -c '^  - ')
         failing=$(cat "$gitdir"/practices-*.failing 2>/dev/null | tr '\n' ' ' | sed 's/ $//')
-        printf '{"systemMessage": "%s finding(s) still open in %s. The agent stopped without fixing them; run .practices/bin/check-ui, check-page, check-voice, check-copy, check-permission-words, check-xcode and check-ui-tests to see them."}\n' "$n" "$failing"
+        printf '{"systemMessage": "%s finding(s) still open in %s. The agent stopped without fixing them; run .practices/bin/check-ui, check-page, check-voice, check-copy, check-permission-words, check-motion, check-xcode and check-ui-tests to see them."}\n' "$n" "$failing"
         exit 0
     fi
     printf '%s' "$found" >"$blocked"

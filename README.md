@@ -163,8 +163,10 @@ own extra checks in `.practices/lint.d/`.
 | `check-xcode` | each Xcode target that ships: built for the declared device family, and the entitlement for every gated framework its sources import (Family Controls, HealthKit, HomeKit); reads `project.pbxproj`, no Xcode needed |
 | `check-ios-artefact` | a built `.ipa`, `.app` or `.xcarchive`: each bundle's `UIDeviceFamily`, and each binary's linked frameworks (`otool -L`) against its signed entitlements (macOS) |
 | `xcode-audit.py` | check-xcode's and check-ios-artefact's reading half (python3, no packages) |
-| `check-ui-tests` | XCUITests that pin the app's language, run Xcode's accessibility audit, and run on an iPhone SE simulator at a large text size |
-| `check-shots` | a screen shot after a live switch (theme, language, text size) against the same screen after a fresh start: every region that differs, with `--skip-top` for the status bar; `shots-diff.mjs` measures |
+| `check-ui-tests` | XCUITests that pin the app's language, run Xcode's accessibility audit, launch the app offline once, and run on an iPhone SE simulator at a large text size |
+| `check-motion` | no selection animated in Swift (`withAnimation` setting it, `.animation(_:value:)` following it), so the old and the new choice never cross-fade; a deliberate slide is marked `practices-allow motion: reason` |
+| `motion-audit.py` | check-motion's reading half (python3, no packages) |
+| `check-shots` | a screen shot after a live switch (theme, language, text size) against the same screen after a fresh start: every region that differs, with `--skip-top` for the status bar; with `--only-top PX`, a placeholder against its loaded page over the top band; `shots-diff.mjs` measures |
 | `shots-diff.mjs` | check-shots' measuring half (Node, no packages) |
 | `check-size` | 700 lines per Rust, TS or JS file, 1000 per test file, a shrinking allowlist |
 | `check-unsafe` | `unsafe` only where the project allows it |

@@ -3,6 +3,32 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### New
+
+- **A selection switches at once** (`ui/visual-craft.md`). A new
+  `check-motion` reads Swift and fails on a selection set inside
+  `withAnimation`, or followed by `.animation(_:value:)`: the old and the
+  new choice cross-fade, which reads as a flicker. A highlight that
+  slides on purpose is marked `practices-allow motion: <reason>`. It runs
+  in lint, claude-hook and pre-commit; `MOTION_SELECTION` adds the app's
+  own names.
+- **A placeholder ends** (`ui/feedback.md`): a deadline of a few
+  seconds, one retry, then words and a Try again button. Review for now.
+- **A placeholder is drawn on the page's own edges** (`ui/feedback.md`).
+  `check-shots --only-top PX PAGE PLACEHOLDER` compares the two shots in
+  the band above PX, status bar included.
+- **The first screen never waits on the network**
+  (`mobile/lifecycle.md`).
+
+### Changed
+
+- **check-ui-tests asks for a UI test that launches the app offline**
+  (`mobile/lifecycle.md`): a launch argument ending in `Offline`, or the
+  app's own named in `UITEST_OFFLINE`. A project with UI tests and none
+  offline now fails until it adds one.
+
 ## 1.13.0 (2026-11-25)
 
 ### Changed

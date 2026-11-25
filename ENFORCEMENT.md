@@ -12,7 +12,7 @@ to the agent to fix. This is where each rule stands
 - **review**: it needs a person's judgement (taste, wording, whether
   an icon is ugly); reviewers check it.
 
-Today: 15 gate, 76 partial, 130 todo, 48 review
+Today: 15 gate, 79 partial, 130 todo, 49 review
 (audited rule by rule on 2026-11-15, each claim checked against the
 scripts, not the docs). `tests/enforcement` fails when a practice has a
 rule this file doesn't list, or lists one that's gone. The todo and
@@ -231,6 +231,8 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | --- | --- | --- | --- |
 | Work shows it's happening | partial | check-ui working: with motion allowed, something inside each element marked aria-busy="true" is animating; check-ui motion: with reduced motion, nothing loops (claude-hook, Stop, pre-commit) | The app's own code is review: whether each wait over a second has its motion, starts and stops with the work, and is the product's own (one motion per screen; a generic spinner isn't detected). A busy state a board draws without aria-busy isn't seen. |
 | A press answers at once | partial | check-ui busy: each element marked aria-busy="true" (or the control inside it) is disabled or aria-disabled="true", shows no pointer cursor, and its words end in … (three dots are a finding); check-ui working (claude-hook, Stop, pre-commit) | The app's own code is review: whether each press that starts slow work has its busy state, its shortcut and menu item off, a time limit from the slowest real case, and a journey test that holds the work open, presses again and sees the control return. |
+| A placeholder ends | review | - | A UI test that holds the content back (a launch argument) and asserts the message and its retry button appear; a lint that every placeholder view has a deadline (ROADMAP.md). |
+| A placeholder is drawn on the page's own edges | partial | check-shots --only-top PX: the loaded page's shot against its placeholder's, over the band above PX, status bar included; run where the project takes its screenshots | Taking the two shots is the project's own script; the side and bottom edges, and a page without such a script: review. |
 
 ### [ui/identity-pass.md](ui/identity-pass.md)
 
@@ -299,6 +301,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Words in the product's voice | partial | check-ui outcome: no button labelled only OK, Yes, No or another word with no outcome; check-copy: each language's mechanical grammar (claude-hook, Stop, pre-commit, lint) | check-ui: dialog body <=2 line boxes; boards mentioning a person present each gender variant; tone and jokes stay human (review). |
 | Answer the next question where it arises | review | - | What the user will ask next is semantic; only 'every failed/error state has a next-action button' is a structure check. |
 | Motion with a reason | partial | check-ui motion: every board is rendered with reduced motion (every check measures that render), and an infinite animation still running there is a finding unless marked data-allow (claude-hook, Stop, pre-commit) | Finite animations and transitions that still play with reduced motion, SVG <animate> loops, and generic spinners (known spinner classes, a rotating circle); whether a motion tells the product's story is review. |
+| A selection switches at once | partial | check-motion: in Swift (MOTION_FILES), a selection state (selected…, selection…, highlighted…, …Selection, …Selected, plus MOTION_SELECTION) set inside withAnimation or followed by .animation(_:value:); practices-allow motion with a reason of three words or more (lint, claude-hook, Stop, pre-commit) | Kotlin and Compose (animate*AsState on a selection), the web (a CSS transition on a selected class), a highlight under another name, and an animation set by a parent's transaction: review. |
 | A resize never shows a squashed frame | partial | check-ui squash: an element holding words drawn scaled out of its shape, or playing a @keyframes rule (under any media) that scales it so; data-allow for a deliberate one (claude-hook, Stop, pre-commit) | A uniform scale (a popover's scale-in), transitions to a scaled state, and the native app's own window resize: review, by recording the resize frame by frame. |
 | Nothing runs past its surface | gate | check-ui contain and clip, at every width and theme (claude-hook, Stop, pre-commit) | - |
 | A button label stays on one line | gate | check-ui wrap: the text of a button, tab, radio, switch or menu item never runs onto a second line, unless it sits in a flex column inside the target (claude-hook, Stop, pre-commit) | - |
@@ -456,6 +459,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Text takes its container's width | review | - | The doc says only an Android walk proves it; a clipped last word needs a person reading the device screen. |
 | Every string names its face, checked on Android | todo | - | An eslint no-restricted-imports rule could refuse the UI kit's Button/Input/Text outside the theme module; the Android letter-shape comparison stays review. |
 | A control fades as one piece | todo | - | A lint could flag opacity on a container with children lacking needsOffscreenAlphaCompositing; the colour match on Android stays review. |
+| The first screen never waits on the network | partial | check-ui-tests: some Swift UI test file matches UITEST_OFFLINE (default: a launch argument ending in Offline) (lint, claude-hook, Stop, pre-commit) | That the app honours it (every request of its own fails at once), that the test asserts the first screen's content, request timeouts, and Espresso, Detox and Maestro tests: review. |
 
 ### [mobile/releases.md](mobile/releases.md)
 

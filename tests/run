@@ -470,6 +470,14 @@ out=$("$shots" "$work/shots/glyph/fresh" "$work/shots/glyph/live" 2>&1)
     bad "check-shots finds the lost glyph and says where" "$out"
 expect 1 "check-shots finds a status bar that differs unless told to skip it" "$shots" "$work/shots/clock/fresh" "$work/shots/clock/live"
 expect 0 "check-shots skips the status bar it is told to" "$shots" --skip-top 12 "$work/shots/clock/fresh" "$work/shots/clock/live"
+# A placeholder drawn on the page's own edges (ui/feedback.md): only the top band is compared.
+out=$("$shots" --only-top 40 "$work/shots/edge/fresh" "$work/shots/edge/live" 2>&1)
+[ $? = 1 ] && case $out in *"placeholder is drawn on the page's own edges"*'today.png: 39×12 px differ at 81,0'*) true ;; *) false ;; esac && ok ||
+    bad "check-shots --only-top finds a placeholder that cuts the glow off under the status bar" "$out"
+expect 0 "check-shots --only-top passes a placeholder that reaches the top, its content still missing" "$shots" --only-top 40 "$work/shots/edge-fixed/fresh" "$work/shots/edge-fixed/live"
+expect 1 "check-shots without --only-top still compares the whole screen" "$shots" "$work/shots/edge-fixed/fresh" "$work/shots/edge-fixed/live"
+out=$("$shots" --only-top "$work/shots/edge/fresh" "$work/shots/edge/live" 2>&1)
+[ $? = 2 ] && case $out in *'--only-top takes a number of pixels'*) true ;; *) false ;; esac && ok || bad "check-shots refuses --only-top without a number" "$out"
 out=$("$shots" "$work/shots/size/fresh" "$work/shots/size/live" 2>&1)
 [ $? = 1 ] && grep -q 'not the same screen size' <<<"$out" && ok || bad "check-shots refuses screens of two sizes" "$out"
 rm "$work/shots/same/live/switcher.png"
@@ -718,6 +726,78 @@ cp "$here/tests/permission/clean/App/Onboarding.swift" "$p/App/Page.swift"
 git -C "$p" add App/Page.swift
 git -C "$p" commit -qm "Primer" >/dev/null 2>&1 && ok || bad "pre-commit lets a Continue button through"
 
+# --- check-motion: a selection switches at once (ui/visual-craft.md);
+# a deliberate slide is marked with its reason
+ev() { printf '{"hook_event_name":"%s","tool_name":"%s","tool_input":{"command":"%s"},"stop_hook_active":%s}' "$1" "$2" "${3:-}" "${4:-false}"; }
+p=$(project)
+expect 0 "check-motion with no Swift passes, saying so" "$p/.practices/bin/check-motion"
+mkdir -p "$p/App"
+cat >"$p/App/Chart.swift" <<'SWIFT'
+struct Chart: View {
+    @State private var selected: Date?
+    var body: some View {
+        Bars(selected: selected)
+            .onTapGesture { day in
+                // withAnimation { selected = day } would cross-fade the bars
+                selected = selected == day ? nil : day
+                withAnimation(.spring) { grown = true }
+                withAnimation { if selected == nil { shown.toggle() } }
+            }
+            .animation(.easeOut, value: grown)
+        Text("withAnimation { selected = day }")
+        // practices-allow motion: the capsule slides between tabs
+        Tabs().onChange(of: tab) { withAnimation { tabSelection = tab } }
+    }
+}
+SWIFT
+expect 0 "check-motion passes a selection set at once, other animations, comments, strings and a marked slide" "$p/.practices/bin/check-motion"
+cat >"$p/App/Trend.swift" <<'SWIFT'
+struct Trend: View {
+    @State private var selected: Date?
+    @State private var highlighted = false
+    var body: some View {
+        Bars().onTapGesture { day in
+            withAnimation(.snappy) { selected = selected == day ? nil : day }
+        }
+        .animation(.snappy, value: highlightedRow)
+        Button("Pick") {
+            withAnimation(.bouncy) {
+                self.highlighted.toggle()
+            }
+        }
+        Row().onTapGesture { withAnimation { currentSelection = 2 } } // practices-allow motion: slides
+        Row().onTapGesture { withAnimation { pickedDay = 2 } }
+    }
+}
+SWIFT
+out=$("$p/.practices/bin/check-motion" 2>&1)
+st=$?
+[ $st = 1 ] && ok || bad "check-motion fails on an animated selection (exit $st)" "$out"
+for want in 'Trend.swift:6 withAnimation sets the selection "selected"' 'Trend.swift:8 .animation follows the selection "highlightedRow"' \
+    'Trend.swift:10 withAnimation sets the selection "highlighted"' 'Trend.swift:14 marks an exception without its reason' 'Rule: A selection switches at once'; do
+    case $out in *"$want"*) ok ;; *) bad "check-motion finds $want" "$out" ;; esac
+done
+case $out in *Chart.swift* | *pickedDay*) bad "check-motion leaves alone what sets no selection, and names it doesn't know" "$out" ;; *) ok ;; esac
+echo "MOTION_SELECTION='picked\w*'" >>"$p/.practices/config"
+out=$("$p/.practices/bin/check-motion" "$p/App/Trend.swift" 2>&1)
+case $out in *'Trend.swift:15 withAnimation sets the selection "pickedDay"'*) ok ;; *) bad "MOTION_SELECTION adds the app's own names" "$out" ;; esac
+printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
+# The gate runs where the others do: after an edit, before a commit, in lint.
+"$p/.practices/bin/install-hooks" >/dev/null
+rm "$p/App/Trend.swift"
+git -C "$p" add App/Chart.swift && git -C "$p" commit -qm "Chart" >/dev/null 2>&1 && ok || bad "pre-commit lets a selection set at once through"
+ev PostToolUse Edit | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok || bad "claude-hook passes a selection set at once"
+printf 'struct T: View {\n    @State var selected = 0\n    var body: some View { Text("a").onTapGesture { withAnimation { selected = 1 } } }\n}\n' >"$p/App/Chart.swift"
+out=$(ev PostToolUse Edit | "$p/.practices/bin/claude-hook" 2>&1)
+st=$?
+[ $st = 2 ] && case $out in *'[motion]'*'Chart.swift:3'*) true ;; *) false ;; esac && ok ||
+    bad "claude-hook hands an animated selection back to the agent" "$out"
+out=$("$p/.practices/bin/lint" 2>&1)
+st=$?
+[ $st != 0 ] && case $out in *"selections failed"*) true ;; *) false ;; esac && ok || bad "lint fails while a selection is animated" "$out"
+git -C "$p" add App/Chart.swift
+git -C "$p" commit -qm "Chart" >/dev/null 2>&1 && bad "pre-commit refuses an animated selection" || ok
+
 # --- check-xcode: each shipped target built for the declared devices, with
 # the entitlement each gated framework it compiles needs (mobile/app-review.md)
 ev() { printf '{"hook_event_name":"%s","tool_name":"%s","tool_input":{"command":"%s"},"stop_hook_active":%s}' "$1" "$2" "${3:-}" "${4:-false}"; }
@@ -890,10 +970,20 @@ mkdir -p "$p/UITests" "$p/scripts"
 uitest() { # uitest ARGUMENTS AUDIT: a UI test file
     printf 'import XCTest\n\nfinal class FlowTests: XCTestCase {\n    func testOnboarding() throws {\n        let app = XCUIApplication()\n        app.launchArguments = [%s]\n        app.launch()\n        %s\n        XCTAssertTrue(app.buttons["Continue"].isHittable)\n    }\n}\n' "$1" "$2" >"$p/UITests/FlowTests.swift"
 }
+printf 'import XCTest\n\nfinal class OfflineTests: XCTestCase {\n    func testTodayOffline() throws {\n        let app = XCUIApplication()\n        app.launchArguments = ["-AppleLanguages", "(en)", "-AcmeLanguage", "en", "-AcmeOffline"]\n        app.launch()\n        XCTAssertTrue(app.staticTexts["Today"].waitForExistence(timeout: 3))\n    }\n}\n' >"$p/UITests/OfflineTests.swift"
 uitest '"-AppleLanguages", "(en)", "-AppleLocale", "en_US"' 'try app.performAccessibilityAudit()'
 # shellcheck disable=SC2016 # the script's own variable
 printf '#!/bin/sh\nxcrun simctl ui "$SIM" content_size extra-extra-large\nxcodebuild test -scheme Acme -destination "platform=iOS Simulator,name=iPhone SE (3rd generation)"\n' >"$p/scripts/ui-tests.sh"
-expect 0 "check-ui-tests passes tests in a pinned language, audited, on an iPhone SE at a large size" "$p/.practices/bin/check-ui-tests"
+expect 0 "check-ui-tests passes tests in a pinned language, audited, offline, on an iPhone SE at a large size" "$p/.practices/bin/check-ui-tests"
+mv "$p/UITests/OfflineTests.swift" "$work/OfflineTests.swift"
+out=$("$p/.practices/bin/check-ui-tests" 2>&1)
+[ $? = 1 ] && case $out in *'no UI test launches the app offline'*'mobile/lifecycle.md'*) true ;; *) false ;; esac && ok ||
+    bad "check-ui-tests finds no UI test that launches the app offline" "$out"
+uitest '"-AppleLanguages", "(en)", "-AcmeNoNetwork"' 'try app.performAccessibilityAudit()'
+echo "UITEST_OFFLINE='-AcmeNoNetwork'" >>"$p/.practices/config"
+expect 0 "UITEST_OFFLINE names the app's own offline switch" "$p/.practices/bin/check-ui-tests"
+printf 'PRIVATE_TERMS=none\n' >"$p/.practices/config"
+mv "$work/OfflineTests.swift" "$p/UITests/OfflineTests.swift"
 uitest '"-AcmeDemo"' 'try app.performAccessibilityAudit()'
 out=$("$p/.practices/bin/check-ui-tests" 2>&1)
 [ $? = 1 ] && case $out in *'launch the app without pinning its language'*'UITests/FlowTests.swift'*) true ;; *) false ;; esac && ok ||

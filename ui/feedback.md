@@ -97,3 +97,58 @@ place of the "rotating progress" (Motion with a reason).
 cursor. Its words must end in "…"; three dots are a finding too.
 `check-ui` (working) then asks for motion inside it. Whether each press
 in the app has its busy state and its journey test is review.
+
+## A placeholder ends
+
+**What.** A placeholder that stands in for content waits a few seconds
+at most. Then it says what it is waiting for, and offers to try again.
+It never waits in silence. Its motion stops after a few pulses, so a
+long wait doesn't look like a loop.
+
+**Why.** On 25 Nov 2026 the owner opened an iPhone app in an elevator.
+Its home screen showed its placeholder, a grey copy of the board, and
+never drew. The page is drawn by iOS's Screen Time report extension, in
+another process, and the app set no deadline. It pulsed five times and
+then just stayed, with no word and no way out. To the owner it looked
+like an endless loop.
+
+**Apply.**
+1. Start a deadline with the placeholder: about 5 seconds, measured
+   from the slowest real case.
+2. When it passes, try once more by itself if that can help (rebuild
+   the view, reload).
+3. Then say what is missing, in the product's voice, with a button to
+   try again ("Today's board hasn't drawn yet. Try again").
+4. When the content comes from another process or a server, have it
+   leave a mark when it has drawn, so the app knows.
+
+**Check.** Review: a UI test holds the content back (a launch argument
+the app honours) and asserts that the message and its button appear.
+A check that every placeholder has its deadline is a task in
+ROADMAP.md.
+
+## A placeholder is drawn on the page's own edges
+
+**What.** A placeholder takes the same space as the page it stands for.
+It ignores the same safe areas, and its background and glow reach as
+far. When the page arrives, nothing at the edges moves or changes.
+
+**Why.** In the same incident on 25 Nov 2026, the placeholder stopped at
+the status bar. The page itself runs under it. So the sun's glow at the
+top right was cut off by a hard line under the status bar. The owner
+saw it as part of the same broken moment.
+
+**Apply.**
+1. Build the placeholder from the page's own frame: the same
+   `ignoresSafeArea` edges, the same background, the same header.
+2. Draw only the content blank. Keep everything around it real.
+3. Shoot the loaded page and the placeholder alone (a launch argument
+   that holds the content back), with the clock fixed: `xcrun simctl
+   status_bar <device> override --time 9:41`.
+
+**Check.** `check-shots --only-top PX PAGE PLACEHOLDER` compares the two
+shots in the band above PX, the status bar included. Below it they
+differ anyway, since the content isn't drawn yet. It fails on any
+region that differs, and says where. It runs where the project runs its
+screenshots; no hook takes the shots by itself. Whether the side and
+bottom edges match is review.

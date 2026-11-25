@@ -997,6 +997,39 @@ measures the same reduced-motion render. Whether every screen still
 reads correctly with reduced motion, and whether a motion tells the
 product's story, is review.
 
+## A selection switches at once
+
+**What.** Choosing a bar, a row or a tab changes the highlight in the
+same frame. The old choice goes dark and the new one lights at once.
+Nothing fades between them. A highlight that slides from the old place
+to the new one is the only exception, and it moves as one piece.
+
+**Why.** On 25 Nov 2026 the owner tapped one bar after another on an
+iPhone app's two-week chart. It flickered: for a moment the old and the
+new bar were both lit. The code set the selected day inside
+`withAnimation(.snappy)`, and each bar's colour followed the selection.
+So the two bars faded across each other. Apple's own Screen Time chart
+switches at once.
+
+**Apply.**
+1. Set the selection without animation. Animate what moves because of
+   it, such as a scroll to the chosen row, on its own.
+2. Numbers that change with the selection may roll
+   (`.contentTransition(.numericText())`), as long as the bars don't fade.
+3. A highlight that slides on purpose (a capsule under the chosen tab)
+   is one shape that moves. Mark that line with
+   `// practices-allow motion: <the reason>`.
+
+**Check.** `check-motion` reads the Swift files (`MOTION_FILES`). It
+finds a selection state set inside `withAnimation`, or followed by
+`.animation(_:value:)`. A selection state is a name like `selected…`,
+`selection…`, `highlighted…`, `…Selection` or `…Selected`;
+`MOTION_SELECTION` adds the app's own. A marked line needs a reason of
+three words or more. It runs in lint, in claude-hook after an edit and
+on Stop, and in pre-commit. Kotlin, Compose and the web aren't read yet
+(ROADMAP.md). Whether a highlight under another name cross-fades is
+review.
+
 ## A resize never shows a squashed frame
 
 **What.** When a window or a panel changes size, its content is laid out
