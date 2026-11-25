@@ -3,6 +3,27 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### Changed
+
+- **A build is checked before the agent uploads it, not after**
+  (`mobile/app-review.md`). claude-hook now also runs before a Bash
+  command (PreToolUse): `xcodebuild -exportArchive` whose export options
+  say `upload`, `xcrun altool --upload-app` or `--upload-package`, and
+  `iTMSTransporter -m upload` are refused while `check-ios-artefact`
+  fails on the build, or when the command names none. Until now the
+  check ran after `-exportArchive`, when the build was already in App
+  Store Connect. `bin/install` updates settings still as the kit made
+  them; otherwise add the `PreToolUse` entry from
+  `templates/claude-settings.json`, which `check-hooks` (pre-commit) now
+  asks for.
+- **The App Review rules quote Apple's messages in full**: the guideline
+  of each rejection (2.5.1, 5.1.1(iv), 4), where the message names the
+  review device and the reviewer's screenshot, and Apple's next step
+  after a refused permission: say so where the feature is, with a button
+  to Settings, and never ask twice.
+
 ## 1.12.1 (2026-11-23)
 
 ### Underneath

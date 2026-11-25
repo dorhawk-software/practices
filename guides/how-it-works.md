@@ -29,7 +29,7 @@ each, who owns which file, and how a change here reaches every project.
  actions/*, .github/workflows/rust-*.yml ◀── uses: …@v1 ── .github/workflows/*.yml
 
  templates/claude-settings.json ───── --templates ─▶ .claude/settings.json
-                                                    (PostToolUse, Stop ─▶ .practices/bin/claude-hook)
+                                                    (PreToolUse, PostToolUse, Stop ─▶ .practices/bin/claude-hook)
 
  .claude-plugin/marketplace.json ◀── /plugin install ── Claude Code
    plugin/ (skills only)
@@ -257,6 +257,18 @@ by `bin/install --templates`:
 ```json
 {
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.practices/bin/claude-hook",
+            "timeout": 900
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit",
@@ -304,7 +316,10 @@ each board or copy file that changed, and on any that failed before. A
 change to copy or code runs `check-permission-words`; one to an Xcode
 project, an entitlements file, Swift or a test script runs `check-xcode`
 and `check-ui-tests`. After `xcodebuild archive` or `-exportArchive`,
-`check-ios-artefact` reads what was built. A failure goes back to the
+`check-ios-artefact` reads what was built. Before a shell command that
+uploads a build to App Store Connect (PreToolUse: `-exportArchive` to
+`upload`, `altool`, `iTMSTransporter`), it reads that build first and
+refuses the upload while it fails. A failure goes back to the
 agent as an error to fix before going on (exit 2). On Stop and
 SubagentStop it refuses to let the turn end while a board still fails, so
 the agent can't tell the person it's done; blocked twice on the same

@@ -16,14 +16,18 @@ as a rule, and given a check that would have caught it. All three land
 before the build goes back to review.
 
 **Why.** The same app was stopped three times in a week: for an
-entitlement (13 Nov 2026), a button's words (16 Nov) and a crowded
-screen (18 Nov). Apple found each one; no check did. A
-fix with no check lets the next screen or target make the same mistake.
+entitlement (13 Nov 2026, Guideline 2.5.1), a button's words (16 Nov,
+5.1.1(iv)) and a crowded screen (18 Nov, 4). Apple found each one; no
+check did. A fix with no check lets the next screen or target make the
+same mistake. All three reviews ran on an iPad Air 11-inch (M3), though
+the app was for iPhone only.
 
 **Apply.**
 1. Quote Apple's message and the guideline in the rule's Why.
-2. Reproduce it first, where the reviewer saw it: the device, the text
-   size, light or dark.
+2. Reproduce it first, where the reviewer saw it. The message's "Review
+   Environment" names the device, its OS and the build reviewed; its
+   "Rejection Attachments" hold the reviewer's screenshot. Then match
+   the text size and light or dark.
 3. Write the check, break it once to see it fail, and wire it into the
    gate ([common/gates.md](../common/gates.md)).
 4. In App Store Connect, a rejected item blocks "Resubmit to App Review"
@@ -43,8 +47,10 @@ and widget. FamilyControls, ManagedSettings and DeviceActivity need
 `com.apple.developer.healthkit`; HomeKit `com.apple.developer.homekit`.
 
 **Why.** On 13 Nov 2026, App Review's automated check stopped the app
-before review could start: "the app uses Screen Time APIs without the
-Family Controls entitlement". The app and four extensions had it. The
+before review could start, under Guideline 2.5.1 (Software
+Requirements): "An automated analysis indicates the app uses one or more
+Screen Time APIs but the app has not been submitted with the Family
+Controls entitlement". The app and four extensions had it. The
 widget compiled the shared source folder, so its binary linked
 ManagedSettings without it. Two days and a resubmission. Nothing in the
 build failed: Xcode signs a binary with whatever entitlements it is given.
@@ -64,8 +70,12 @@ runs in lint, in claude-hook after an edit to the project, an
 entitlements file or Swift, and in pre-commit. `check-ios-artefact`
 reads the built `.xcarchive` or `.ipa` with `otool -L` and `codesign`.
 claude-hook runs it after the agent's `xcodebuild archive` or
-`-exportArchive`. Run it before every upload too: no kit release script
-does that yet (ROADMAP.md).
+`-exportArchive`, and before any upload the agent starts (PreToolUse):
+`-exportArchive` whose export options say `upload`, `altool
+--upload-app` or `--upload-package`, `iTMSTransporter -m upload`. A
+failing build, or one the command doesn't name, isn't sent. Until 1.13.0
+the check came after `-exportArchive`, when an upload had already gone.
+An upload by hand or by CI isn't checked yet (ROADMAP.md).
 `ENTITLED_FRAMEWORKS` in `.practices/config` adds pairs.
 
 ## The app is built for the devices it declares
@@ -112,7 +122,12 @@ became one Continue.
    ([lifecycle.md](lifecycle.md#explain-before-the-permission-prompt-and-ask-once)).
 2. Its one button says Continue, in each language: "Pokračovat",
    "Continuar", "Tiếp tục".
-3. Delete catalog entries no code uses any more. Xcode marks them
+3. When the person says no and a feature can't work without the
+   permission, the feature says so where it's used, with a button that
+   opens Settings (`UIApplication.openSettingsURLString`). It never
+   shows the explanation again to ask twice. This is Apple's own next
+   step in the 16 Nov message.
+4. Delete catalog entries no code uses any more. Xcode marks them
    `"extractionState": "stale"` only after a build, and they still ship.
 
 **Check.** `check-permission-words` reads the copy files and the code.
@@ -124,7 +139,8 @@ Vietnamese; `PERMISSION_VERBS` and `PERMISSION_NOUNS` add words. A
 catalog entry marked stale is skipped; every other entry counts. A step
 in a guide that names a setting is marked `practices-allow permission:
 <reason>`. It runs in lint, claude-hook (edits, Stop) and pre-commit.
-Whether a button with other words leads to a prompt is review.
+Whether a button with other words leads to a prompt, and the Settings
+link after a refusal, are review.
 
 ## Every screen fits a small iPhone at a large text size
 
@@ -134,7 +150,9 @@ screen without scrolling: pinned at the bottom, never below the fold.
 
 **Why.** On 18 Nov 2026 App Review refused the app under Guideline 4:
 parts of it were "crowded, laid out, or displayed in a way that made it
-difficult to use" on an iPad Air 11-inch (M3). An iPhone-only app on an
+difficult to use" on an iPad Air 11-inch (M3). Apple added: "users
+expect apps they download to function on all the devices where they are
+available". An iPhone-only app on an
 iPad runs in an iPhone SE-sized window, 375 × 667 pt. The reviewer had a
 larger text size and dark mode. The onboarding was one VStack that
 didn't scroll, taller than the window, so SwiftUI cut off both ends. The

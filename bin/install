@@ -165,13 +165,18 @@ if [ -n "$templates" ]; then
     own templates/claude-settings.json .claude/settings.json
 fi
 # The Claude Code hooks. Settings still exactly as an older kit made them
-# get the current template (1.6.0 added edits, Stop and SubagentStop);
+# get the current template (1.6.0 added edits, Stop and SubagentStop;
+# 1.13.0 PreToolUse, which checks a build before it is uploaded);
 # settings the project changed are its own: install says what to add,
 # and the pre-commit hook (check-hooks) refuses commits until it's there.
 settings=$project/.claude/settings.json
-if [ -f "$settings" ] && [ "$(git hash-object "$settings")" = d8ed312ba7d86cd9d6a1ccecddac1451075433bf ]; then
+case $([ -f "$settings" ] && git hash-object "$settings") in
+d8ed312ba7d86cd9d6a1ccecddac1451075433bf | 90de8b419d251cc10129959dee487a8251b59728) old_settings=1 ;;
+*) old_settings= ;;
+esac
+if [ -n "$old_settings" ]; then
     cp "$here/templates/claude-settings.json" "$settings"
-    echo "updated: .claude/settings.json (claude-hook now also runs after edits and when a turn ends)"
+    echo "updated: .claude/settings.json (claude-hook now also runs before a Bash command, after edits and when a turn ends)"
 elif [ -f "$settings" ] && ! (cd "$project" && "$kit/bin/check-hooks" >/dev/null 2>&1); then
     echo
     echo "Your .claude/settings.json doesn't run claude-hook everywhere it must:"

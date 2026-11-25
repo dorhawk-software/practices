@@ -857,6 +857,30 @@ out=$(xev "nice -n 19 xcodebuild -exportArchive -archivePath build/Acme.xcarchiv
 [ $? = 2 ] && case $out in *'Acme.ipa'*) true ;; *) false ;; esac && ok || bad "claude-hook checks the .ipa after xcodebuild -exportArchive" "$out"
 xev "xcodebuild build -scheme Acme" | artefact "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok ||
     bad "claude-hook leaves the archive alone after a plain build"
+# Before an upload (PreToolUse): the build is checked first; a failing or
+# missing one isn't sent. Until 1.13.0 the check came after the upload.
+pre() { printf '{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"%s"},"cwd":"%s"}' "$1" "$p"; }
+printf '<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0"><dict><key>destination</key><string>upload</string></dict></plist>\n' >"$p/upload.plist"
+printf '<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0"><dict><key>destination</key><string>export</string></dict></plist>\n' >"$p/export.plist"
+out=$(pre "xcodebuild -exportArchive -archivePath build/Acme.xcarchive -exportPath build/export -exportOptionsPlist upload.plist" | artefact "$p/.practices/bin/claude-hook" 2>&1)
+[ $? = 2 ] && case $out in *'Upload refused: check-ios-artefact failed on'*'Acme.xcarchive'*'Widget.appex: links ManagedSettings'*) true ;; *) false ;; esac && ok ||
+    bad "claude-hook refuses an -exportArchive that uploads a failing archive" "$out"
+pre "xcodebuild -exportArchive -archivePath build/Acme.xcarchive -exportPath build/export -exportOptionsPlist export.plist" | artefact "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok ||
+    bad "claude-hook leaves an export to a folder for after it (PostToolUse)"
+out=$(pre "xcrun altool --upload-app -f build/export/Acme.ipa -t ios" | artefact "$p/.practices/bin/claude-hook" 2>&1)
+[ $? = 2 ] && case $out in *'Upload refused'*'Acme.ipa'*) true ;; *) false ;; esac && ok || bad "claude-hook refuses altool --upload-app with a failing .ipa" "$out"
+out=$(pre "xcrun iTMSTransporter -m upload -assetFile build/export/Acme.ipa" | artefact "$p/.practices/bin/claude-hook" 2>&1)
+[ $? = 2 ] && case $out in *'Upload refused'*'Acme.ipa'*) true ;; *) false ;; esac && ok || bad "claude-hook refuses iTMSTransporter -m upload with a failing .ipa" "$out"
+out=$(pre "xcrun altool --upload-package build/gone.ipa --apple-id 1" | artefact "$p/.practices/bin/claude-hook" 2>&1)
+[ $? = 2 ] && case $out in *'needs to read that build first'*'gone.ipa'*) true ;; *) false ;; esac && ok || bad "claude-hook refuses an upload of a build that isn't there" "$out"
+out=$(pre "xcodebuild -exportArchive -exportPath build/export -exportOptionsPlist upload.plist" | artefact "$p/.practices/bin/claude-hook" 2>&1)
+[ $? = 2 ] && case $out in *'none named'*) true ;; *) false ;; esac && ok || bad "claude-hook refuses an upload that names no archive" "$out"
+for c in "xcrun altool --validate-app -f build/export/Acme.ipa" "ls build" "xcodebuild archive -scheme Acme -archivePath build/Acme"; do
+    pre "$c" | artefact "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok || bad "claude-hook lets a command that uploads nothing run: $c"
+done
+bundle "$app/PlugIns/Widget.appex" Widget "1" yes /System/Library/Frameworks/ManagedSettings.framework/ManagedSettings
+pre "xcodebuild -exportArchive -archivePath build/Acme.xcarchive -exportPath build/export -exportOptionsPlist upload.plist" | artefact "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok ||
+    bad "claude-hook lets a clean archive be uploaded"
 
 # --- check-ui-tests: XCUITests pin the language, run the accessibility audit,
 # and run on an iPhone SE at a large text size (mobile/app-review.md)
@@ -992,8 +1016,8 @@ expect 0 "check-hooks passes the template" "$p/.practices/bin/check-hooks"
 printf '{"hooks":{"PostToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"x/.practices/bin/claude-hook"}]}]}}\n' >"$p/.claude/settings.json"
 out=$("$p/.practices/bin/check-hooks" 2>&1)
 st=$?
-[ $st = 1 ] && case $out in *'after Edit'*'Stop'*) true ;; *) false ;; esac && ok ||
-    bad "check-hooks finds edits and Stop unwired" "$out"
+[ $st = 1 ] && case $out in *'after Edit'*'PreToolUse'*'Stop'*) true ;; *) false ;; esac && ok ||
+    bad "check-hooks finds edits, the pre-upload check and Stop unwired" "$out"
 git -C "$p" add .claude/settings.json
 git -C "$p" commit -qm "Settings" >/dev/null 2>&1 && bad "pre-commit refuses settings that drop the hooks" || ok
 # shellcheck disable=SC2016 # $CLAUDE_PROJECT_DIR is for Claude Code to expand

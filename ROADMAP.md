@@ -290,9 +290,12 @@ rows are this list's source; the most valuable first.
   - [x] `check-permission-words`, `check-xcode`, `check-ios-artefact`
     and `check-ui-tests`, in lint, claude-hook and pre-commit, each with
     its planted faults in `tests/run` (Unreleased).
-  - [ ] check-ios-artefact before every upload: phase 2's release script
-    and the reusable mobile release workflow run it, not only the agent's
-    archive.
+  - [x] check-ios-artefact before the agent's upload: claude-hook's
+    PreToolUse refuses `-exportArchive` to `upload`, `altool` and
+    `iTMSTransporter` uploads of a failing or unnamed build (1.13.0).
+  - [ ] check-ios-artefact before every other upload: phase 2's release
+    script, the reusable mobile release workflow, and fastlane's
+    `pilot`/`deliver` (no build path in the command to read).
   - [ ] check-ui-tests reads Espresso, Detox and Maestro tests, and a
     dark-mode run.
   - [ ] Every screen audited and its main button asserted on screen: a

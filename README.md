@@ -183,9 +183,9 @@ own extra checks in `.practices/lint.d/`.
 | `ui-mark.mjs` | check-ui's mark check: each `svg[data-mark]` drawn alone and large, measured from its pixels at the smallest size the board shows |
 | `ui-type.mjs` | check-ui's type checks: each text drawn in the face it asks for, never a fallback (Chrome's own report of the fonts it used), and times and counts in tabular figures |
 | `ui-motion.mjs` | check-ui's motion check: busy controls, with reduced motion and again with motion allowed, loops that don't stop for reduced motion, and words scaled out of their shape |
-| `check-hooks` | `.claude/settings.json` still runs `claude-hook` after edits and when a turn ends |
+| `check-hooks` | `.claude/settings.json` still runs `claude-hook` before Bash, after edits and when a turn ends |
 | `disk-guard` | cargo's build disk keeps a free-space floor |
-| `claude-hook` | Claude Code's hooks. After Bash, Edit and Write: disk-guard; the lint gate after cargo builds and tests, and after npm or npx tests, tsc and ESLint; check-ui on any board that changed, check-page on any proposal page that changed, check-voice and check-copy on any copy that changed, check-permission-words on copy or code, check-xcode and check-ui-tests on an Xcode project, entitlements or Swift; check-ios-artefact after `xcodebuild archive` or `-exportArchive`. On Stop: the turn can't end while a changed file fails a gate |
+| `claude-hook` | Claude Code's hooks. After Bash, Edit and Write: disk-guard; the lint gate after cargo builds and tests, and after npm or npx tests, tsc and ESLint; check-ui on any board that changed, check-page on any proposal page that changed, check-voice and check-copy on any copy that changed, check-permission-words on copy or code, check-xcode and check-ui-tests on an Xcode project, entitlements or Swift; check-ios-artefact after `xcodebuild archive` or `-exportArchive`. Before Bash: an upload to App Store Connect waits for check-ios-artefact on its build. On Stop: the turn can't end while a changed file fails a gate |
 | `install-hooks` | points git at `.practices/hooks` (pre-commit, commit-msg) |
 | `prune-caches`, `sweep-target` | keep GitHub's 10 GB cache budget for what jobs restore |
 

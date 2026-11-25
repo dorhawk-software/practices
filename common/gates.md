@@ -52,6 +52,8 @@ varies from run to run; a hook doesn't.
 2. Run it from the hooks the agent can't skip:
    - `claude-hook` after Bash, Edit and Write (Claude Code's
      PostToolUse), where exit 2 hands the findings to the agent;
+   - `claude-hook` before Bash (PreToolUse), where exit 2 stops a
+     command that can't be taken back, such as an upload to a store;
    - `claude-hook` on Stop and SubagentStop, so the agent can't end its
      turn, or tell the person it's done, while a check fails;
    - `hooks/pre-commit`, and CI for what got past both.
