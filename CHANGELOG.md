@@ -3,6 +3,17 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### Underneath
+
+- **1.15.0, released from a green main.** CI on 1.15.0's release commit
+  failed on macOS: headless Chrome gave no answer to `Runtime.enable` in
+  60 s, before any board was drawn. check-ui and check-page now enable
+  Chrome's domains inside the page's three tries, each in a fresh page,
+  and say so on stderr (`common/testing.md`, "A stuck renderer is asked
+  once more"). Projects get exactly 1.15.0's rules and checks.
+
 ## 1.15.0 (2026-11-25)
 
 ### New

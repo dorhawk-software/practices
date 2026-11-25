@@ -612,11 +612,8 @@ function audit(cfg) {
 const runs = [], marks = new Map(), types = new Map(), motions = new Map(), rendersOf = new Map();
 const { vague } = await loadRules(opts["copy-rules"]);
 try {
-  const sessionId = await openPage();
+  const sessionId = await openPage(["Page", "Runtime", "Animation"]);
   const s = (m, p) => send(m, p, sessionId);
-  await s("Page.enable");
-  await s("Runtime.enable");
-  await s("Animation.enable");
   for (const file of files) {
     const url = pathToFileURL(resolve(file)).href;
     const own = fixedWidth(file);

@@ -35,25 +35,29 @@ export function startChrome(path, die) {
   chrome.on("exit", (code) => { if (waiting.size) die(`Chrome stopped (exit ${code}): ${chromeErr.trim().split("\n").pop()}`); });
   const send = (method, params = {}, sessionId) => new Promise((ok, fail) => {
     const i = ++id;
-    const timer = setTimeout(() => fail(new Error(`${method}: no answer in 60 s`)), 60000);
+    const timer = setTimeout(() => { waiting.delete(i); fail(new Error(`${method}: no answer in 60 s`)); }, 60000);
     waiting.set(i, (m) => { clearTimeout(timer); m.error ? fail(new Error(`${method}: ${m.error.message}`)) : ok(m.result); });
     toChrome.write(JSON.stringify({ id: i, method, params, ...(sessionId ? { sessionId } : {}) }) + "\0");
   });
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  // --- Chrome's first page. In a container it failed half the time with "Cannot read properties of
-  // undefined (reading 'targetId')": no page yet (Scops, 2026-11-16). So: open one if none, try three times.
-  async function openPage() {
+  // --- Chrome's first page, with domains ("Page", "Runtime") enabled. In a container it failed half the
+  // time with "Cannot read properties of undefined (reading 'targetId')": no page yet (Scops, 2026-11-16).
+  // On a macOS runner Runtime.enable got no answer in 60 s (2026-11-25). Nothing is rendered or compared
+  // yet, so a miss is asked again in a fresh page (common/testing.md), up to three times, and said.
+  async function openPage(domains = []) {
     let last = null;
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
         const { targetInfos } = await send("Target.getTargets");
-        let page = targetInfos.find((t) => t.type === "page");
+        let page = attempt === 1 ? targetInfos.find((t) => t.type === "page") : null;
         if (!page) page = await send("Target.createTarget", { url: "about:blank" });
         const { sessionId } = await send("Target.attachToTarget", { targetId: page.targetId, flatten: true });
+        for (const domain of domains) await send(`${domain}.enable`, {}, sessionId);
         return sessionId;
       } catch (err) {
         last = err;
+        if (attempt < 3) process.stderr.write(`Chrome: ${err.message}; asked once more in a fresh page.\n`);
         await sleep(400 * attempt);
       }
     }

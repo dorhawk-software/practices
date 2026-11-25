@@ -97,9 +97,8 @@ const PROBE = (W, tieLangs, fallback) => `(() => {
 const { send, openPage, load, cleanup } = startChrome(opts.chrome, die);
 const findings = [];
 try {
-  const session = await openPage();
+  const session = await openPage(["Page"]);
   const s = (m, p) => send(m, p, session);
-  await s("Page.enable");
   for (const page of files) {
     const path = resolve(page);
     let src;
