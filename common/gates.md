@@ -181,13 +181,22 @@ Count the files it reports checking against `git ls-files`.
 
 **What.** While working on a few screens, a slow gate may run on just
 those (`--only A,B`). Its result says it was partial. Only a full run
-counts before a merge, and the hooks always run the full set.
+counts before a merge, and the hooks always run the full set. In a
+repository whose commits go straight to the shared branch, the push is
+the merge: a commit may land after the subset it touches passes, and the
+full run gates the push.
 
 **Why.** In Scops, an iOS app, a change to a column view every screen
 shares was meant for one screen (2026-11-22). It made another screen
 fade its text at the standard size. Only the full screenshot match
 caught it: 9 findings, a lead 5 pt off. A run of the screen being worked
 on would have passed.
+
+Running the full set on every commit was the other cost. In Scops each
+new screen touched shared files (its strings, its story fixture, the
+core), so each commit ran the full screenshot match (225 s) and the full
+UI suite (355 s). The owner asked: "Why are full gates always
+rerunning?" (2026-11-27), and chose the full run before the push.
 
 **Apply.**
 1. Give a slow gate a way to run a few of its items by name. An unknown
@@ -196,9 +205,15 @@ on would have passed.
    full run counts before a merge".
 3. The commit hook and the Stop hook run the full set. Nothing is merged,
    or called matching, on a partial run.
+4. Committing straight to the shared branch: commit each piece after
+   its subset passes, and run the full set once before `git push`. The
+   push carries every commit since the last full run, so a failure is
+   fixed in a new commit before it. The commit body names what ran, the
+   subset or the full set.
 
 **Check.** Review: a claim that rests on a partial run is in the
-conversation. The hooks' full run is the gate.
+conversation, and a push with no full run since its commits. The hooks'
+full run is the gate.
 
 ## Cache by content, never by time
 

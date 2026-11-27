@@ -3,6 +3,16 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### Changed
+
+- **Committing straight to the shared branch: the full run gates the push,
+  not each commit** (common/gates.md, "A subset iterates; only the full
+  run gates"). Each commit lands after the subset it touches passes; the
+  full set runs once before `git push`. Scops ran a 10-minute full set on
+  every screen's commit.
+
 ## 1.17.1 (2026-11-27)
 
 ### Fixed
