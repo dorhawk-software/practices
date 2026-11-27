@@ -1309,6 +1309,57 @@ printf "const en = {\n  'a': 'Saved.',\n};\n" >"$p/src/i18n/strings.ts"
 git -C "$p" add src/i18n/strings.ts
 git -C "$p" commit -qm "Copy" >/dev/null 2>&1 && ok || bad "pre-commit lets copy without we through"
 
+# --- check-asked: a turn's last message may not ask the person in prose
+p=$(project)
+say() { # say FILE LINE...: a transcript of JSON lines
+    local f=$1
+    shift
+    printf '%s\n' "$@" >"$f"
+}
+U='{"type":"user","message":{"role":"user","content":"review the design"}}'
+R='{"type":"user","message":{"role":"user","content":[{"type":"tool_result","content":"ok"}]}}'
+T='{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","name":"Bash","input":{}}]}}'
+D='{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","name":"AskUserQuestion","input":{}}]}}'
+a() { printf '{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"%s"}]}}' "$1"; }
+tr=$work/asked.jsonl
+say "$tr" "$U" "$T" "$R" "$(a 'Review done.\n\n## Decisions for you\n\n1. The break is weak. I recommend redrawing it.\n2. Is a branch always a decision?')"
+out=$("$p/.practices/bin/check-asked" "$tr" 2>&1)
+st=$?
+[ $st = 1 ] && case $out in *'[asked]'*'Decisions for you'*) true ;; *) false ;; esac && ok ||
+    bad "check-asked finds decisions handed over as paragraphs" "$out"
+say "$tr" "$U" "$T" "$R" "$(a 'The gate is not built. Want me to add it as 1.18.0?')"
+out=$("$p/.practices/bin/check-asked" "$tr" 2>&1)
+[ $? = 1 ] && case $out in *'Want me to add it'*) true ;; *) false ;; esac && ok || bad "check-asked finds a closing question" "$out"
+say "$tr" "$U" "$(a 'I would add the hook. Say if you want it, and whether the app takes it now.')"
+"$p/.practices/bin/check-asked" "$tr" >/dev/null 2>&1
+[ $? = 1 ] && ok || bad "check-asked finds a request with no question mark (say if)"
+say "$tr" "$U" "$D" "$R" "$(a 'You chose B. Applied. Should the rest follow?')"
+"$p/.practices/bin/check-asked" "$tr" >/dev/null 2>&1 && ok || bad "check-asked passes a turn that opened the question dialog"
+say "$tr" "$U" "$T" "$R" "$(a 'Done: the board passes, and the commit is pushed.')"
+"$p/.practices/bin/check-asked" "$tr" >/dev/null 2>&1 && ok || bad "check-asked passes a report that asks nothing"
+say "$tr" "$U" "$(a 'Why did it fail? The cache was stale.\n\nIt is fixed and pushed.')"
+"$p/.practices/bin/check-asked" "$tr" >/dev/null 2>&1 && ok || bad "check-asked passes one question the message answers itself"
+say "$tr" "$U" "$(a "The dialog asked \\\"Which one stays?\\\" and the log has \`ready?\` in it.\n\n> Is it done?\n\nAll three are quotes.")"
+"$p/.practices/bin/check-asked" "$tr" >/dev/null 2>&1 && ok || bad "check-asked doesn't read quoted speech, code or a block quote"
+say "$tr" "$U" "$(a 'Shall I go on?')" "$U" "$T" "$R" "$(a 'Went on. It is done.')"
+"$p/.practices/bin/check-asked" "$tr" >/dev/null 2>&1 && ok || bad "check-asked reads only the turn since the person last wrote"
+"$p/.practices/bin/check-asked" "$work/none.jsonl" >/dev/null 2>&1
+[ $? = 2 ] && ok || bad "check-asked fails (2) on a transcript it can't read"
+# In the hook: blocked once, and let go with a note when nothing changed.
+say "$tr" "$U" "$T" "$R" "$(a 'The gate is not built. Want me to add it as 1.18.0?')"
+stop() { printf '{"hook_event_name":"%s","transcript_path":"%s","stop_hook_active":%s}' "$1" "$tr" "$2"; }
+out=$(stop Stop false | "$p/.practices/bin/claude-hook" 2>&1)
+st=$?
+[ $st = 2 ] && case $out in *'asks the person in prose'*'[asked]'*) true ;; *) false ;; esac && ok ||
+    bad "the Stop hook sends a prose question back to the dialog" "$out"
+out=$(stop Stop true | "$p/.practices/bin/claude-hook" 2>/dev/null)
+st=$?
+[ $st = 0 ] && case $out in *systemMessage*'asks in prose'*) true ;; *) false ;; esac && ok ||
+    bad "blocked twice on the same question, the agent may stop and the person is told" "$out"
+stop SubagentStop false | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok || bad "a subagent's last message isn't read: it answers its parent"
+say "$tr" "$U" "$D" "$R" "$(a 'Asked in the dialog; B it is.')"
+stop Stop false | "$p/.practices/bin/claude-hook" >/dev/null 2>&1 && ok || bad "the Stop hook passes a turn that asked in the dialog"
+
 # --- pre-commit: a failing board can't be committed; nor can unwired hooks
 p=$(project)
 "$p/.practices/bin/install-hooks" >/dev/null

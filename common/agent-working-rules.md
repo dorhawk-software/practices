@@ -127,7 +127,7 @@ Never work around the failure with `CARGO_BUILD_BUILD_DIR`, `CARGO_TARGET_DIR` o
 4. The report says what was done and found; the decisions are in the dialog. Work that doesn't depend on the answers goes on meanwhile ("Keep going on an agreed plan").
 5. A design round follows [ui/design-before-build.md](../ui/design-before-build.md), "The owner answers one question at a time": the page's link and the board's name in each step.
 
-**Check.** Review: the questions are asked in the agent's dialog, which no script sees. A report that ends in "Decisions for you" as paragraphs broke the rule.
+**Check.** `check-asked`, run by claude-hook when the agent's turn ends (Stop). It reads the session's transcript: a last message that asks in prose (a "Decisions for you" heading, a closing question, two or more questions, "say if", "let me know which"), in a turn that never opened the question dialog, sends the agent back to ask there. Quoted speech, code and block quotes aren't read. Blocked twice on the same message, the agent may stop, and the person is told. Until 1.17.1 the rule was an instruction only; the owner: "it missing seems like a bug to me". Left to review: whether one questionnaire or one question after another fits, and whether each step stands alone.
 
 ## Screenshots don't flash the screen
 
