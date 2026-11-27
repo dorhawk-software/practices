@@ -114,6 +114,21 @@ Never work around the failure with `CARGO_BUILD_BUILD_DIR`, `CARGO_TARGET_DIR` o
 
 **Check.** A session that stopped mid-plan stopped for a question only the developer could answer.
 
+## Feedback is asked in a questionnaire
+
+**What.** When the agent needs an answer from the owner, it asks in its question dialog, never in the prose of a report. Each question has two to four options, the recommended one first. The agent chooses the form: one questionnaire of several steps, or one question after another.
+
+**Why.** On 2026-11-27 a design review ended in a long report with four open decisions as numbered paragraphs. The owner wrote: "give me questionnaire if you need some answer". Asked as four steps in the dialog, all four were answered in one pass. A question inside a report waits until the owner reads to its end, and its answer has to be typed out.
+
+**Apply.**
+1. Independent questions the owner can answer from what is on the screen go in one questionnaire, up to four steps.
+2. Ask one after another when an answer changes the next question, or when a question needs its own picture or explanation first.
+3. Every step stands alone: what was found, what it names, the options in plain words. The owner may see only the dialog.
+4. The report says what was done and found; the decisions are in the dialog. Work that doesn't depend on the answers goes on meanwhile ("Keep going on an agreed plan").
+5. A design round follows [ui/design-before-build.md](../ui/design-before-build.md), "The owner answers one question at a time": the page's link and the board's name in each step.
+
+**Check.** Review: the questions are asked in the agent's dialog, which no script sees. A report that ends in "Decisions for you" as paragraphs broke the rule.
+
 ## Screenshots don't flash the screen
 
 **What.** Capture a window from its own pixels, for example X11's `XGetImage` through a small script. Never take bursts through the desktop's screenshot portal, which flashes the whole screen.

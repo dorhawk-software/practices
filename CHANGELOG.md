@@ -3,6 +3,17 @@
 What changed for the projects that use the practices. Written by hand,
 newest first, in the kinds common/changelog.md describes.
 
+## Unreleased
+
+### New
+
+- **Feedback is asked in a questionnaire** (`common/agent-working-rules.md`).
+  When the agent needs an answer, it asks in its question dialog, never in
+  the prose of a report: options, the recommended one first. It chooses
+  one questionnaire of several steps for independent questions, or one
+  question after another when an answer changes the next. Review only:
+  no script sees the dialog.
+
 ## 1.16.1 (2026-11-25)
 
 ### Fixed

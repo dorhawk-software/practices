@@ -12,7 +12,7 @@ to the agent to fix. This is where each rule stands
 - **review**: it needs a person's judgement (taste, wording, whether
   an icon is ugly); reviewers check it.
 
-Today: 15 gate, 86 partial, 130 todo, 49 review
+Today: 15 gate, 86 partial, 130 todo, 50 review
 (audited rule by rule on 2026-11-15, each claim checked against the
 scripts, not the docs). `tests/enforcement` fails when a practice has a
 rule this file doesn't list, or lists one that's gone. The todo and
@@ -34,6 +34,7 @@ partial rows are the work list; [ROADMAP.md](ROADMAP.md) ranks it.
 | Release only on a green main | todo | - | The kit ships no release script; a shared release script and release workflow job should refuse unless `gh run list --commit $SHA --status success` covers every job on main's tip. |
 | Quote measured CI timings | review | - | A duration quoted in a chat message and its source are only visible to a reader of the conversation. |
 | Keep going on an agreed plan | review | - | Whether a stop was for a question only the developer could answer is judgement. |
+| Feedback is asked in a questionnaire | review | - | The questions are asked in the agent's dialog, which no script sees; whether one questionnaire or one question after another fits is judgement. |
 | Screenshots don't flash the screen | todo | - | A PreToolUse Bash hook could count desktop-portal/full-screen capture commands (gnome-screenshot, screencapture without -l/-R, portal calls) and refuse past two per session; low value. |
 | Long gates run in the main session | review | - | Which agents run, and whether a sub-agent waited on a long gate, is visible only to the session that started them. |
 | Only the lock's own script waits for the lock | todo | - | A PreToolUse claude-hook could refuse a Bash command that polls a `*.lock` path in a loop (`until [ ! -d …lock ]`, `while [ -e …lock ]`). |
